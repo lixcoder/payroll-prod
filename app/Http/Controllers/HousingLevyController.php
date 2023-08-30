@@ -103,7 +103,7 @@ class HousingLevyController extends Controller
             return Redirect::back()->withErrors($validator)->withInput();
         }
 
-        $hrate->percentage = $request->input('percentage');
+        $hrate->percentage = $request('percentage');
 
         $hrate->update();
 
