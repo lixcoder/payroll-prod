@@ -92,7 +92,7 @@ class HousingLevyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update($id)
+    public function update( Request $request,$id)
     {
         $hrate = HousingLevy::findOrFail($id);
 
@@ -103,9 +103,10 @@ class HousingLevyController extends Controller
             return Redirect::back()->withErrors($validator)->withInput();
         }
 
-        $hrate->percentage = request('percentage');
+        $hrate->percentage = $request->input('percentage');
 
         $hrate->update();
+
         return Redirect::route('housinglevy.index');
     }
 
