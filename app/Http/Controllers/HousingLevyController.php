@@ -55,7 +55,7 @@ class HousingLevyController extends Controller
 
         $hrate->organization_id = '1';
 
-        $hrate->update();
+        $hrate->save();
 
         return Redirect::route('housinglevy.index');
     }
