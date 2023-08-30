@@ -18,7 +18,7 @@
                                 <div class="card-body">
 
                                 <div class="mb-2">
-                                        <a class="btn btn-info btn-sm-2" href="{{ URL::to('housinglevy/create')}}">add housing levy</a>
+                                        <a class="btn btn-info btn-sm-2"  style="float: right;" href="{{ URL::to('housinglevy/create')}}">add housing levy</a>
                                     </div>
 
                                     <div class="mb-2">
