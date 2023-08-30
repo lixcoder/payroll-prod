@@ -9,7 +9,6 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <h3>New Housing Levy</h3>
-
                             <hr>
                         </div>
                         <div class="col-lg-12">
