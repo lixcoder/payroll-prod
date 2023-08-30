@@ -93,7 +93,7 @@ class HousingLevyController extends Controller
      */
     public function update($id)
     {
-        $nrate = HousingLevy::findOrFail($id);
+        $hrate = HousingLevy::findOrFail($id);
 
         $validator = Validator::make($data = request()->all(), HousingLevy::$rules,HousingLevy::$messages);
 
