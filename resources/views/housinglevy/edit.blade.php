@@ -21,7 +21,7 @@
                                             </div>
                                         @endforeach
                                     @endif
-                                    <form method="PUT" action="{{{ URL::to('housinglevy/update/'.$hrate->id) }}}"
+                                    <form method="POST" action="{{{ URL::to('housinglevy/update/'.$hrate->id) }}}"
                                           accept-charset="UTF-8">
                                         @csrf
                                         <fieldset>
