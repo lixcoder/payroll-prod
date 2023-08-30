@@ -12,7 +12,6 @@
                             <hr>
                         </div>
                         
-
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-body">
@@ -31,7 +30,6 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-
     
                                         @foreach($hrates as $hrate)
                                             <tr>
@@ -39,7 +37,7 @@
                                                 <td>{{ $hrate->id }}</td>
                                                 <td>{{ $hrate->percentage }}</td>
                                                 <td>
-                                                                                          <div class="btn-group">
+                                                     <div class="btn-group">
                                                         <button type="button"
                                                                 class="btn btn-info btn-sm dropdown-toggle"
                                                                 data-toggle="dropdown" aria-expanded="false">
