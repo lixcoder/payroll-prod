@@ -695,7 +695,7 @@ Route::get('paye/edit/{id}', [PayeController::class, 'edit']);
 *housing levy routes
 */
 Route::resource('housinglevy', HousingLevyController::class);
-Route::post('housinglevy/update/.$hrate->id', [HousingLevyController::class, 'update']);
+Route::put('housinglevy/update/.$hrate->id', [HousingLevyController::class, 'update']);
 Route::get('housinglevy/delete/{id}', [HousingLevyController::class, 'destroy']);
 Route::get('housinglevy/edit/{id}', [HousingLevyController::class, 'edit']);
 
