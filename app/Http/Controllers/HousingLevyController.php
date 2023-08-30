@@ -116,7 +116,7 @@ class HousingLevyController extends Controller
      */
     public function destroy($id)
     {
-        NssfRates::destroy($id);
+        HousingLevy::destroy($id);
 
         return Redirect::route('housinglevy.index');
     }
