@@ -40,6 +40,7 @@ use App\Http\Controllers\LoanrepaymentsController;
 use App\Http\Controllers\NhifController;
 use App\Http\Controllers\NssfController;
 use App\Http\Controllers\PayeController;
+use App\Http\Controllers\HousingLevyController;
 use App\Http\Controllers\OccurencesController;
 use App\Http\Controllers\OccurencesettingsController;
 use App\Http\Controllers\OrganizationsController;
@@ -689,6 +690,14 @@ Route::resource('paye', PayeController::class);
 Route::post('paye/update/.$prate->id', [PayeController::class, 'update']);
 Route::get('paye/delete/{id}', [PayeController::class, 'destroy']);
 Route::get('paye/edit/{id}', [PayeController::class, 'edit']);
+
+/*
+*housing levy routes
+*/
+Route::resource('housinglevy', HousingLevyController::class);
+Route::post('housinglevy/update/.$prate->id', [HousingLevyController::class, 'update']);
+Route::get('housinglevy/delete/{id}', [HousingLevyController::class, 'destroy']);
+Route::get('housinglevy/edit/{id}', [HousingLevyController::class, 'edit']);
 
 /*
 * nhif routes
