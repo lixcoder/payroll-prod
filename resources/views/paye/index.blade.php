@@ -16,12 +16,14 @@
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-body">
+
+                                <div class="mb-2">
+                                        <a class="btn btn-info btn-sm-2"  style="float: right;" href="{{ URL::to('housinglevy/create')}}">add housing levy</a>
+                                    </div>
+
                                     <div class="mb-2">
                                         <a class="btn btn-info btn-sm-2" href="{{ URL::to('paye/create')}}">add new paye
                                             rates slab</a>
-                                    </div>
-                                    <div class="mb-2">
-                                        <a class="btn btn-info btn-sm-2" href="{{ URL::to('housinlevy/create')}}">add housing levy</a>
                                     </div>
                                     
                                     <table id="users" class="table table-condensed table-bordered table-hover">
