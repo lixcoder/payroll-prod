@@ -21,8 +21,18 @@ class AccountsController extends Controller {
      */
     public function index()
     {
-        $accounts = DB::table('x_accounts')->orderBy('code', 'asc')->simplePaginate(10);
-        return View::make('accounts.index', compact('accounts'));
+        // Retrieve logged-in user
+        $user = Auth::user();
+
+        if ($user) {
+            $accounts = DB::table('x_accounts')->where('organization_id',$user->organization_id)->orderBy('code', 'asc')->simplePaginate(10);
+            return View::make('accounts.index', compact('accounts'));
+    
+        }
+        else{
+            return redirect('login');
+        }
+
     }
 
     /*
@@ -52,7 +62,7 @@ class AccountsController extends Controller {
 
         // check if code exists
         $code = $request->get('code');
-        $code_exists = DB::table('accounts')->where('code', '=', $code)->count();
+        $code_exists = DB::table('x_accounts')->where('code', '=', $code)->count();
 
         if($code_exists >= 1){
 
@@ -60,13 +70,17 @@ class AccountsController extends Controller {
         }
         else {
 
+            $user = Auth::user();
 
             $account = new Account;
-
 
             $account->category = $request->get('category');
             $account->name = $request->get('name');
             $account->code = $request->get('code');
+
+            //Added by Dominick on 30/8/2023 to resolve errors while inserting to the table,,,
+            $account->organization_id = $user->organization_id;
+            $account->balance = 0; //Balance set to 0 by default
             if($request->get('active')){
                 $account->active = TRUE;
             }
@@ -317,14 +331,16 @@ class AccountsController extends Controller {
 
     public function showExpenses()
     {
-        $expenseAccounts = Account::select('id')->where('category', 'EXPENSE')->get()->toArray();
+        $user = Auth::user();
+        $expenseAccounts = Account::select('id')->where('category', 'EXPENSE')->where('organization_id',$user->organization_id)->get()->toArray();
         $expenses = Journal::whereIn('account_id', $expenseAccounts)->get();
         return View::make('accounts.expenses', compact('expenses'));
     }
 
     public function createExpenses()
     {
-        $expenseAccounts = Account::select('id')->where('category', 'EXPENSE')->get()->toArray();
+        $user = Auth::user();
+        $expenseAccounts = Account::select('id')->where('category', 'EXPENSE')->where('organization_id',$user->organization_id)->get()->toArray();
         $particulars = Particular::whereIn('debitaccount_id',$expenseAccounts)->get();
         foreach ($particulars as $key => $particular) {
             if ($particular->name == "Expense (Loan Insurance)" || $particular->id == '32') {
@@ -338,6 +354,9 @@ class AccountsController extends Controller {
     public function storeExpenses(Request $request)
     {
         $types = DB::table('proposal_categories')->select('name')->where('type', 'Expenditure')->get();
+        
+        //Added by Dominick on 30/08/2023 to remove error on the implode function below...
+        $types = array($types);
         $types_string = implode(",", array_map(function ($element) {
             return $element->name;
         }, $types));
@@ -367,7 +386,8 @@ class AccountsController extends Controller {
         $from=date('Y-m')."-01";
         $to=date('Y-m-t');
 
-        $incomeAccounts = Account::select('id')->where('category', 'INCOME')->get()->toArray();
+        $user = Auth::user();
+        $incomeAccounts = Account::select('id')->where('category', 'INCOME')->where('organization_id',$user->organization_id)->get()->toArray();
         $incomes = Journal::whereIn('account_id', $incomeAccounts)
             ->whereNotNull('particulars_id')->whereBetween('date',array($from,$to))->get();
         $incomeSums = array();
@@ -388,7 +408,8 @@ class AccountsController extends Controller {
 
     }
     public function createIncomes(){
-        $incomeAccounts = Account::select('id')->where('category', 'INCOME')->get()->toArray();
+        $user = Auth::user();
+        $incomeAccounts = Account::select('id')->where('category', 'INCOME')->where('organization_id',$user->organization_id)->get()->toArray();
         $particulars = Particular::whereIn('creditaccount_id',$incomeAccounts)->get();
 
         foreach ($particulars as $key => $particular) {
@@ -404,9 +425,10 @@ class AccountsController extends Controller {
         $data = $request->all();
         //credit cash account and debit bank account
         if($data['type'] == 'deposit'){
-            $credit_account = Account::where('name', 'like', '%'.'Cash Account'.'%')->pluck('id');
-            $debit_account = Account::where('name', 'like', '%'.'Bank Account'.'%')->pluck('id');
-            $particulars = Particular::where('name', 'like', '%'.'bank deposits'.'%')->first();
+            $user = Auth::user();
+            $credit_account = Account::where('name', 'like', '%'.'Cash Account'.'%')->where('organization_id',$user->organization_id)->pluck('id');
+            $debit_account = Account::where('name', 'like', '%'.'Bank Account'.'%')->where('organization_id',$user->organization_id)->pluck('id');
+            $particulars = Particular::where('name', 'like', '%'.'bank deposits'.'%')->where('organization_id',$user->organization_id)->first();
             if(empty($particulars)){
                 $particulars = new Particular;
                 $particulars->name='Bank Deposits';
@@ -459,9 +481,10 @@ class AccountsController extends Controller {
         $data = $request->all();
         //credit cash account and debit bank account
         if($data['type'] == 'payment'){
-            $credit_account = Account::where('name', 'like', '%'.'Cash Account'.'%')->pluck('id');
-            $debit_account = Account::where('name', 'like', '%'.'Bank Account'.'%')->pluck('id');
-            $particulars = Particular::where('name', 'like', '%'.'bank deposits'.'%')->first();
+            $user = Auth::user();
+            $credit_account = Account::where('name', 'like', '%'.'Cash Account'.'%')->where('organization_id',$user->organization_id)->pluck('id');
+            $debit_account = Account::where('name', 'like', '%'.'Bank Account'.'%')->where('organization_id',$user->organization_id)->pluck('id');
+            $particulars = Particular::where('name', 'like', '%'.'bank deposits'.'%')->where('organization_id',$user->organization_id)->first();
             $type='deposit';
             if(empty($particulars)){
                 $particulars = new Particular;
@@ -474,9 +497,10 @@ class AccountsController extends Controller {
 
         }//else debit cash/expense account and credit bank account
         elseif ($data['type'] == 'disbursal') {
-            $debit_account = Account::where('name', 'like', '%'.'Cash Account'.'%')->pluck('id');
-            $credit_account = Account::where('name', 'like', '%'.'Bank Account'.'%')->pluck('id');
-            $particulars = Particular::where('name', 'like', '%'.'bank withdrawals'.'%')->first();
+            $user = Auth::user();
+            $debit_account = Account::where('name', 'like', '%'.'Cash Account'.'%')->where('organization_id',$user->organization_id)->pluck('id');
+            $credit_account = Account::where('name', 'like', '%'.'Bank Account'.'%')->where('organization_id',$user->organization_id)->pluck('id');
+            $particulars = Particular::where('name', 'like', '%'.'bank withdrawals'.'%')->where('organization_id',$user->organization_id)->first();
             $type="withdraw";
             if(empty($particulars)){
                 $particulars = new Particular;

@@ -730,7 +730,7 @@ class Payroll extends Model
                     ->where('instalments', '>', 0)
                     ->where('first_day_month', '<=', $start)
                     ->where('last_day_month', '>=', $start);
-            })->get();
+            })->groupBy('instalments')->get();
 
         foreach ($total_earns as $total_earn) {
             if ($total_earn->instalments >= 1) {
@@ -780,7 +780,7 @@ class Payroll extends Model
                         ->where('job_group_id', $jgroup->id)
                         ->where('first_day_month', '<=', $start)
                         ->where('last_day_month', '>=', $start);
-                })->get();
+                })->groupBy('instalments')->get();
 
             foreach ($total_earns as $total_earn) {
                 if ($total_earn->instalments >= 1) {
@@ -808,7 +808,7 @@ class Payroll extends Model
                         ->where('job_group_id', '!=', $jgroup->id)
                         ->where('first_day_month', '<=', $start)
                         ->where('last_day_month', '>=', $start);
-                })->get();
+                })->groupBy('instalments')->get();
 
             foreach ($total_earns as $total_earn) {
                 if ($total_earn->instalments >= 1) {
@@ -847,7 +847,7 @@ class Payroll extends Model
                     ->where('instalments', '>', 0)
                     ->where('first_day_month', '<=', $start)
                     ->where('last_day_month', '>=', $start);
-            })->get();
+            })->groupBy('instalments')->get();
 
         foreach ($total_earns as $total_earn) {
             if ($total_earn->instalments >= 1) {
@@ -1205,9 +1205,11 @@ class Payroll extends Model
             $nssf_amts = DB::table('x_social_security')->get();
             foreach ($nssf_amts as $nssf_amt) {
                 $nssfLowerEarning = $nssf_amt->nssf_lower_earning;
-                $to = $nssf_amt->income_to;
+                $to = $nssf_amt->nssf_upper_earning;
+                // Added by Dominick on 3/08/2023 to remove error of undefined variable $from
+                $from = $nssf_amt->nssf_lower_earning;
                 if ($total >= $from && $total <= $to) {
-                    $nssfAmt = $nssf_amt->ss_amount_employee;
+                    $nssfAmt = $nssf_amt->max_employee_nssf;
                 }
             }
         }
@@ -1234,6 +1236,21 @@ class Payroll extends Model
         return round($nhifAmt, 2);
     }
 
+    //Housing Levy function added on31/08/2023 by Dominick
+    public static function housingLevy($id, $period){
+        $levies = DB::table('housing_levy')
+            ->select('*')
+            ->where('housing_levy.organization_id', Auth::user()->organization_id)->get();
+        
+        foreach($levies as $levy){
+            $per_levy = $levy->percentage;
+            $gross = self::gross($id, $period);
+
+            return ($per_levy/100)*$gross;
+        }
+
+    }
+
     public static function deductions($id, $deduction_id, $period)
     {
 
@@ -1243,6 +1260,7 @@ class Payroll extends Model
 
         $other_ded = 0.00;
 
+    
 
         $deds = DB::table('x_employee_deductions')
             ->join('x_employee', 'x_employee_deductions.employee_id', '=', 'x_employee.id')
@@ -1260,7 +1278,7 @@ class Payroll extends Model
                     ->where('instalments', '>', 0)
                     ->where('first_day_month', '<=', $start)
                     ->where('last_day_month', '>=', $start);
-            })->get();
+            })->groupBy('instalments')->get();
         foreach ($deds as $ded) {
             if ($ded->instalments >= 1) {
                 $other_ded = $ded->total_deduction;
@@ -1276,7 +1294,8 @@ class Payroll extends Model
 
 //        $part = explode("-", $period);
         $part = $period;
-        $start = $part[1] . "-" . $part[0] . "-01";
+        $start = $part[0] . "-" . $part[1] . "-01";
+        //$start = "2023-08-01";
         $end = date('Y-m-t', strtotime($start));
 
         $other_ded = 0.00;
@@ -1288,6 +1307,8 @@ class Payroll extends Model
             })->first();
 
         if ($type == 'management') {
+
+            
 
             $deds = DB::table('x_employee_deductions')
                 ->join('x_employee', 'x_employee_deductions.employee_id', '=', 'x_employee.id')
@@ -1307,7 +1328,7 @@ class Payroll extends Model
                         ->where('job_group_id', $jgroup->id)
                         ->where('first_day_month', '<=', $start)
                         ->where('last_day_month', '>=', $start);
-                })->get();
+                })->groupBy('instalments')->get();
             foreach ($deds as $ded) {
                 if ($ded->instalments >= 1) {
                     $other_ded = $ded->total_deduction;
@@ -1334,7 +1355,7 @@ class Payroll extends Model
                         ->where('job_group_id', '!=', $jgroup->id)
                         ->where('first_day_month', '<=', $start)
                         ->where('last_day_month', '>=', $start);
-                })->get();
+                })->groupBy('instalments')->get();
             foreach ($deds as $ded) {
                 if ($ded->instalments >= 1) {
                     $other_ded = $ded->total_deduction;
@@ -1372,7 +1393,7 @@ class Payroll extends Model
                     ->where('instalments', '>', 0)
                     ->where('first_day_month', '<=', $start)
                     ->where('last_day_month', '>=', $start);
-            })->get();
+            })->groupBy('instalments')->get();
         foreach ($deds as $ded) {
             if ($ded->instalments >= 1) {
                 $other_ded = $ded->total_deduction;
@@ -1387,7 +1408,7 @@ class Payroll extends Model
     {
         $total_deds = 0.00;
 
-        $total_deds = static::tax($id, $period) + static::nssf($id, $period) + static::nhif($id, $period) + static::deductionall($id, $period) + static::pension($id, $period);
+        $total_deds = static::tax($id, $period) + static::nssf($id, $period) + static::nhif($id, $period) + static::deductionall($id, $period) + static::pension($id, $period) + static::housingLevy($id, $period);
         return round($total_deds, 2);
 
     }
@@ -1495,9 +1516,13 @@ class Payroll extends Model
             ->where('employee_id', '=', $id)
             ->first();
 
-        $gross = $pays->taxable_income;
+        if(isset($pays->taxable_income)){
+            $gross = $pays->taxable_income;
 
-        return number_format($gross, 2);
+            return number_format($gross, 2);
+        }
+        else return 0.00;
+        
 
     }
 
@@ -1578,8 +1603,10 @@ class Payroll extends Model
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
             ->get();
+
+            
+            // ->groupBy('employee_id')
 
         foreach ($total_rels as $total_rel) {
             $rel = $total_rel->relief_name;
@@ -1620,7 +1647,6 @@ class Payroll extends Model
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
             ->get();
 
         foreach ($total_earns as $total_earn) {
@@ -1662,7 +1688,6 @@ class Payroll extends Model
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
             ->get();
 
         foreach ($total_overtimes as $total_overtime) {
@@ -1707,9 +1732,13 @@ class Payroll extends Model
             ->groupBy('employee_id')
             ->first();
 
-        $tax = $total_paye->paye;
+        if(isset($total_paye->paye)){
+            $tax = $total_paye->paye;
 
-        return number_format($tax, 2);
+            return number_format($tax, 2);
+    
+        }
+        else return 0.00;
 
     }
 
@@ -1723,8 +1752,10 @@ class Payroll extends Model
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('allowance_name')
             ->get();
+
+            
+            // ->groupBy('allowance_name')
 
         foreach ($total_tallws as $total_tallw) {
             $tallw = $total_tallw->allowance_name;
@@ -1765,8 +1796,10 @@ class Payroll extends Model
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('nontaxable_name')
             ->get();
+
+            
+            // ->groupBy('nontaxable_name')
 
         foreach ($total_nontaxes as $total_nontax) {
             $tnontax = $total_nontax->nontaxable_name;
@@ -1831,9 +1864,35 @@ class Payroll extends Model
             ->groupBy('employee_id')
             ->first();
 
-        $nhif_amt = $total_nhifs->nhif;
+        if(isset($total_nhifs->nhif)){
+            $nhif_amt = $total_nhifs->nhif;
 
-        return number_format($nhif_amt, 2);
+            return number_format($nhif_amt, 2);
+    
+        }
+        else return 0.00;
+
+    }
+    
+    public static function processedLevy($id, $period)
+    {
+
+        $levy_amt = 0.00;
+
+        $total_levies = DB::table('x_transact')
+            ->select('*')
+            ->where('organization_id', Auth::user()->organization_id)
+            ->where('financial_month_year', '=', $period)
+            ->where('employee_id', '=', $id)
+            ->first();
+
+        if(isset($total_levies->housing_levy)){
+            $levy_amt = $total_levies->housing_levy;
+
+            return number_format($levy_amt, 2);
+    
+        }
+        else return 0.00;
 
     }
 
@@ -1847,9 +1906,9 @@ class Payroll extends Model
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('deduction_name')
             ->get();
 
+            // ->groupBy('deduction_name')
         foreach ($total_deds as $total_ded) {
             $deductions = $total_ded->deduction_name;
         }
@@ -1905,16 +1964,22 @@ class Payroll extends Model
 
         $net = 0.00;
 
+        // $total_nets = DB::table('x_transact')
+        //     ->select('employee_id', DB::raw('COALESCE(sum(net),0.00) as total_net'))
+        //     ->where('organization_id', Auth::user()->organization_id)
+        //     ->where('financial_month_year', '=', $period)
+        //     ->where('employee_id', '=', $id)
+        //     ->groupBy('employee_id')
+        //     ->get();
         $total_nets = DB::table('x_transact')
-            ->select('employee_id', DB::raw('COALESCE(sum(net),0.00) as total_net'))
-            ->where('organization_id', Auth::user()->organization_id)
-            ->where('financial_month_year', '=', $period)
-            ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
-            ->get();
+        ->select('*')
+        ->where('organization_id', Auth::user()->organization_id)
+        ->where('financial_month_year', '=', $period)
+        ->where('employee_id', '=', $id)
+        ->get();
 
         foreach ($total_nets as $total_net) {
-            $net = $total_net->total_net;
+            $net = $total_net->net;
         }
 
         return number_format($net, 2);

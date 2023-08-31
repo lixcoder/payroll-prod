@@ -86,10 +86,9 @@ class AdvanceController extends Controller
      */
     public function create()
     {
-        $employees = DB::table('x_employee')
+        $employees = DB::table('x_employee')->where('x_employee.organization_id', '=', Auth::user()->organization_id)
             ->join('x_employee_deductions', 'x_employee.id', '=', 'x_employee_deductions.employee_id')
             ->where('in_employment', '=', 'Y')
-            ->where('x_employee.organization_id', '=', Auth::user()->organization_id)
             ->where('deduction_id', 1)
             ->where('instalments', '>', 0)
             ->get();
@@ -133,10 +132,9 @@ class AdvanceController extends Controller
      */
     public function store()
     {
-        $employees = DB::table('x_employee')
+        $employees = DB::table('x_employee')->where('x_employee.organization_id', '=', Auth::user()->organization_id)
             ->join('x_employee_deductions', 'x_employee.id', '=', 'x_employee_deductions.employee_id')
             ->where('in_employment', '=', 'Y')
-            ->where('organization_id', '=', Auth::user()->organization_id)
             ->where('deduction_id', 1)
             ->where('instalments', '>', 0)
             ->get();

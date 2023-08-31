@@ -3,11 +3,14 @@
 
 <?php
 //$part = explode("-", $period);
+
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 $part = $period;
 $start_date = $part[1] . "-" . $part[0] . "-01";
 $end_date = date('Y-m-t', strtotime($start_date));
 $start = date('Y-m-01', strtotime($end_date));
-
 
 $per = DB::table('x_transact')
     ->where('financial_month_year', '=', $period)
@@ -81,7 +84,6 @@ function asMoney($value)
 {
     return number_format($value, 2);
 }
-
 ?>
 @section('xara_cbs')
     @include('partials.breadcrumbs')
@@ -237,7 +239,12 @@ function asMoney($value)
                                                         <td align="right">{{ asMoney((double)App\Models\Payroll::nssf($employee->id,$period)) }}</td>
                                                         <td align="right">{{ asMoney((double)App\Models\Payroll::nhif($employee->id,$period)) }}</td>
                                                         @foreach($deductions as $deduction)
-                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::deductions($employee->id,$deduction->id,$period)) }}</td>
+                                                            @if($deduction->deduction_name=='Housing Levy')
+                                                                <td align="right">{{ asMoney((double)App\Models\Payroll::housingLevy($employee->id,$period)) }}</td>
+                                                            @endif
+                                                            @if($deduction->deduction_name!='Housing Levy')
+                                                                <td align="right">{{ asMoney((double)App\Models\Payroll::deductions($employee->id,$deduction->id,$period)) }}</td>
+                                                            @endif
                                                         @endforeach
                                                         <td align="right">{{ asMoney((double)App\Models\Payroll::pension($employee->id,$period)) }}</td>
                                                         <?php

@@ -31,6 +31,7 @@ use Zizaco\Entrust\Entrust;
 
 class PayrollController extends Controller
 {
+    // public $start = '2023-08-01';
 
     /**
      * Display a listing of branches
@@ -160,7 +161,7 @@ class PayrollController extends Controller
      */
     public function create()
     {
-
+        set_time_limit(2000);
         $unlock = Lockpayroll::where('user_id', Auth::user()->id)->where('period', request('period'))->count();
 
         if (!Auth::user()->can('reprocess_payroll') && $unlock == 0) {
@@ -192,7 +193,7 @@ class PayrollController extends Controller
                 $query->whereNull('organization_id')
                     ->orWhere('organization_id', Auth::user()->organization_id);
             })->first();
-//        dd($jgroup);
+        //        dd($jgroup);
 
         if (request('type') == 'management') {
 
@@ -217,15 +218,16 @@ class PayrollController extends Controller
         $overtimes = Overtime::all();
         $allowances = Allowance::where('organization_id', Auth::user()->organization_id)
             ->orWhereNull('organization_id')->get();
-//        dd($allowances);
+        //        dd($allowances);
         $nontaxables = Nontaxable::where('organization_id', Auth::user()->organization_id)
             ->orWhereNull('organization_id')->get();
-//        dd($nontaxables);
+        //        dd($nontaxables);
         $reliefs = Relief::where('organization_id', Auth::user()->organization_id)
             ->orWhereNull('organization_id')->get();
         $deductions = Deduction::where('organization_id', Auth::user()->organization_id)
             ->orWhereNull('organization_id')->get();
-//        print_r($accounts);
+        //        print_r($accounts);
+        // var_dump($overtimes); echo "<br><br>";
 
         Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'preview', 'previewed payroll');
 
@@ -325,7 +327,7 @@ class PayrollController extends Controller
         $postedit = request()->all();
         parse_str(request('formdata'), $postedit);
         $gross = str_replace(',', '', $postedit['gross']);
-//        dd($gross);
+        //        dd($gross);
         $paye = number_format(Payroll::payecalc($gross), 2);
         $nssf = number_format(Payroll::nssfcalc($gross), 2);
         $nhif = number_format(Payroll::nhifcalc($gross), 2);
@@ -680,7 +682,7 @@ class PayrollController extends Controller
 
             /*$nssf1 = DB::table('social_security')->whereNull('organization_id')->whereRaw($gross.' between income_from and income_to')->pluck('ss_amount_employee');
 
-    $nhif1 = DB::table('hospital_insurance')->whereNull('organization_id')->whereRaw($gross.' between income_from and income_to')->pluck('hi_amount');    */
+        $nhif1 = DB::table('hospital_insurance')->whereNull('organization_id')->whereRaw($gross.' between income_from and income_to')->pluck('hi_amount');    */
 
             $nssf1 = Payroll::nssfcalc($gross);
             $nhif1 = Payroll::nhifcalc($gross);
@@ -953,9 +955,13 @@ class PayrollController extends Controller
     public function store()
     {
      //   dd('Hello');
-        $period = request('period');
-        $start = date('Y-m-01', strtotime("01-" . $period));
-        $end = date('Y-m-t', strtotime("01-" . $period));
+        set_time_limit(3000);
+        $period = request('period');        
+        $period = explode("-", $period);
+
+
+        $start = date('Y-m-01', strtotime("01-" . $period[0].$period[1]));
+        $end = date('Y-m-t', strtotime("01-" . $period[0].$period[1]));
 
         $employees = DB::table('x_employee')
             ->where('in_employment', '=', 'Y')
@@ -1009,6 +1015,7 @@ class PayrollController extends Controller
             $payroll->relief = 1408;
             $payroll->nssf_amount = Payroll::nssf($employee->id, request('period'));
             $payroll->nhif_amount = Payroll::nhif($employee->id, request('period'));
+            $payroll->housing_levy = Payroll::housingLevy($employee->id, request('period'));
             $payroll->other_deductions = Payroll::deductionall($employee->id, request('period'));
             $payroll->total_deductions = Payroll::total_deductions($employee->id, request('period'));
             $payroll->net = Payroll::net($employee->id, request('period'));

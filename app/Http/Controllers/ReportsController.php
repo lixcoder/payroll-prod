@@ -33,7 +33,8 @@ use App\Models\Property;
 use App\Models\Savingaccount;
 use App\Models\Savingproduct;
 use App\Models\Transact;
-use Barryvdh\DomPDF\Facade as PDF;
+use Barryvdh\DomPDF\PDF;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -93,7 +94,6 @@ class ReportsController extends Controller
         }
 
         $organization = Organization::find(1);
-
         //return $members;
         if ($request->get('format') == 'pdf') {
             $pdf = PDF::loadView('pdf.memberlist', compact('members', 'organization'))->setPaper('a4');
@@ -3878,6 +3878,7 @@ class ReportsController extends Controller
 
     public function payslip(Request $request)
     {
+        set_time_limit(2000);
         $check = DB::table('x_transact')
             ->where('financial_month_year', '=', $request->get('period'))
             ->count();
@@ -3997,7 +3998,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                Audit::logaudit('Payslip', 'view', 'viewed payslip for ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $request->get('period'));
+                Audit::logaudit(Carbon::now(), 'view', 'viewed payslip for ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $request->get('period'));
 
 
                 Excel::create($save . '_' . $month . ' Payslip', function ($excel) use ($data, $nontaxables, $name, $period, $employee, $allws, $earnings, $overtimes, $rels, $deds, $pension, $organization, $currency) {
@@ -4396,17 +4397,21 @@ class ReportsController extends Controller
                 $transacts = DB::table('x_transact')
                     ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
                     ->where('financial_month_year', '=', $request->get('period'))
-                    ->where('x_employee.id', '=', $request->get('employeeid'))
                     ->where('x_employee.organization_id', Auth::user()->organization_id)
                     ->first();
 
-                Audit::logaudit('Payslip', 'view', 'viewed payslip for all employees for period ' . $request->get('period'));
-                //return view('payslips.payslips', compact('empall', 'select', 'period', 'currency', 'organization'));
-//                return view('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization'));
-                $pdf = PDF::loadView('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization', 'transacts'))->setPaper('a4');
+                    // Commented out by dominick Kyengo on 31/08/2023
+                    //->where('x_employee.id', '=', $request->get('employeeid'))
+
+                Audit::logaudit(Carbon::now(), 'view', 'viewed payslip for all employees for period ' . $request->get('period'));
+                // return view('payslips.payslips', compact('empall', 'select', 'period', 'currency', 'organization'));
+                // return view('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization'));
+                $pdf = app('dompdf.wrapper')->loadView('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization', 'transacts'))->setPaper('a4');
                 return $pdf->stream('Payslips.pdf');
 
-            } else {
+
+            } 
+            else {
                 if ($data = DB::table('x_transact')
                         ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -4523,9 +4528,9 @@ class ReportsController extends Controller
 
                     $organization = Organization::find(Auth::user()->organization_id);
 
-                    Audit::logaudit('Payslip', 'view', 'viewed payslip for ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $request->get('period'));
+                    Audit::logaudit(Carbon::now(), 'view', 'viewed payslip for ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $request->get('period'));
 
-//return view('pdf.monthlySlip', compact('nontaxables','empall','select','name','employee','transact','allws','deds','earnings','overtimes','pension','rels','period','currency', 'organization','id'));
+                    //return view('pdf.monthlySlip', compact('nontaxables','empall','select','name','employee','transact','allws','deds','earnings','overtimes','pension','rels','period','currency', 'organization','id'));
                     $pdf = PDF::loadView('pdf.monthlySlip', compact('nontaxables', 'empall', 'select', 'name', 'employee', 'transacts', 'allws', 'deds', 'earnings', 'overtimes', 'pension', 'rels', 'period', 'currency', 'organization', 'id'))->setPaper('a5');
 
                     return $pdf->stream($employee->personal_file_number . '_' . $employee->first_name . '_' . $employee->last_name . '_' . $month . '.pdf');

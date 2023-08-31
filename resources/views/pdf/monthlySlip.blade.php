@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Payslip Monthly Report</title>
     <style type="text/css">
 
         table {
@@ -73,6 +73,15 @@
     </style>
 </head>
 <body>
+    <div>
+        <?php
+
+            use App\Models\Employee;
+            use Illuminate\Support\Facades\Auth;
+
+            $empall = Employee::where('organization_id', Auth::user()->organization_id)->get();
+        ?>
+    </div>
 @foreach($empall as $emp)
     <div class="container">
         <div style="width:46%; margin:0 2%;  float:left; display:inline-block; ">
@@ -95,7 +104,7 @@
             </div>
             <div class="content">
                 <br>
-                <table class="table table-bordered" border='1' cellspacing='0' cellpadding='0' style='width:100%'>
+                <table class="table table-bordered border=1" cellspacing='0' cellpadding='0' style='width:100%'>
                     {{'<tr><td colspan="2" align="center"><strong>PERIOD : '.$period.'</strong></td></tr>'}}
                     <tr>
                         <td colspan='2'><strong>PERSONAL DETAILS</strong></td>
@@ -216,6 +225,10 @@
                     <tr>
                         <td>Nhif:</td>
                         <td align='right'>{{ App\Models\Payroll::processedNhif($emp->personal_file_number,$period) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Housing Levy:</td>
+                        <td align='right'>{{ App\Models\Payroll::processedLevy($emp->personal_file_number,$period) }}</td>
                     </tr>
 
                     @if(App\Models\Payroll::processeddeductionnames($emp->id,$period)  != null)

@@ -85,6 +85,16 @@ use Illuminate\Support\Facades\View;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+
+//Testing routes added by Dominick on 30/9/2022
+
+Route::get('/accountssenor', [AccountsController::class, 'createIncomes']);
+
+
+
+
+
 Route::get('sendEmails',[EmailController::class,'sendEmail']);
 Route::get('notifyContract',[ContractController::class,'EmployeeContracts']);
 Route::get('notofyMail',[EmailController::class,'notifyAdmin']);
