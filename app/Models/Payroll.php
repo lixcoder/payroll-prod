@@ -1207,6 +1207,7 @@ class Payroll extends Model
             foreach ($nssf_amts as $nssf_amt) {
                 $lowerEarning = $nssf_amt->nssf_lower_earning;
                 $upperEarning = $nssf_amt->nssf_upper_earning;
+                $employeeContribution=$nssf_amt->employee_contribution;
                
                 if ($total >= $lowerEarning  && $total <= $upperEarning ) {
                     $employeeContribution= $nssf_amt->$employee_contribution;
