@@ -1199,11 +1199,13 @@ class Payroll extends Model
         $nssfAmt = 0.00;
         $total = static::gross($id, $period);
         $employee = Employee::find($id);
-        if ($employee->social_security_applicable == '0') {
-            $nssfAmt = 0.00;
+        if (!$employee || $employee->social_security_applicable == '0') {
+            return $nssfAmt = 0.00;
+          
         } else {
             $nssf_amts = DB::table('x_social_security')->get();
             foreach ($nssf_amts as $nssf_amt) {
+<<<<<<< HEAD
                 $nssfLowerEarning = $nssf_amt->nssf_lower_earning;
                 $to = $nssf_amt->nssf_upper_earning;
                 // Added by Dominick on 3/08/2023 to remove error of undefined variable $from
@@ -1213,6 +1215,18 @@ class Payroll extends Model
                 }
                 else if($total > $to){
                     $nssfAmt = $nssf_amt->max_employee_nssf;
+=======
+                $lowerEarning = $nssf_amt->nssf_lower_earning;
+                $upperEarning = $nssf_amt->nssf_upper_earning;
+                $employeeContribution=$nssf_amt->employee_contribution;
+               
+                if ($total >= $lowerEarning  && $total <= $upperEarning ) {
+                    $employeeContribution= $nssf_amt->$employee_contribution;
+                    $nssfAmt=$total*($employeeContribution/100);// calculate nssf amount
+                } elseif($total>=$upperEarning){
+                    $employeeContribution= $nssf_amt->$employee_contribution;
+                    $nssfAmt=$upperEarning*($employeeContribution/100);//calculate nssf amount if it exceeds the upper limit
+>>>>>>> 284d5e7ab1e0500e14fa1fe77c10c86481c243ce
                 }
             }
         }
