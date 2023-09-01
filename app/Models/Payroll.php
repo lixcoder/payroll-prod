@@ -1204,15 +1204,15 @@ class Payroll extends Model
           
         } else {
             $nssf_amts = DB::table('x_social_security')->get();
-            foreach ($nssfData as $nssfEntry) {
-                $lowerEarning = $nssfEntry->nssf_lower_earning;
-                $upperEarning = $nssfEntry->nssf_upper_earning;
+            foreach ($nhif_amts as $nhif_amt) {
+                $lowerEarning = $nhif_amt->nssf_lower_earning;
+                $upperEarning = $nhif_amt->nssf_upper_earning;
                
                 if ($total >= $lowerEarning  && $total <= $upperEarning ) {
-                    $employeeContribution= $nssfEntry->$employee_contribution;
+                    $employeeContribution= $nhif_amt->$employee_contribution;
                     $nssfAmt=$total*($employeeContribution/100);// calculate nssf amount
                 } elseif($total>=$upperEarning){
-                    $employeeContribution= $nssfEntry->$employee_contribution;
+                    $employeeContribution= $nhif_amt->$employee_contribution;
                     $nssfAmt=$upperEarning*($employeeContribution/100);//calculate nssf amount if it exceeds the upper limit
                 }
             }
