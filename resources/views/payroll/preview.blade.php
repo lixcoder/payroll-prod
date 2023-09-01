@@ -99,7 +99,10 @@ function asMoney($value)
                                     </h3>
                                 </div>
                                 <div class="card-body">
+                                    <!-- Commented for Testing on 01/09/2023 by Dominick -->
                                     <form method="POST" action="{{{ URL::to('payroll') }}}" accept-charset="UTF-8">
+                                    <!-- <form method="POST" action="{{{ URL::to('payroll/stored1') }}}" accept-charset="UTF-8"> -->
+
                                         @csrf
                                         <div class="form-actions form-group float-right">
 
@@ -111,6 +114,7 @@ function asMoney($value)
                                         </div>
                                         <hr>
 
+                                        <?php $all_ids = []; ?>
                                         <input type="hidden" name="period" value="{{ $period }}">
                                         <input type="hidden" name="account" value="{{ $account }}">
                                         <input type="hidden" value="{{ $type }}" name="type"/>

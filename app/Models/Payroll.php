@@ -1209,6 +1209,9 @@ class Payroll extends Model
                 // Added by Dominick on 3/08/2023 to remove error of undefined variable $from
                 $from = $nssf_amt->nssf_lower_earning;
                 if ($total >= $from && $total <= $to) {
+                    $nssfAmt = (($nssf_amt->employee_contribution)/100) * $total;
+                }
+                else if($total > $to){
                     $nssfAmt = $nssf_amt->max_employee_nssf;
                 }
             }
@@ -1771,11 +1774,10 @@ class Payroll extends Model
         $tallw = 0.00;
 
         $total_tallws = DB::table('x_transact_allowances')
-            ->select('employee_id', DB::raw('COALESCE(sum(allowance_amount),0.00) as total_allowances'))
+            ->select('*')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('allowance_name')
             ->get();
 
         foreach ($total_tallws as $total_tallw) {
@@ -1836,15 +1838,14 @@ class Payroll extends Model
         $nssf_amt = 0.00;
 
         $total_nssfs = DB::table('x_transact')
-            ->select('employee_id', DB::raw('COALESCE(sum(nssf_amount),0.00) as nssf'))
+            ->select('*')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
             ->get();
 
         foreach ($total_nssfs as $total_nssf) {
-            $nssf_amt = $total_nssf->nssf;
+            $nssf_amt = $total_nssf->nssf_amount;
         }
 
         return number_format($nssf_amt, 2);
@@ -1857,15 +1858,14 @@ class Payroll extends Model
         $nhif_amt = 0.00;
 
         $total_nhifs = DB::table('x_transact')
-            ->select('employee_id', DB::raw('COALESCE(sum(nhif_amount),0.00) as nhif'))
+            ->select('*')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
             ->first();
 
-        if(isset($total_nhifs->nhif)){
-            $nhif_amt = $total_nhifs->nhif;
+        if(isset($total_nhifs->nhif_amount)){
+            $nhif_amt = $total_nhifs->nhif_amount;
 
             return number_format($nhif_amt, 2);
     
