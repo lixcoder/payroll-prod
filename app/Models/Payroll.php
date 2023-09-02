@@ -1210,10 +1210,10 @@ class Payroll extends Model
                 $employeeContribution=$nssf_amt->employee_contribution;
                
                 if ($total >= $lowerEarning  && $total <= $upperEarning ) {
-                    $employeeContribution= $nssf_amt->$employee_contribution;
+                    $employeeContribution= $nssf_amt->employee_contribution;
                     $nssfAmt=$total*($employeeContribution/100);// calculate nssf amount
                 } elseif($total>=$upperEarning){
-                    $employeeContribution= $nssf_amt->$employee_contribution;
+                    $employeeContribution= $nssf_amt->employee_contribution;
                     $nssfAmt=$upperEarning*($employeeContribution/100);//calculate nssf amount if it exceeds the upper limit
                 }
             }
@@ -1841,15 +1841,14 @@ class Payroll extends Model
         $nssf_amt = 0.00;
 
         $total_nssfs = DB::table('x_transact')
-            ->select('employee_id', DB::raw('COALESCE(sum(nssf_amount),0.00) as nssf'))
+            ->select('nssf_amount')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
             ->get();
 
         foreach ($total_nssfs as $total_nssf) {
-            $nssf_amt = $total_nssf->nssf;
+            $nssf_amt = $total_nssf->nssf_amount;
         }
 
         return number_format($nssf_amt, 2);
@@ -1862,11 +1861,11 @@ class Payroll extends Model
         $nhif_amt = 0.00;
 
         $total_nhifs = DB::table('x_transact')
-            ->select('employee_id', DB::raw('COALESCE(sum(nhif_amount),0.00) as nhif'))
+            ->select('nhif_amount')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
+           
             ->first();
 
         if(isset($total_nhifs->nhif)){
@@ -1885,7 +1884,7 @@ class Payroll extends Model
         $levy_amt = 0.00;
 
         $total_levies = DB::table('x_transact')
-            ->select('*')
+            ->select('housing_levy')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)

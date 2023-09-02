@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LicenseController;
+use App\Http\Controllers\PayrollController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::post('test',[LicenseController::class,'store']);
+Route::post('store',[PayrollController::class,'store']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
