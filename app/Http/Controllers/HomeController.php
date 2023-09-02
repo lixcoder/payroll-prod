@@ -73,7 +73,7 @@ class HomeController extends Controller
         $departments = Department::with('employees')->get();
         //Employee Type
         $employeeTypes = EType::where('organization_id',Auth::user()->organization_id)->get();
-//        dd($employeeTypes->employees);
+        //        dd($employeeTypes->employees);
         for ($i=1;$i<count($employeeTypes);$i++)
             {
                 $emps = Employee::where('type_id',$employeeTypes[$i]->id)->get();
@@ -83,4 +83,6 @@ class HomeController extends Controller
         ,'month6','month7','month8','month9','month10','month11','month12','employees','users','leaves','monthss1','monthss2','monthss3','monthss4','monthss5'
             ,'monthss6','monthss7','monthss8','monthss9','monthss10','monthss11','monthss12'));
     }
+
+
 }

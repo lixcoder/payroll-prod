@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\View;
 use Maatwebsite\Excel\Classes\PHPExcel;
 use Maatwebsite\Excel\Facades\Excel;
 use Zizaco\Entrust\Entrust;
+use Illuminate\Http\Request;
 
 class PayrollController extends Controller
 {
@@ -214,6 +215,9 @@ class PayrollController extends Controller
                 ->whereDate('date_joined', '<=', $end)
                 ->get();
         }
+
+
+
         $type = request('type');
         $account = request('account');
         $earnings = Earningsetting::where('organization_id', Auth::user()->organization_id)->orWhereNull('organization_id')->get();
@@ -937,6 +941,12 @@ class PayrollController extends Controller
      *
      * @return Response
      */
+    public function store1(Request $request){
+        echo $request->input('period'); echo "<br><br><br>";
+        echo $request->input('id');
+    }
+
+
     public function store()
     {
         //   dd('Hello');

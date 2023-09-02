@@ -606,6 +606,10 @@ Route::post('deleterow', [PayrollController::class, 'del_exist']);
 Route::post('payroll/preview', [PayrollController::class, 'create']);
 Route::post('payroll/edit{id}', [PayrollController::class, 'edit']);
 
+//Added by Dominick on 01/09/2023 for testing processing stage of the payroll generation
+Route::post('payroll/stored1', [PayrollController::class, 'store1']);
+
+
 Route::post('showrecord', [PayrollController::class, 'display']);
 Route::post('shownet', [PayrollController::class, 'disp']);
 Route::post('showgross', [PayrollController::class, 'dispgross']);

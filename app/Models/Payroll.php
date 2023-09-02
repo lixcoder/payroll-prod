@@ -1199,12 +1199,12 @@ class Payroll extends Model
         $nssfAmt = 0.00;
         $total = static::gross($id, $period);
         $employee = Employee::find($id);
-        if (!$employee || $employee->social_security_applicable == '0') {
-            return $nssfAmt = 0.00;
-          
+        if ($employee->social_security_applicable == '0') {
+            $nssfAmt = 0.00;
         } else {
             $nssf_amts = DB::table('x_social_security')->get();
             foreach ($nssf_amts as $nssf_amt) {
+<<<<<<< HEAD
                 $lowerEarning = $nssf_amt->nssf_lower_earning;
                 $upperEarning = $nssf_amt->nssf_upper_earning;
                 $employeeContribution=$nssf_amt->employee_contribution;
@@ -1215,6 +1215,17 @@ class Payroll extends Model
                 } elseif($total>=$upperEarning){
                     $employeeContribution= $nssf_amt->employee_contribution;
                     $nssfAmt=$upperEarning*($employeeContribution/100);//calculate nssf amount if it exceeds the upper limit
+=======
+                $nssfLowerEarning = $nssf_amt->nssf_lower_earning;
+                $to = $nssf_amt->nssf_upper_earning;
+                // Added by Dominick on 3/08/2023 to remove error of undefined variable $from
+                $from = $nssf_amt->nssf_lower_earning;
+                if ($total >= $from && $total <= $to) {
+                    $nssfAmt = (($nssf_amt->employee_contribution)/100) * $total;
+                }
+                else if($total > $to){
+                    $nssfAmt = $nssf_amt->max_employee_nssf;
+>>>>>>> 5010050399bea0927a6b35a2c5d53a98c25dafb5
                 }
             }
         }
@@ -1776,11 +1787,10 @@ class Payroll extends Model
         $tallw = 0.00;
 
         $total_tallws = DB::table('x_transact_allowances')
-            ->select('employee_id', DB::raw('COALESCE(sum(allowance_amount),0.00) as total_allowances'))
+            ->select('*')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('allowance_name')
             ->get();
 
         foreach ($total_tallws as $total_tallw) {
@@ -1841,7 +1851,11 @@ class Payroll extends Model
         $nssf_amt = 0.00;
 
         $total_nssfs = DB::table('x_transact')
+<<<<<<< HEAD
             ->select('nssf_amount')
+=======
+            ->select('*')
+>>>>>>> 5010050399bea0927a6b35a2c5d53a98c25dafb5
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
@@ -1861,15 +1875,22 @@ class Payroll extends Model
         $nhif_amt = 0.00;
 
         $total_nhifs = DB::table('x_transact')
+<<<<<<< HEAD
             ->select('nhif_amount')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
            
+=======
+            ->select('*')
+            ->where('organization_id', Auth::user()->organization_id)
+            ->where('financial_month_year', '=', $period)
+            ->where('employee_id', '=', $id)
+>>>>>>> 5010050399bea0927a6b35a2c5d53a98c25dafb5
             ->first();
 
-        if(isset($total_nhifs->nhif)){
-            $nhif_amt = $total_nhifs->nhif;
+        if(isset($total_nhifs->nhif_amount)){
+            $nhif_amt = $total_nhifs->nhif_amount;
 
             return number_format($nhif_amt, 2);
     
