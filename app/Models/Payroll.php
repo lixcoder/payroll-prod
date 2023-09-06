@@ -1204,18 +1204,6 @@ class Payroll extends Model
         } else {
             $nssf_amts = DB::table('x_social_security')->get();
             foreach ($nssf_amts as $nssf_amt) {
-<<<<<<< HEAD
-                $lowerEarning = $nssf_amt->nssf_lower_earning;
-                $upperEarning = $nssf_amt->nssf_upper_earning;
-                $employeeContribution=$nssf_amt->employee_contribution;
-               
-                if ($total >= $lowerEarning  && $total <= $upperEarning ) {
-                    $employeeContribution= $nssf_amt->employee_contribution;
-                    $nssfAmt=$total*($employeeContribution/100);// calculate nssf amount
-                } elseif($total>=$upperEarning){
-                    $employeeContribution= $nssf_amt->employee_contribution;
-                    $nssfAmt=$upperEarning*($employeeContribution/100);//calculate nssf amount if it exceeds the upper limit
-=======
                 $nssfLowerEarning = $nssf_amt->nssf_lower_earning;
                 $to = $nssf_amt->nssf_upper_earning;
                 // Added by Dominick on 3/08/2023 to remove error of undefined variable $from
@@ -1225,7 +1213,6 @@ class Payroll extends Model
                 }
                 else if($total > $to){
                     $nssfAmt = $nssf_amt->max_employee_nssf;
->>>>>>> 5010050399bea0927a6b35a2c5d53a98c25dafb5
                 }
             }
         }
@@ -1851,11 +1838,7 @@ class Payroll extends Model
         $nssf_amt = 0.00;
 
         $total_nssfs = DB::table('x_transact')
-<<<<<<< HEAD
-            ->select('nssf_amount')
-=======
             ->select('*')
->>>>>>> 5010050399bea0927a6b35a2c5d53a98c25dafb5
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
@@ -1875,18 +1858,10 @@ class Payroll extends Model
         $nhif_amt = 0.00;
 
         $total_nhifs = DB::table('x_transact')
-<<<<<<< HEAD
-            ->select('nhif_amount')
-            ->where('organization_id', Auth::user()->organization_id)
-            ->where('financial_month_year', '=', $period)
-            ->where('employee_id', '=', $id)
-           
-=======
             ->select('*')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
->>>>>>> 5010050399bea0927a6b35a2c5d53a98c25dafb5
             ->first();
 
         if(isset($total_nhifs->nhif_amount)){
