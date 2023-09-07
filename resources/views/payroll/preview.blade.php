@@ -138,6 +138,7 @@ function asMoney($value)
                                                         <th>{{$allowance->allowance_name}}</th>
                                                     @endforeach
                                                     <th>Gross Pay</th>
+                                                    <th>Taxable Pay</th>
                                                     @foreach($nontaxables as $nontaxable)
                                                         <th>{{$nontaxable->name}}</th>
                                                     @endforeach
@@ -187,6 +188,7 @@ function asMoney($value)
                                                         ?>
                                                         <td align="right">{{ App\Models\Payroll::basicpay($employee->id,request('period')) }}</td>
 
+
                                                         @foreach($earnings as $earning)
                                                             <td align="right">{{ asMoney((double)App\Models\Payroll::earnings($employee->id,$earning->id,$period)) }}</td>
                                                         @endforeach
@@ -227,12 +229,14 @@ function asMoney($value)
                                                         <td align="right">
                                                             <strong>{{ asMoney((double)App\Models\Payroll::gross($employee->id,$period)) }}</strong>
                                                         </td>
+                                                                                                                <td align="right">{{ App\Models\Payroll::taxablePay($employee->id,request('period')) }}</td>
                                                         @foreach($nontaxables as $nontaxable)
                                                             <td align="right">{{ asMoney((double)App\Models\Payroll::nontaxables($employee->id,$nontaxable->id,$period)) }}</td>
                                                         @endforeach
                                                         <td align="right">{{ asMoney((double)App\Models\Payroll::totaltax($employee->id,$period)) }}</td>
                                                         @if($employee->income_tax_applicable == 1 && (double)App\Models\Payroll::gross($employee->id,$period)>=11180 && $employee->income_tax_relief_applicable == 1)
-                                                            <td align="right">{{ asMoney('1408') }}</td>
+                                                            <td align="right">{{ asMoney('2400') }}</td>
+                                                            
                                                         @else
                                                             <td align="right">{{ asMoney('0.00') }}</td>
                                                         @endif

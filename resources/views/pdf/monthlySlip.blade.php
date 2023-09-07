@@ -100,6 +100,7 @@
                             {{ nl2br($organization->address)}}
                         </td>
                     </tr>
+                    <tr><td colspan="2" align="center"><strong>PAYROLL FOR PERIOD : {{ $period }}</strong></td></tr>
                 </table>
             </div>
             <div class="content">
@@ -189,7 +190,13 @@
                     @else
                     @endif
                     <tr>
-                        <td><strong>GROSS PAY: </strong></td>
+                        <td><strong>NSSF: </strong></td>
+                        <td align='right'>
+                            <strong>{{ App\Models\Payroll::processedNssf($emp->personal_file_number,$period) }}</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Taxable Pay: </strong></td>
                         <td align='right'>
                             <strong>{{ App\Models\Payroll::processedgross($emp->personal_file_number,$period) }}</strong>
                         </td>
@@ -209,6 +216,21 @@
                         </tr>
                     @else
                     @endif
+                    
+                    <tr>
+                        <td>Gross Tax:</td>
+                        <td align='right'>{{ App\Models\Payroll::processedgrosstax($emp->personal_file_number,$period) }}</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Personal Relief:</td>
+                        <td align='right'>{{ App\Models\Payroll::processedpersonalrelief($emp->personal_file_number,$period) }}</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>Insurance Relief:</td>
+                        <td align='right'>{{ App\Models\Payroll::processedinsurancerelief($emp->personal_file_number,$period) }}</td>
+                    </tr>
 
                     <tr>
                         <td><strong>DEDUCTIONS</strong>
@@ -218,10 +240,7 @@
                         <td>Paye:</td>
                         <td align='right'>{{ App\Models\Payroll::processedpaye($emp->personal_file_number,$period) }}</td>
                     </tr>
-                    <tr>
-                        <td>Nssf:</td>
-                        <td align='right'>{{ App\Models\Payroll::processedNssf($emp->personal_file_number,$period) }}</td>
-                    </tr>
+                    
                     <tr>
                         <td>Nhif:</td>
                         <td align='right'>{{ App\Models\Payroll::processedNhif($emp->personal_file_number,$period) }}</td>

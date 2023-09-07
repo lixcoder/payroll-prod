@@ -1,4 +1,6 @@
-<?php namespace App\Http\Controllers;
+<?php
+
+namespace App\Http\Controllers;
 
 use App\Models\Account;
 use App\Models\Allowance;
@@ -50,18 +52,18 @@ class PayrollController extends Controller
             $query->whereNull('organization_id')
                 ->orWhere('organization_id', Auth::user()->organization_id);
         })->get();
-//        if ($jgroup != null) {
-//            $type = Employee::where('organization_id', Auth::user()->organization_id)->where('job_group_id', $jgroup->id)->where('personal_file_number', Auth::user()->username)->count();
-//        } else {
-//            $type = Employee::where('organization_id', Auth::user()->organization_id)->/*where('job_group_id',$jgroup->id)->*/ where('personal_file_number', Auth::user()->username)->count();
-//        }
+        //        if ($jgroup != null) {
+        //            $type = Employee::where('organization_id', Auth::user()->organization_id)->where('job_group_id', $jgroup->id)->where('personal_file_number', Auth::user()->username)->count();
+        //        } else {
+        //            $type = Employee::where('organization_id', Auth::user()->organization_id)->/*where('job_group_id',$jgroup->id)->*/ where('personal_file_number', Auth::user()->username)->count();
+        //        }
         return View::make('payroll.index', compact('accounts', 'jgroups'));
     }
 
     public function unlockindex()
     {
         DB::statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
-//        $transacts = DB::table('x_transact')->where('organization_id', Auth::user()->organization_id)->orderBy('id', 'Desc')->simplepaginate(10);
+        //        $transacts = DB::table('x_transact')->where('organization_id', Auth::user()->organization_id)->orderBy('id', 'Desc')->simplepaginate(10);
         $transacts = DB::table('x_transact')->where('organization_id', Auth::user()->organization_id)->groupBy('financial_month_year', 'id', 'organization_id')->orderBy('id', 'Desc')->simplepaginate(10);
 
         return View::make('payroll.unlockindex', compact('transacts'));
@@ -110,13 +112,15 @@ class PayrollController extends Controller
     public function createaccount()
     {
         $postaccount = request()->all();
-        $data = array('name' => $postaccount['name'],
+        $data = array(
+            'name' => $postaccount['name'],
             'code' => $postaccount['code'],
             'category' => $postaccount['category'],
             'active' => 1,
             'organization_id' => Auth::user()->organization_id,
             'created_at' => DB::raw('NOW()'),
-            'updated_at' => DB::raw('NOW()'));
+            'updated_at' => DB::raw('NOW()')
+        );
         $check = DB::table('x_accounts')->insertGetId($data);
 
         if ($check > 0) {
@@ -126,7 +130,6 @@ class PayrollController extends Controller
         } else {
             return 1;
         }
-
     }
 
     public function preview_payroll()
@@ -360,7 +363,6 @@ class PayrollController extends Controller
         echo json_encode(array("paye" => $paye, "nssf" => $nssf, "nhif" => $nhif));
         //return $display;
         exit();
-
     }
 
 
@@ -384,7 +386,6 @@ class PayrollController extends Controller
         }
 
         return round($gross, 2);
-
     }
 
 
@@ -484,7 +485,6 @@ class PayrollController extends Controller
 
                     // call cell manipulation methods
                     $r->setFontWeight('bold');
-
                 });
 
                 $row = 4;
@@ -500,67 +500,57 @@ class PayrollController extends Controller
 
                         // manipulate the cell
                         $cell->setAlignment('right');
-
                     });
 
                     $sheet->cell('D' . $row, function ($cell) {
 
                         // manipulate the cell
                         $cell->setAlignment('right');
-
                     });
 
                     $sheet->cell('E' . $row, function ($cell) {
 
                         // manipulate the cell
                         $cell->setAlignment('right');
-
                     });
 
                     $sheet->cell('F' . $row, function ($cell) {
 
                         // manipulate the cell
                         $cell->setAlignment('right');
-
                     });
 
                     $sheet->cell('G' . $row, function ($cell) {
 
                         // manipulate the cell
                         $cell->setAlignment('right');
-
                     });
 
                     $sheet->cell('H' . $row, function ($cell) {
 
                         // manipulate the cell
                         $cell->setAlignment('right');
-
                     });
 
                     $sheet->cell('I' . $row, function ($cell) {
 
                         // manipulate the cell
                         $cell->setAlignment('right');
-
                     });
 
                     $sheet->cell('J' . $row, function ($cell) {
 
                         // manipulate the cell
                         $cell->setAlignment('right');
-
                     });
 
                     $sheet->cell('K' . $row, function ($cell) {
 
                         // manipulate the cell
                         $cell->setAlignment('right');
-
                     });
 
                     $row++;
-
                 }
                 /*$sheet->row($row, array(
              '','Total: ',number_format(floatval($total_pay), 2),number_format(floatval($total_earning), 2),number_format(floatval($total_gross), 2),number_format(floatval($total_paye), 2),number_format(floatval($total_nssf), 2),number_format(floatval($total_nhif), 2),number_format(floatval($total_others), 2),number_format(floatval($total_deds), 2),number_format(floatval($total_net), 2)
@@ -649,9 +639,7 @@ class PayrollController extends Controller
                 $cell->setAlignment('right');
 
               });*/
-
             });
-
         })->download('xls');
     }
 
@@ -659,7 +647,6 @@ class PayrollController extends Controller
     {
 
         return number_format($value, 2);
-
     }
 
     public function dispgross()
@@ -682,7 +669,7 @@ class PayrollController extends Controller
         $nssf1 = 0;
         $nhif1 = 0;
 
-        for ($i = $net; ; $i--) {
+        for ($i = $net;; $i--) {
 
             /*$nssf1 = DB::table('social_security')->whereNull('organization_id')->whereRaw($gross.' between income_from and income_to')->pluck('ss_amount_employee');
 
@@ -835,7 +822,7 @@ class PayrollController extends Controller
             $daily = number_format(Payroll::overtimes($employee->id, 'Hourly', $fperiod), 2);
             $gross = number_format(Payroll::gross($employee->id, $fperiod), 2);
             $tax = number_format(Payroll::totaltax($employee->id, $fperiod), 2);
-            if ($employee->income_tax_applicable == 1 && (double)Payroll::gross($employee->id, $fperiod) >= 11180 && $employee->income_tax_relief_applicable == 1) {
+            if ($employee->income_tax_applicable == 1 && (float)Payroll::gross($employee->id, $fperiod) >= 11180 && $employee->income_tax_relief_applicable == 1) {
                 $taxrelief = number_format('1408', 2);
             } else {
                 $taxrelief = number_format('0.00', 2);
@@ -847,20 +834,20 @@ class PayrollController extends Controller
             $total_deductions = number_format(Payroll::total_deductions($employee->id, $fperiod), 2);
             $net = number_format(Payroll::net($employee->id, $fperiod), 2);
 
-            $totalsalary = $totalsalary + (double)Payroll::basicpay($employee->id, Input::get('period'));
-            $totalhourly = $totalhourly + (double)Payroll::overtimes($employee->id, 'Hourly', $fperiod);
-            $totaldaily = $totaldaily + (double)Payroll::overtimes($employee->id, 'Daily', $fperiod);
-            $totalgross = $totalgross + (double)Payroll::gross($employee->id, $fperiod);
-            $totaltax = $totaltax + (double)Payroll::totaltax($employee->id, $fperiod);
-            if ($employee->income_tax_applicable == 1 && (double)Payroll::gross($employee->id, $fperiod) >= 11180 && $employee->income_tax_relief_applicable == 1) {
+            $totalsalary = $totalsalary + (float)Payroll::basicpay($employee->id, Input::get('period'));
+            $totalhourly = $totalhourly + (float)Payroll::overtimes($employee->id, 'Hourly', $fperiod);
+            $totaldaily = $totaldaily + (float)Payroll::overtimes($employee->id, 'Daily', $fperiod);
+            $totalgross = $totalgross + (float)Payroll::gross($employee->id, $fperiod);
+            $totaltax = $totaltax + (float)Payroll::totaltax($employee->id, $fperiod);
+            if ($employee->income_tax_applicable == 1 && (float)Payroll::gross($employee->id, $fperiod) >= 11180 && $employee->income_tax_relief_applicable == 1) {
                 $totaltaxrelief = $totaltaxrelief + 1408;
             }
-            $totalpaye = $totalpaye + (double)Payroll::tax($employee->id, $fperiod);
-            $totalnssf = $totalnssf + (double)Payroll::nssf($employee->id, $fperiod);
-            $totalnhif = $totalnhif + (double)Payroll::nhif($employee->id, $fperiod);
-            $totalpension = $totalpension + (double)Payroll::pension($employee->id, $fperiod);
-            $totaldeduction = $totaldeduction + (double)Payroll::total_deductions($employee->id, $fperiod);
-            $totalnet = $totalnet + (double)Payroll::net($employee->id, $fperiod);
+            $totalpaye = $totalpaye + (float)Payroll::tax($employee->id, $fperiod);
+            $totalnssf = $totalnssf + (float)Payroll::nssf($employee->id, $fperiod);
+            $totalnhif = $totalnhif + (float)Payroll::nhif($employee->id, $fperiod);
+            $totalpension = $totalpension + (float)Payroll::pension($employee->id, $fperiod);
+            $totaldeduction = $totaldeduction + (float)Payroll::total_deductions($employee->id, $fperiod);
+            $totalnet = $totalnet + (float)Payroll::net($employee->id, $fperiod);
 
             $display .= "
         <tr>
@@ -904,7 +891,6 @@ class PayrollController extends Controller
 
           </tr>";
             $i++;
-
         }
 
         $display .= "<tr style='background:#EEE;'>
@@ -913,42 +899,41 @@ class PayrollController extends Controller
           <td align='right'><strong>Totals</strong></td>
           <td align='right'><strong>" . number_format($totalsalary, 2) . "</strong></td>";
         foreach ($earnings as $earning) {
-            $totalearning . $earning->id = $totalearning + (double)Payroll::totalearnings($earning->id, $fperiod, '');
+            $totalearning . $earning->id = $totalearning + (float)Payroll::totalearnings($earning->id, $fperiod, '');
             $display .= "<td align='right'><strong>" . number_format($totalearning . $earning->id, 2) . "</strong></td>";
         }
         $display .= "<td align='right'><strong>" . number_format($totalhourly, 2) . "</strong></td>
            <td align='right'><strong>" . number_format($totaldaily, 2) . "</strong></td>";
         foreach ($allowances as $allowance) {
-            $totalallowance . $allowance->id = $totalallowance + (double)Payroll::totalallowances($allowance->id, $fperiod, '');
+            $totalallowance . $allowance->id = $totalallowance + (float)Payroll::totalallowances($allowance->id, $fperiod, '');
             $display .= "<td align='right'><strong>" . number_format($totalallowance . $allowance->id, 2) . "</strong></td>";
         }
 
         $display .= "<td align='right'><strong>" . number_format($totalgross, 2) . "</strong></td>";
         foreach ($nontaxables as $nontaxable) {
-            $totalnontaxable . $nontaxable->id = $totalnontaxable + (double)Payroll::totalnontaxable($nontaxable->id, $fperiod, '');
+            $totalnontaxable . $nontaxable->id = $totalnontaxable + (float)Payroll::totalnontaxable($nontaxable->id, $fperiod, '');
             $display .= "<td align='right'><strong>" . number_format($totalnontaxable . $nontaxable->id, 2) . "</strong></td>";
         }
         $display .= "<td align='right'><strong>$totaltax</strong></td>
           <td align='right'><strong>" . number_format($totaltaxrelief, 2) . "</strong></td>";
         foreach ($reliefs as $relief) {
-            $totalrelief . $relief->id = $totalrelief + (double)Payroll::totalreliefs($relief->id, $fperiod, '');
+            $totalrelief . $relief->id = $totalrelief + (float)Payroll::totalreliefs($relief->id, $fperiod, '');
             $display .= "<td align='right'><strong>" . number_format($totalrelief . $relief->id, 2) . "</strong></td>";
         }
         $display .= "<td align='right'><strong>" . number_format($totalpaye, 2) . "</strong></td>
           <td align='right'><strong>" . number_format($totalnssf, 2) . "</strong></td>
           <td align='right'><strong>" . number_format($totalnhif, 2) . "</strong></td>";
         foreach ($deductions as $deduction) {
-            $otherdeduction . $deduction->id = $otherdeduction + (double)Payroll::totaldeductions($deduction->id, $fperiod, '');
+            $otherdeduction . $deduction->id = $otherdeduction + (float)Payroll::totaldeductions($deduction->id, $fperiod, '');
             $display .= "<td align='right'><strong>" . number_format($otherdeduction . $deduction->id, 2) . "</strong></td>";
         }
-        $display .= "<td align='right'><strong>" . number_format((double)Payroll::pension($employee->id, $fperiod), 2) . "</strong></td><td align='right'><strong>" . number_format($totaldeduction, 2) . "</strong></td>
+        $display .= "<td align='right'><strong>" . number_format((float)Payroll::pension($employee->id, $fperiod), 2) . "</strong></td><td align='right'><strong>" . number_format($totaldeduction, 2) . "</strong></td>
           <td align='right'><strong>" . number_format($totalnet, 2) . "</strong></td>
         </tr>
         ";
 
         return $display;
         exit();
-
     }
 
     /**
@@ -964,14 +949,14 @@ class PayrollController extends Controller
 
     public function store()
     {
-     //   dd('Hello');
+        //   dd('Hello');
         set_time_limit(3000);
-        $period = request('period');        
+        $period = request('period');
         $period = explode("-", $period);
 
 
-        $start = date('Y-m-01', strtotime("01-" . $period[0].$period[1]));
-        $end = date('Y-m-t', strtotime("01-" . $period[0].$period[1]));
+        $start = date('Y-m-01', strtotime("01-" . $period[0] . $period[1]));
+        $end = date('Y-m-t', strtotime("01-" . $period[0] . $period[1]));
 
         $employees = DB::table('x_employee')
             ->where('in_employment', '=', 'Y')
@@ -1009,36 +994,84 @@ class PayrollController extends Controller
                 ->whereDate('date_joined', '<=', $end)
                 ->get();
         }
+
+
+
+
+
         foreach ($employees as $employee) {
-            $payroll = new Payroll;
 
-            $payroll->employee_id = $employee->personal_file_number;
-            $payroll->employeeId = $employee->id;
+            $organization_id = Auth::user()->organization_id;
+            $query = Payroll::select('*')
+                ->where('organization_id', $organization_id)
+                ->Where('financial_month_year', request('period'))
+                ->Where('employee_id', $employee->personal_file_number)
+                ->get();
+            if ($query == true) {
 
-            $payroll->user_id = Auth::user()->id;
+                foreach ($query as $q) {
+                    $q->delete();
+                }
+                    $payroll = new Payroll;
+                    $payroll->employee_id = $employee->personal_file_number;
+                    $payroll->employeeId = $employee->id;
+                    $payroll->user_id = Auth::user()->id;
+                    $payroll->basic_pay = Payroll::basicpay($employee->id, request('period'));
+                    $payroll->earning_amount = Payroll::total_benefits($employee->id, request('period'));
+                    $payroll->taxable_income = Payroll::taxablePay($employee->id, request('period'));
+                    $payroll->gross_tax = Payroll::totaltax($employee->id, request('period'));
+                    $payroll->paye = Payroll::tax($employee->id, request('period'));
+                    $payroll->insurance_relief = Payroll::insuranceRelief($employee->id, request('period'));
+                    $payroll->relief = 2400;
+                    $payroll->nssf_amount = Payroll::nssf($employee->id, request('period'));
+                    $payroll->nhif_amount = Payroll::nhif($employee->id, request('period'));
+                    $payroll->housing_levy = Payroll::housingLevy($employee->id, request('period'));
+                    $payroll->other_deductions = Payroll::deductionall($employee->id, request('period'));
+                    $payroll->total_deductions = Payroll::total_deductions($employee->id, request('period'));
+                    $payroll->net = Payroll::net($employee->id, request('period'));
+                    $payroll->financial_month_year = request('period');
+                    $payroll->account_id = request('account');
+                    $payroll->process_type = request('type');
+                    $payroll->organization_id = Auth::user()->organization_id;
+                    $payroll->save();
+                    //Crons
+                    $email = new Email();
+                    $email->employee_id = $employee->id;
+                    $email->organization_id = Auth::user()->organization_id;
+                    $email->save();
+                
+            } else {
+                $payroll = new Payroll;
+                $payroll->employee_id = $employee->personal_file_number;
+                $payroll->employeeId = $employee->id;
 
-            $payroll->basic_pay = Payroll::basicpay($employee->id, request('period'));
+                $payroll->user_id = Auth::user()->id;
 
-            $payroll->earning_amount = Payroll::total_benefits($employee->id, request('period'));
-            $payroll->taxable_income = Payroll::gross($employee->id, request('period'));
-            $payroll->paye = Payroll::tax($employee->id, request('period'));
-            $payroll->relief = 1408;
-            $payroll->nssf_amount = Payroll::nssf($employee->id, request('period'));
-            $payroll->nhif_amount = Payroll::nhif($employee->id, request('period'));
-            $payroll->housing_levy = Payroll::housingLevy($employee->id, request('period'));
-            $payroll->other_deductions = Payroll::deductionall($employee->id, request('period'));
-            $payroll->total_deductions = Payroll::total_deductions($employee->id, request('period'));
-            $payroll->net = Payroll::net($employee->id, request('period'));
-            $payroll->financial_month_year = request('period');
-            $payroll->account_id = request('account');
-            $payroll->process_type = request('type');
-            $payroll->organization_id = Auth::user()->organization_id;
-            $payroll->save();
-            //Crons
-            $email = new Email();
-            $email->employee_id = $employee->id;
-            $email->organization_id = Auth::user()->organization_id;
-            $email->save();
+                $payroll->basic_pay = Payroll::basicpay($employee->id, request('period'));
+
+                $payroll->earning_amount = Payroll::total_benefits($employee->id, request('period'));
+                $payroll->taxable_income = Payroll::gross($employee->id, request('period'));
+                $payroll->gross_tax = Payroll::totaltax($employee->id, request('period'));
+                $payroll->paye = Payroll::tax($employee->id, request('period'));                
+                $payroll->insurance_relief = Payroll::insuranceRelief($employee->id, request('period'));
+                $payroll->relief = 2400;
+                $payroll->nssf_amount = Payroll::nssf($employee->id, request('period'));
+                $payroll->nhif_amount = Payroll::nhif($employee->id, request('period'));
+                $payroll->housing_levy = Payroll::housingLevy($employee->id, request('period'));
+                $payroll->other_deductions = Payroll::deductionall($employee->id, request('period'));
+                $payroll->total_deductions = Payroll::total_deductions($employee->id, request('period'));
+                $payroll->net = Payroll::net($employee->id, request('period'));
+                $payroll->financial_month_year = request('period');
+                $payroll->account_id = request('account');
+                $payroll->process_type = request('type');
+                $payroll->organization_id = Auth::user()->organization_id;
+                $payroll->save();
+                //Crons
+                $email = new Email();
+                $email->employee_id = $employee->id;
+                $email->organization_id = Auth::user()->organization_id;
+                $email->save();
+            }
         }
 
 
@@ -1095,7 +1128,8 @@ class PayrollController extends Controller
             if ($count_a > 0) {
                 foreach ($allws as $allw) {
                     DB::table('transact_allowances')->insert(
-                        ['employee_id' => $allw->eid,
+                        [
+                            'employee_id' => $allw->eid,
                             'employee_allowance_id' => $allw->id,
                             'organization_id' => Auth::user()->organization_id,
                             'allowance_name' => $allw->allowance_name,
@@ -1118,7 +1152,6 @@ class PayrollController extends Controller
                     ->where('job_group_id', $jgroup->id)
                     ->where('employee.organization_id', Auth::user()->organization_id)
                     ->decrement('instalments');
-
             }
 
 
@@ -1165,7 +1198,8 @@ class PayrollController extends Controller
             if ($count_ntax > 0) {
                 foreach ($nontaxes as $nontax) {
                     DB::table('transact_nontaxables')->insert(
-                        ['employee_id' => $nontax->eid,
+                        [
+                            'employee_id' => $nontax->eid,
                             'organization_id' => Auth::user()->organization_id,
                             'employee_nontaxable_id' => $nontax->id,
                             'nontaxable_name' => $nontax->name,
@@ -1188,7 +1222,6 @@ class PayrollController extends Controller
                     })
                     ->where('instalments', '>', 0)
                     ->decrement('instalments');
-
             }
 
             $deds = DB::table('x_employee_deductions')
@@ -1234,7 +1267,8 @@ class PayrollController extends Controller
             if ($count > 0) {
                 foreach ($deds as $ded) {
                     DB::table('transact_deductions')->insert(
-                        ['employee_id' => $ded->eid,
+                        [
+                            'employee_id' => $ded->eid,
                             'organization_id' => Auth::user()->organization_id,
                             'employee_deduction_id' => $ded->id,
                             'deduction_name' => $ded->deduction_name,
@@ -1257,7 +1291,6 @@ class PayrollController extends Controller
                     })
                     ->where('instalments', '>', 0)
                     ->decrement('instalments');
-
             }
 
 
@@ -1307,7 +1340,8 @@ class PayrollController extends Controller
 
                 foreach ($pensions as $pension) {
                     DB::table('transact_pensions')->insert(
-                        ['employee_id' => $pension->employee_id,
+                        [
+                            'employee_id' => $pension->employee_id,
                             'organization_id' => Auth::user()->organization_id,
                             'employee_amount' => $pension->employee_contribution,
                             'employer_amount' => $pension->employer_contribution,
@@ -1319,7 +1353,6 @@ class PayrollController extends Controller
                         ]
                     );
                 }
-
             }
 
 
@@ -1367,7 +1400,8 @@ class PayrollController extends Controller
             if ($ct > 0) {
                 foreach ($earns as $earn) {
                     DB::table('transact_earnings')->insert(
-                        ['employee_id' => $earn->employee_id,
+                        [
+                            'employee_id' => $earn->employee_id,
                             'earning_id' => $earn->id,
                             'organization_id' => Auth::user()->organization_id,
                             'earning_name' => $earn->earning_name,
@@ -1389,7 +1423,6 @@ class PayrollController extends Controller
                     })
                     ->where('instalments', '>', 0)
                     ->decrement('instalments');
-
             }
 
             $overtimes = DB::table('x_overtimes')
@@ -1435,7 +1468,8 @@ class PayrollController extends Controller
 
                 foreach ($overtimes as $overtime) {
                     DB::table('transact_overtimes')->insert(
-                        ['employee_id' => $overtime->employee_id,
+                        [
+                            'employee_id' => $overtime->employee_id,
                             'organization_id' => Auth::user()->organization_id,
                             'overtime_type' => $overtime->type,
                             'overtime_id' => $overtime->id,
@@ -1458,7 +1492,6 @@ class PayrollController extends Controller
                     })
                     ->where('instalments', '>', 0)
                     ->decrement('instalments');
-
             }
 
             $rels = DB::table('x_employee_relief')
@@ -1473,7 +1506,8 @@ class PayrollController extends Controller
 
             foreach ($rels as $rel) {
                 DB::table('transact_reliefs')->insert(
-                    ['employee_id' => $rel->eid,
+                    [
+                        'employee_id' => $rel->eid,
                         'organization_id' => Auth::user()->organization_id,
                         'employee_relief_id' => $rel->id,
                         'relief_name' => $rel->relief_name,
@@ -1528,7 +1562,8 @@ class PayrollController extends Controller
             if ($count_a > 0) {
                 foreach ($allws as $allw) {
                     DB::table('transact_allowances')->insert(
-                        ['employee_id' => $allw->eid,
+                        [
+                            'employee_id' => $allw->eid,
                             'employee_allowance_id' => $allw->id,
                             'organization_id' => Auth::user()->organization_id,
                             'allowance_name' => $allw->allowance_name,
@@ -1551,7 +1586,6 @@ class PayrollController extends Controller
                     ->where('job_group_id', '!=', $jgroup->id)
                     ->where('employee.organization_id', Auth::user()->organization_id)
                     ->decrement('instalments');
-
             }
 
 
@@ -1598,7 +1632,8 @@ class PayrollController extends Controller
             if ($count_ntax > 0) {
                 foreach ($nontaxes as $nontax) {
                     DB::table('transact_nontaxables')->insert(
-                        ['employee_id' => $nontax->eid,
+                        [
+                            'employee_id' => $nontax->eid,
                             'organization_id' => Auth::user()->organization_id,
                             'employee_nontaxable_id' => $nontax->id,
                             'nontaxable_name' => $nontax->name,
@@ -1621,7 +1656,6 @@ class PayrollController extends Controller
                     })
                     ->where('instalments', '>', 0)
                     ->decrement('instalments');
-
             }
 
             $deds = DB::table('x_employee_deductions')
@@ -1668,7 +1702,8 @@ class PayrollController extends Controller
             if ($count > 0) {
                 foreach ($deds as $ded) {
                     DB::table('transact_deductions')->insert(
-                        ['employee_id' => $ded->eid,
+                        [
+                            'employee_id' => $ded->eid,
                             'organization_id' => Auth::user()->organization_id,
                             'employee_deduction_id' => $ded->id,
                             'deduction_name' => $ded->deduction_name,
@@ -1691,7 +1726,6 @@ class PayrollController extends Controller
                     })
                     ->where('instalments', '>', 0)
                     ->decrement('instalments');
-
             }
 
             $part = explode("-", request('period'));
@@ -1740,7 +1774,8 @@ class PayrollController extends Controller
 
                 foreach ($pensions as $pension) {
                     DB::table('x_transact_pensions')->insert(
-                        ['employee_id' => $pension->employee_id,
+                        [
+                            'employee_id' => $pension->employee_id,
                             'organization_id' => Auth::user()->organization_id,
                             'employee_amount' => $pension->employee_contribution,
                             'employer_amount' => $pension->employer_contribution,
@@ -1752,7 +1787,6 @@ class PayrollController extends Controller
                         ]
                     );
                 }
-
             }
 
 
@@ -1799,7 +1833,8 @@ class PayrollController extends Controller
             if ($ct > 0) {
                 foreach ($earns as $earn) {
                     DB::table('transact_earnings')->insert(
-                        ['employee_id' => $earn->employee_id,
+                        [
+                            'employee_id' => $earn->employee_id,
                             'earning_id' => $earn->id,
                             'organization_id' => Auth::user()->organization_id,
                             'earning_name' => $earn->earning_name,
@@ -1821,7 +1856,6 @@ class PayrollController extends Controller
                     })
                     ->where('instalments', '>', 0)
                     ->decrement('instalments');
-
             }
 
             $overtimes = DB::table('x_overtimes')
@@ -1867,7 +1901,8 @@ class PayrollController extends Controller
 
                 foreach ($overtimes as $overtime) {
                     DB::table('x_transact_overtimes')->insert(
-                        ['employee_id' => $overtime->employee_id,
+                        [
+                            'employee_id' => $overtime->employee_id,
                             'organization_id' => Auth::user()->organization_id,
                             'overtime_type' => $overtime->type,
                             'overtime_id' => $overtime->id,
@@ -1890,7 +1925,6 @@ class PayrollController extends Controller
                     })
                     ->where('instalments', '>', 0)
                     ->decrement('instalments');
-
             }
 
             $rels = DB::table('x_employee_relief')
@@ -1905,7 +1939,8 @@ class PayrollController extends Controller
 
             foreach ($rels as $rel) {
                 DB::table('x_transact_reliefs')->insert(
-                    ['employee_id' => $rel->eid,
+                    [
+                        'employee_id' => $rel->eid,
                         'organization_id' => Auth::user()->organization_id,
                         'employee_relief_id' => $rel->id,
                         'relief_name' => $rel->relief_name,
@@ -1922,8 +1957,6 @@ class PayrollController extends Controller
         Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'process', 'processed payroll for ' . $period);
 
         return Redirect::route('payroll.index')->withFlashMessage('Payroll successfully processed!');
-
-
     }
 
 
@@ -1987,5 +2020,4 @@ class PayrollController extends Controller
 
         return Redirect::route('deductions.index');
     }
-
 }
