@@ -1018,9 +1018,11 @@ class PayrollController extends Controller
                     $payroll->user_id = Auth::user()->id;
                     $payroll->basic_pay = Payroll::basicpay($employee->id, request('period'));
                     $payroll->earning_amount = Payroll::total_benefits($employee->id, request('period'));
-                    $payroll->taxable_income = Payroll::gross($employee->id, request('period'));
+                    $payroll->taxable_income = Payroll::taxablePay($employee->id, request('period'));
+                    $payroll->gross_tax = Payroll::totaltax($employee->id, request('period'));
                     $payroll->paye = Payroll::tax($employee->id, request('period'));
-                    $payroll->relief = 1408;
+                    $payroll->insurance_relief = Payroll::insuranceRelief($employee->id, request('period'));
+                    $payroll->relief = 2400;
                     $payroll->nssf_amount = Payroll::nssf($employee->id, request('period'));
                     $payroll->nhif_amount = Payroll::nhif($employee->id, request('period'));
                     $payroll->housing_levy = Payroll::housingLevy($employee->id, request('period'));
@@ -1049,8 +1051,10 @@ class PayrollController extends Controller
 
                 $payroll->earning_amount = Payroll::total_benefits($employee->id, request('period'));
                 $payroll->taxable_income = Payroll::gross($employee->id, request('period'));
-                $payroll->paye = Payroll::tax($employee->id, request('period'));
-                $payroll->relief = 1408;
+                $payroll->gross_tax = Payroll::totaltax($employee->id, request('period'));
+                $payroll->paye = Payroll::tax($employee->id, request('period'));                
+                $payroll->insurance_relief = Payroll::insuranceRelief($employee->id, request('period'));
+                $payroll->relief = 2400;
                 $payroll->nssf_amount = Payroll::nssf($employee->id, request('period'));
                 $payroll->nhif_amount = Payroll::nhif($employee->id, request('period'));
                 $payroll->housing_levy = Payroll::housingLevy($employee->id, request('period'));

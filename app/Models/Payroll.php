@@ -83,6 +83,20 @@ class Payroll extends Model
         return round($allw, 2);
 
     }
+    
+    public static function taxablePay($id, $period){
+        $total_pay = static::gross($id, $period);
+        $total_nssf = static::nssf($id, $period);
+        $total_pension = static::grosspension($id, $period);
+
+        $taxable = $total_pay - $total_nssf - $total_pension;
+        
+        return $taxable;
+    }
+    
+    public static function insuranceRelief($id, $period){
+      return (15/100)* static::nhif($id, $period);      return 100.00;
+    }
 
     public static function basicpay($id, $period)
     {
@@ -643,7 +657,11 @@ class Payroll extends Model
         foreach ($total_rels as $total_rel) {
             $rel = $total_rel->total_reliefs;
         }
-        return round($rel, 2);
+        if(isset($rel)){
+          return round($rel, 2);
+        }
+        else return 2400.00;
+        //return round($rel, 2);
 
     }
 
@@ -1101,16 +1119,16 @@ class Payroll extends Model
             } else if ($emp->income_tax_applicable == '1' && $emp->income_tax_relief_applicable == '1') {
                 if ($taxable >= 13686 && $taxable < 23884) {
                     $paye = 1229.8 + ($taxable - 12298.33) * 15 / 100;
-                    $paye = $paye - 1408.00 - static::taxrelief($id, $period);
+                    $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
                 } else if ($taxable >= 23884 && $taxable < 35470) {
                     $paye = (1229.8 + ((11586.92) * 0.15)) + ($taxable - 23884) * 20 / 100;
-                    $paye = $paye - 1408.00 - static::taxrelief($id, $period);
+                    $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
                 } else if ($taxable >= 35470 && $taxable < 47059) {
                     $paye = (1229.8 + (11586.92 * 0.15) + ((11586.92) * 0.2)) + ($taxable - 35470) * 25 / 100;
-                    $paye = $paye - 1408.00 - static::taxrelief($id, $period);
+                    $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
                 } else if ($taxable >= 47059) {
                     $paye = (1229.8 + (11586.92 * 0.15) + (11586.92 * 0.2) + ((11586.92) * 0.25)) + ($taxable - 47059) * 30 / 100;
-                    $paye = $paye - 1408.00 - static::taxrelief($id, $period);
+                    $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
                 } else {
                     $paye = 0.00;
                 }
@@ -1411,7 +1429,7 @@ class Payroll extends Model
     {
         $total_deds = 0.00;
 
-        $total_deds = static::tax($id, $period) + static::nssf($id, $period) + static::nhif($id, $period) + static::deductionall($id, $period) + static::pension($id, $period) + static::housingLevy($id, $period);
+        $total_deds = static::tax($id, $period)+ static::nssf($id, $period) + static::nhif($id, $period) + static::deductionall($id, $period) + static::pension($id, $period) + static::housingLevy($id, $period);
         return round($total_deds, 2);
 
     }
@@ -1523,6 +1541,72 @@ class Payroll extends Model
             $gross = $pays->taxable_income;
 
             return number_format($gross, 2);
+        }
+        else return 0.00;
+        
+
+    }
+    
+    public static function processedgrosstax($id, $period)
+    {
+
+        $gross = 0.00;
+
+        $pays = DB::table('x_transact')
+            ->select('employee_id', 'gross_tax')
+            ->where('organization_id', Auth::user()->organization_id)
+            ->where('financial_month_year', '=', $period)
+            ->where('employee_id', '=', $id)
+            ->first();
+
+        if(isset($pays->gross_tax)){
+            $gross = $pays->gross_tax;
+
+            return number_format($gross, 2);
+        }
+        else return 0.00;
+        
+
+    }
+    
+    public static function processedpersonalrelief($id, $period)
+    {
+
+        $relief = 0.00;
+
+        $pays = DB::table('x_transact')
+            ->select('employee_id', 'relief')
+            ->where('organization_id', Auth::user()->organization_id)
+            ->where('financial_month_year', '=', $period)
+            ->where('employee_id', '=', $id)
+            ->first();
+
+        if(isset($pays->relief)){
+            $relief = $pays->relief;
+
+            return number_format($relief, 2);
+        }
+        else return 0.00;
+        
+
+    }
+    
+    public static function processedinsurancerelief($id, $period)
+    {
+
+        $relief = 0.00;
+
+        $pays = DB::table('x_transact')
+            ->select('employee_id', 'insurance_relief')
+            ->where('organization_id', Auth::user()->organization_id)
+            ->where('financial_month_year', '=', $period)
+            ->where('employee_id', '=', $id)
+            ->first();
+
+        if(isset($pays->insurance_relief)){
+            $relief = $pays->insurance_relief;
+
+            return number_format($relief, 2);
         }
         else return 0.00;
         
