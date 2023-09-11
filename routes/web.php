@@ -708,6 +708,8 @@ Route::resource('paye', PayeController::class);
 Route::post('paye/update/.$prate->id', [PayeController::class, 'update']);
 Route::get('paye/delete/{id}', [PayeController::class, 'destroy']);
 Route::get('paye/edit/{id}', [PayeController::class, 'edit']);
+Route::post('paye/update/{id}', [PayeController::class, 'update']);
+
 
 /*
 *housing levy routes

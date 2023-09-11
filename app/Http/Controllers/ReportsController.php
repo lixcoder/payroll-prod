@@ -96,7 +96,7 @@ class ReportsController extends Controller
         $organization = Organization::find(1);
         //return $members;
         if ($request->get('format') == 'pdf') {
-            $pdf = PDF::loadView('pdf.memberlist', compact('members', 'organization'))->setPaper('a4');
+            $pdf = app('dompdf.wrapper')->loadView('pdf.memberlist', compact('members', 'organization'))->setPaper('a4');
 
             return $pdf->stream('MemberList.pdf');
 
@@ -122,7 +122,7 @@ class ReportsController extends Controller
 
         $loanproducts = Loanproduct::all();
 
-        $pdf = PDF::loadView('pdf.remittance', compact('members', 'organization', 'loanproducts', 'savingproducts'))->setPaper('a4', 'landscape');
+        $pdf = app('dompdf.wrapper')->loadView('pdf.remittance', compact('members', 'organization', 'loanproducts', 'savingproducts'))->setPaper('a4', 'landscape');
 
         return $pdf->stream('Remittance.pdf');
 
@@ -136,7 +136,7 @@ class ReportsController extends Controller
 
         $organization = Organization::find(1);
 
-        $pdf = PDF::loadView('pdf.blank', compact('members', 'organization'))->setPaper('a4', 'landscape');
+        $pdf = app('dompdf.wrapper')->loadView('pdf.blank', compact('members', 'organization'))->setPaper('a4', 'landscape');
 
         return $pdf->stream('Template.pdf');
 
@@ -178,7 +178,7 @@ class ReportsController extends Controller
             return (new DisbursedLoanListingExport($data, $period))->download('DisbursedLoans.xlsx');
 
         } else {
-            $pdf = PDF::loadView('pdf.loanreports.loanbalances', compact('loans', 'organization', 'to', 'period'))->setPaper('a4');
+            $pdf = app('dompdf.wrapper')->loadView('pdf.loanreports.loanbalances', compact('loans', 'organization', 'to', 'period'))->setPaper('a4');
 
             return $pdf->stream('Loan Listing.pdf');
         }
@@ -324,7 +324,7 @@ class ReportsController extends Controller
                 });
             })->export('xlsx');
         } else {
-            $pdf = PDF::loadView('pdf.loanreports.loanproducts', compact('loans', 'loanproduct', 'organization', 'to', 'period'))->setPaper('a4');
+            $pdf = app('dompdf.wrapper')->loadView('pdf.loanreports.loanproducts', compact('loans', 'loanproduct', 'organization', 'to', 'period'))->setPaper('a4');
 
             return $pdf->stream('Loan Product Listing.pdf');
         }
@@ -486,7 +486,7 @@ class ReportsController extends Controller
                 });
             })->export('xlsx');
         } else {
-            $pdf = PDF::loadView('pdf.loanreports.interest', compact('intArray', 'loanproduct', 'organization', 'period'))->setPaper('a4');
+            $pdf = app('dompdf.wrapper')->loadView('pdf.loanreports.interest', compact('intArray', 'loanproduct', 'organization', 'period'))->setPaper('a4');
 
             return $pdf->stream($loanproduct->name . '_interest.pdf');
         }
@@ -626,7 +626,7 @@ class ReportsController extends Controller
                 });
             })->export('xlsx');
         } else {
-            $pdf = PDF::loadView('pdf.loanreports.interest', compact('intArray', 'all', 'organization', 'period'))->setPaper('a4');
+            $pdf = app('dompdf.wrapper')->loadView('pdf.loanreports.interest', compact('intArray', 'all', 'organization', 'period'))->setPaper('a4');
 
             return $pdf->stream('Total_interest.pdf');
         }
@@ -703,7 +703,7 @@ class ReportsController extends Controller
 
         $organization = Organization::find(1);
 
-        $pdf = PDF::loadView('pdf.loanreports.repayments', compact('organization', 'period', 'loantrans', 'all', 'loanproduct'))->setPaper('a4');
+        $pdf = app('dompdf.wrapper')->loadView('pdf.loanreports.repayments', compact('organization', 'period', 'loantrans', 'all', 'loanproduct'))->setPaper('a4');
 
         return $pdf->stream('Repayments.pdf');
     }
@@ -764,7 +764,7 @@ class ReportsController extends Controller
 
         if ($data['format'] == 'pdf') {
 
-            $pdf = PDF::loadView('pdf.savingreports.savingbalances', compact('savings', 'organization', 'period'))->setPaper('a4', 'portrait');
+            $pdf = app('dompdf.wrapper')->loadView('pdf.savingreports.savingbalances', compact('savings', 'organization', 'period'))->setPaper('a4', 'portrait');
 
             return $pdf->stream('Savings Listing.pdf');
         } else {//Displays in Excel format
@@ -928,7 +928,7 @@ class ReportsController extends Controller
 
         $title = ucwords(strtolower($savingproduct->name)) . ' Report';
         if ($data['format'] == 'pdf') {
-            $pdf = PDF::loadView('pdf.savingreports.savingproducts', compact('savings', 'interestrate', 'organization', 'period', 'title'))->setPaper('a4');
+            $pdf = app('dompdf.wrapper')->loadView('pdf.savingreports.savingproducts', compact('savings', 'interestrate', 'organization', 'period', 'title'))->setPaper('a4');
 
             return $pdf->stream('Saving Product Deposit.pdf');
         } else {
@@ -1033,7 +1033,7 @@ class ReportsController extends Controller
 
 
             $organization = Organization::find(1);
-            $pdf = PDF::loadView('pdf.monthlyrepayments', compact('date', 'scrapdate', 'organization'))->setPaper('a4', 'portrait');
+            $pdf = app('dompdf.wrapper')->loadView('pdf.monthlyrepayments', compact('date', 'scrapdate', 'organization'))->setPaper('a4', 'portrait');
             return $pdf->stream('Monthly Repayment Report.pdf');
         } else {
             return Redirect::back()
@@ -1063,7 +1063,7 @@ class ReportsController extends Controller
             ->where('shareaccounts.member_id', '=', $id)
             ->where('sharetransactions.type', '=', 'credit')
             ->sum('sharetransactions.amount');
-        $pdf = PDF::loadView('pdf.loanreports.creditappraisal', compact('member', 'loans', 'savings', 'savingaccount', 'shares', 'shareaccount', 'currentloan'))->setPaper('a4');
+        $pdf = app('dompdf.wrapper')->loadView('pdf.loanreports.creditappraisal', compact('member', 'loans', 'savings', 'savingaccount', 'shares', 'shareaccount', 'currentloan'))->setPaper('a4');
         return $pdf->stream('Member Credit Appraisal Report.pdf');
 
     }
@@ -1224,7 +1224,7 @@ class ReportsController extends Controller
                     });
                 })->export('xlsx');
             } else {
-                $pdf = PDF::loadView('pdf.financials.balancesheet', compact('accounts', 'to', 'from', 'date', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.financials.balancesheet', compact('accounts', 'to', 'from', 'date', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Balance Sheet.pdf');
             }
@@ -1377,7 +1377,7 @@ class ReportsController extends Controller
                     });
                 })->export('xlsx');
             } else {
-                $pdf = PDF::loadView('pdf.financials.incomestatement', compact('accounts', 'date', 'from', 'to', 'organization'))->setPaper('a4', 'portrait');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.financials.incomestatement', compact('accounts', 'date', 'from', 'to', 'organization'))->setPaper('a4', 'portrait');
 
                 return $pdf->stream('Income Statement.pdf');
             }
@@ -1504,7 +1504,7 @@ class ReportsController extends Controller
                     });
                 })->export('xlsx');
             } else {
-                $pdf = PDF::loadView('pdf.financials.trialbalance', compact('accounts', 'from', 'to', 'period', 'date', 'organization'))->setPaper('a4', 'portrait');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.financials.trialbalance', compact('accounts', 'from', 'to', 'period', 'date', 'organization'))->setPaper('a4', 'portrait');
 
                 return $pdf->stream('Trial Balance.pdf');
             }
@@ -1537,7 +1537,7 @@ class ReportsController extends Controller
                     ->get()
             );
 
-            $pdf = PDF::loadView('pdf.budget_report', compact('set_year', 'previous_year', 'projections'))
+            $pdf = app('dompdf.wrapper')->loadView('pdf.budget_report', compact('set_year', 'previous_year', 'projections'))
                 ->setPaper('a4', 'landscape');
             return $pdf->stream($set_year . '_budget_report.pdf');
         }
@@ -1600,7 +1600,7 @@ class ReportsController extends Controller
                 }
             }
 
-            $pdf = PDF::loadView('pdf.financials.income_reports', compact('incomeAccounts', 'date', 'organization', 'from', 'to', 'period', 'particulars', 'incomeSums', 'incomes'))->setPaper('a4');
+            $pdf = app('dompdf.wrapper')->loadView('pdf.financials.income_reports', compact('incomeAccounts', 'date', 'organization', 'from', 'to', 'period', 'particulars', 'incomeSums', 'incomes'))->setPaper('a4');
             return $pdf->stream('Income Report.pdf');
         }
 
@@ -1663,7 +1663,7 @@ class ReportsController extends Controller
             }
 
 
-            $pdf = PDF::loadView('pdf.financials.expenses_reports', compact('expenseAccounts', 'date', 'organization', 'from', 'to', 'period', 'particulars', 'expenses', 'expe'))
+            $pdf = app('dompdf.wrapper')->loadView('pdf.financials.expenses_reports', compact('expenseAccounts', 'date', 'organization', 'from', 'to', 'period', 'particulars', 'expenses', 'expe'))
                 ->setPaper('a4');
             return $pdf->stream('Expenses Report.pdf');
 
@@ -1742,7 +1742,7 @@ class ReportsController extends Controller
 
         $organization = Organization::find(1);
 
-        $pdf = PDF::loadView('banking.bankReconciliationReport', compact('recMonth', 'organization', 'bnkStmtBal', 'bkTotal', 'add', 'less'))->setPaper('a4', 'portrait');
+        $pdf = app('dompdf.wrapper')->loadView('banking.bankReconciliationReport', compact('recMonth', 'organization', 'bnkStmtBal', 'bkTotal', 'add', 'less'))->setPaper('a4', 'portrait');
         return $pdf->stream('Reconciliation Reports');
         /*if(count($bnkStmtBal) == 0 || $bkTotal == 0 || count($additions) == 0 ){
 					return "Error";
@@ -1777,7 +1777,7 @@ class ReportsController extends Controller
 
         $organization = Organization::find(1);
         //  $transaction=AccountTransaction::whereBetween('transaction_date', array($request->get('from'),$request->get('to')))->where('description',$type)->get();
-        $pdf = PDF::loadView('reports.transactionReport', compact('transaction', 'transaction1', 'organization', 'from', 'type', 'to'))->setPaper('a4');
+        $pdf = app('dompdf.wrapper')->loadView('reports.transactionReport', compact('transaction', 'transaction1', 'organization', 'from', 'type', 'to'))->setPaper('a4');
         return $pdf->stream('Transactions Reports');
 
     }
@@ -2504,7 +2504,7 @@ class ReportsController extends Controller
 
                 $month = $m . "_" . $part[1];
 
-                $pdf = PDF::loadView('pdf.summaryAdvanceReport', compact('sums', 'selBranch', 'selDept', 'total_amount', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.summaryAdvanceReport', compact('sums', 'selBranch', 'selDept', 'total_amount', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Advance_summary_' . $month . '.pdf');
 
@@ -2544,7 +2544,7 @@ class ReportsController extends Controller
 
                 $month = $m . "_" . $part[1];
 
-                $pdf = PDF::loadView('pdf.summaryAdvanceReport', compact('sums', 'selBranch', 'selDept', 'sels', 'total_amount', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.summaryAdvanceReport', compact('sums', 'selBranch', 'selDept', 'sels', 'total_amount', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Advance_summary_' . $month . '.pdf');
 
@@ -2585,7 +2585,7 @@ class ReportsController extends Controller
 
                 $month = $m . "_" . $part[1];
 
-                $pdf = PDF::loadView('pdf.summaryAdvanceReport', compact('sums', 'selBranch', 'selDept', 'sels', 'total_amount', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.summaryAdvanceReport', compact('sums', 'selBranch', 'selDept', 'sels', 'total_amount', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Advance_summary_' . $month . '.pdf');
 
@@ -2632,7 +2632,7 @@ class ReportsController extends Controller
 
                 $month = $m . "_" . $part[1];
 
-                $pdf = PDF::loadView('pdf.summaryAdvanceReport', compact('sums', 'selBranch', 'selDept', 'selBr', 'selDt', 'total_amount', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.summaryAdvanceReport', compact('sums', 'selBranch', 'selDept', 'selBr', 'selDt', 'total_amount', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Advance_summary_' . $month . '.pdf');
 
@@ -3680,7 +3680,7 @@ class ReportsController extends Controller
 
                 $month = $m . "_" . $part[1];
 
-                $pdf = PDF::loadView('pdf.advanceremittanceReport', compact('rems', 'branch', 'bank', 'total', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.advanceremittanceReport', compact('rems', 'branch', 'bank', 'total', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Advance_Remittance_' . $month . '.pdf');
             } else if ($request->get('department') == 'All') {
@@ -3732,7 +3732,7 @@ class ReportsController extends Controller
 
                 $month = $m . "_" . $part[1];
 
-                $pdf = PDF::loadView('pdf.advanceremittanceReport', compact('rems', 'branch', 'bank', 'total', 'emps', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.advanceremittanceReport', compact('rems', 'branch', 'bank', 'total', 'emps', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Advance_Remittance_' . $month . '.pdf');
 
@@ -3783,7 +3783,7 @@ class ReportsController extends Controller
 
                 $month = $m . "_" . $part[1];
 
-                $pdf = PDF::loadView('pdf.advanceremittanceReport', compact('rems', 'total', 'branch', 'bank', 'from', 'to', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.advanceremittanceReport', compact('rems', 'total', 'branch', 'bank', 'from', 'to', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Advance_Remittance_' . $month . '.pdf');
 
@@ -3837,7 +3837,7 @@ class ReportsController extends Controller
 
                 $month = $m . "_" . $part[1];
 
-                $pdf = PDF::loadView('pdf.advanceremittanceReport', compact('rems', 'branch', 'bank', 'total', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.advanceremittanceReport', compact('rems', 'branch', 'bank', 'total', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Advance_Remittance_' . $month . '.pdf');
 
@@ -4531,7 +4531,7 @@ class ReportsController extends Controller
                     Audit::logaudit(Carbon::now(), 'view', 'viewed payslip for ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $request->get('period'));
 
                     //return view('pdf.monthlySlip', compact('nontaxables','empall','select','name','employee','transact','allws','deds','earnings','overtimes','pension','rels','period','currency', 'organization','id'));
-                    $pdf = PDF::loadView('pdf.monthlySlip', compact('nontaxables', 'empall', 'select', 'name', 'employee', 'transacts', 'allws', 'deds', 'earnings', 'overtimes', 'pension', 'rels', 'period', 'currency', 'organization', 'id'))->setPaper('a5');
+                    $pdf = app('dompdf.wrapper')->loadView('pdf.monthlySlip', compact('nontaxables', 'empall', 'select', 'name', 'employee', 'transacts', 'allws', 'deds', 'earnings', 'overtimes', 'pension', 'rels', 'period', 'currency', 'organization', 'id'))->setPaper('a5');
 
                     return $pdf->stream($employee->personal_file_number . '_' . $employee->first_name . '_' . $employee->last_name . '_' . $month . '.pdf');
                 }
@@ -5923,7 +5923,7 @@ class ReportsController extends Controller
 
                 Audit::logaudit('Payroll Summary', 'view', 'viewed payroll summary for all employees for period ' . $request->get('period'));
 
-                $pdf = PDF::loadView('pdf.summaryReport', compact('sums', 'selBranch', 'selDept', 'total_pay', 'total_earning', 'total_gross', 'total_paye', 'total_nssf', 'total_nhif', 'total_others', 'total_deds', 'total_net', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.summaryReport', compact('sums', 'selBranch', 'selDept', 'total_pay', 'total_earning', 'total_gross', 'total_paye', 'total_nssf', 'total_nhif', 'total_others', 'total_deds', 'total_net', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Payroll_summary_' . $month . '.pdf');
 
@@ -6116,7 +6116,7 @@ class ReportsController extends Controller
 
                 Audit::logaudit('Payroll Summary', 'view', 'viewed payroll summary for all employees in branch ' . $branch->name . ' for period ' . $request->get('period'));
 
-                $pdf = PDF::loadView('pdf.summaryReport', compact('sums', 'selBranch', 'selDept', 'sels', 'total_pay', 'total_earning', 'total_gross', 'total_paye', 'total_nssf', 'total_nhif', 'total_others', 'total_deds', 'total_net', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.summaryReport', compact('sums', 'selBranch', 'selDept', 'sels', 'total_pay', 'total_earning', 'total_gross', 'total_paye', 'total_nssf', 'total_nhif', 'total_others', 'total_deds', 'total_net', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Payroll_summary_' . $month . '.pdf');
 
@@ -6307,7 +6307,7 @@ class ReportsController extends Controller
 
                 Audit::logaudit('Payroll Summary', 'view', 'viewed payroll summary for all employees in department ' . $department->deduction_name . ' for period ' . $request->get('period'));
 
-                $pdf = PDF::loadView('pdf.summaryReport', compact('sums', 'selBranch', 'selDept', 'sels', 'total_pay', 'total_earning', 'total_gross', 'total_paye', 'total_nssf', 'total_nhif', 'total_others', 'total_deds', 'total_net', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.summaryReport', compact('sums', 'selBranch', 'selDept', 'sels', 'total_pay', 'total_earning', 'total_gross', 'total_paye', 'total_nssf', 'total_nhif', 'total_others', 'total_deds', 'total_net', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Payroll_summary_' . $month . '.pdf');
 
@@ -6522,7 +6522,7 @@ class ReportsController extends Controller
 
                 Audit::logaudit('Payroll Summary', 'view', 'viewed payroll summary for all employees in branch ' . $branch->name . ' and department ' . $department->deduction_name . ' for period ' . $request->get('period'));
 
-                $pdf = PDF::loadView('pdf.summaryReport', compact('sums', 'selBranch', 'selDept', 'selBr', 'selDt', 'total_pay', 'total_earning', 'total_gross', 'total_paye', 'total_nssf', 'total_nhif', 'total_others', 'total_deds', 'total_net', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.summaryReport', compact('sums', 'selBranch', 'selDept', 'selBr', 'selDt', 'total_pay', 'total_earning', 'total_gross', 'total_paye', 'total_nssf', 'total_nhif', 'total_others', 'total_deds', 'total_net', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Payroll_summary_' . $month . '.pdf');
 
@@ -7313,7 +7313,7 @@ class ReportsController extends Controller
         $month = $m."_".$part[1];*/
 
 
-                $pdf = PDF::loadView('pdf.remittanceReport', compact('rems', 'branch', 'bank', 'mont', 'total', 'currencies', 'currency', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.remittanceReport', compact('rems', 'branch', 'bank', 'mont', 'total', 'currencies', 'currency', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Pay_Remittance_' . $request->get('period') . '.pdf');
 
@@ -7387,7 +7387,7 @@ class ReportsController extends Controller
 
         $month = $m."_".$part[1];*/
 
-                $pdf = PDF::loadView('pdf.remittanceReport', compact('rems', 'branch', 'bank', 'total', 'mont', 'currency', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.remittanceReport', compact('rems', 'branch', 'bank', 'total', 'mont', 'currency', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Pay_Remittance_' . $request->get('period') . '.pdf');
 
@@ -7461,7 +7461,7 @@ class ReportsController extends Controller
 
         $month = $m."_".$part[1];*/
 
-                $pdf = PDF::loadView('pdf.remittanceReport', compact('rems', 'total', 'branch', 'mont', 'bank', 'currency', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.remittanceReport', compact('rems', 'total', 'branch', 'mont', 'bank', 'currency', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Pay_Remittance_' . $request->get('period') . '.pdf');
 
@@ -7539,7 +7539,7 @@ class ReportsController extends Controller
 
         $month = $m."_".$part[1];*/
 
-                $pdf = PDF::loadView('pdf.remittanceReport', compact('rems', 'branch', 'bank', 'mont', 'total', 'currency', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.remittanceReport', compact('rems', 'branch', 'bank', 'mont', 'total', 'currency', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
                 return $pdf->stream('Pay_Remittance_' . $request->get('period') . '.pdf');
 
@@ -7986,7 +7986,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.earningReport', compact('earnings', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.earningReport', compact('earnings', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Earning_Report_' . $month . '.pdf');
             } else {
@@ -8045,7 +8045,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.earningReport', compact('earnings', 'name', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.earningReport', compact('earnings', 'name', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Earning_Report_' . $month . '.pdf');
             }
@@ -8687,7 +8687,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.allowanceReport', compact('allws', 'earnings', 'overtimes', 'totalearning', 'totalovertime', 'period', 'type', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.allowanceReport', compact('allws', 'earnings', 'overtimes', 'totalearning', 'totalovertime', 'period', 'type', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Allowance_Report_' . $month . '.pdf');
             } else {
@@ -8816,7 +8816,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.allowanceReport', compact('allws', 'earnings', 'overtimes', 'totalearning', 'totalovertime', 'period', 'type', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.allowanceReport', compact('allws', 'earnings', 'overtimes', 'totalearning', 'totalovertime', 'period', 'type', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Allowance_Report_' . $month . '.pdf');
             }
@@ -9263,7 +9263,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.nontaxableReport', compact('nontaxables', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.nontaxableReport', compact('nontaxables', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Non_Taxable_Income_Report_' . $month . '.pdf');
             } else {
@@ -9322,7 +9322,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.nontaxableReport', compact('nontaxables', 'name', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.nontaxableReport', compact('nontaxables', 'name', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Non_Taxable_Income_Report_' . $month . '.pdf');
             }
@@ -9762,7 +9762,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.overtimeReport', compact('overtimes', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.overtimeReport', compact('overtimes', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Overtimes_Report_' . $month . '.pdf');
             } else {
@@ -9822,7 +9822,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.overtimeReport', compact('overtimes', 'name', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.overtimeReport', compact('overtimes', 'name', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Overtime_Report_' . $month . '.pdf');
             }
@@ -10265,7 +10265,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.deductionReport', compact('deds', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.deductionReport', compact('deds', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Deduction_Report_' . $month . '.pdf');
             } else {
@@ -10323,7 +10323,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.deductionReport', compact('deds', 'name', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.deductionReport', compact('deds', 'name', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Deduction_Report_' . $month . '.pdf');
             }
@@ -10921,7 +10921,7 @@ class ReportsController extends Controller
 
                 Audit::logaudit('Pension Report', 'view', 'viewed pension contributions report for period ' . $period);
 
-                $pdf = PDF::loadView('pdf.pensionReport', compact('pensions', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.pensionReport', compact('pensions', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Pension_Contrbutions_Report_' . $month . '.pdf');
             } else {
@@ -10995,7 +10995,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.pensionReport', compact('pensions', 'employee', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.pensionReport', compact('pensions', 'employee', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Pension_Contributions_Report_' . $month . '.pdf');
             }
@@ -11555,7 +11555,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.reliefReport', compact('reliefs', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.reliefReport', compact('reliefs', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Relief_Report_' . $month . '.pdf');
             } else {
@@ -11614,7 +11614,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.reliefReport', compact('reliefs', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.reliefReport', compact('reliefs', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Relief_Report_' . $month . '.pdf');
             }
@@ -11713,7 +11713,7 @@ class ReportsController extends Controller
                 $m = $part[0];
             }
             $month = $m . "_" . $part[1];
-            $pdf = PDF::loadView('pdf.nssfReport', compact('nssfs', 'total', 'currencies', 'period', 'organization'))->setPaper('a4');
+            $pdf = app('dompdf.wrapper')->loadView('pdf.nssfReport', compact('nssfs', 'total', 'currencies', 'period', 'organization'))->setPaper('a4');
             return $pdf->stream('nssf_Report_' . $month . '.pdf');
         }
     }
@@ -11794,7 +11794,7 @@ class ReportsController extends Controller
             $month = $m . "_" . $part[1];
 
 
-            $pdf = PDF::loadView('pdf.nhifReport', compact('nhifs', 'total', 'currencies', 'period', 'organization'))->setPaper('a4');
+            $pdf = app('dompdf.wrapper')->loadView('pdf.nhifReport', compact('nhifs', 'total', 'currencies', 'period', 'organization'))->setPaper('a4');
 
             return $pdf->stream('nhif_Report_' . $month . '.pdf');
         }
@@ -12066,7 +12066,7 @@ class ReportsController extends Controller
 
             $organization = Organization::find(Auth::user()->organization_id);
 
-            $pdf = PDF::loadView('pdf.payeReport', compact('payes_enabled', 'payes_disabled', 'type', 'total_enabled', 'total_disabled', 'currencies', 'period', 'organization'))->setPaper('a4');
+            $pdf = app('dompdf.wrapper')->loadView('pdf.payeReport', compact('payes_enabled', 'payes_disabled', 'type', 'total_enabled', 'total_disabled', 'currencies', 'period', 'organization'))->setPaper('a4');
 
             return $pdf->stream('Paye_Returns_' . $month . '.pdf');
         }
@@ -12439,7 +12439,7 @@ class ReportsController extends Controller
                     $period = 'DECEMBER ' . $part[1];
                 }
 
-                $pdf = PDF::loadView('pdf.mergedStatutoryReport', compact('statutories', 'currencies', 'period', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.mergedStatutoryReport', compact('statutories', 'currencies', 'period', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Merged_Statutory_Report_' . $month . '.pdf');
 
@@ -12460,7 +12460,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.mergedYearStatutoryReport', compact('statutories', 'currencies', 'period', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.mergedYearStatutoryReport', compact('statutories', 'currencies', 'period', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Annual_Merged_Statutory_Report_' . request()->get('periodyear') . '.pdf');
 
@@ -12708,7 +12708,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Confide::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.appraisal', compact('from', 'to', 'organization', 'appraisals'))->setPaper('a4')->setOrientation('potrait');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.appraisal', compact('from', 'to', 'organization', 'appraisals'))->setPaper('a4')->setOrientation('potrait');
 
                 //dd($organization);
 
@@ -12735,7 +12735,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Confide::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.individualappraisal', compact('from', 'to', 'employee', 'organization', 'appraisals'))->setPaper('a4')->setOrientation('potrait');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.individualappraisal', compact('from', 'to', 'employee', 'organization', 'appraisals'))->setPaper('a4')->setOrientation('potrait');
 
                 //dd($organization);
 
@@ -12979,7 +12979,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.property', compact('from', 'to', 'organization', 'properties'))->setPaper('a4')->setOrientation('potrait');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.property', compact('from', 'to', 'organization', 'properties'))->setPaper('a4')->setOrientation('potrait');
 
                 //dd($organization);
 
@@ -13003,7 +13003,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = PDF::loadView('pdf.individualproperty', compact('from', 'to', 'employee', 'organization', 'properties'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.individualproperty', compact('from', 'to', 'employee', 'organization', 'properties'))->setPaper('a4');
 
                 //dd($organization);
 
@@ -13054,7 +13054,8 @@ class ReportsController extends Controller
             return Excel::download(new P9FormExports($year, $employee, $organization), $ename . '_P9Form_' . $year . ".xls");
         } else {
             $pdf = app('dompdf.wrapper')->loadview('pdf.p9Pdf', compact('organization', 'employee', 'year'));
-            return $pdf->stream('senor');
+
+            return $pdf->stream($employee->first_name . '_' . $employee->last_name . '_' . $year);
         }
     }
 

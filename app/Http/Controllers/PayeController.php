@@ -103,12 +103,18 @@ class PayeController extends Controller
 
         if ($validator->fails())
         {
-            return redirect()->back()->withErrors($validator)->withInput();
+
+            //return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $prate->income_from = request('income_from');
+        //$prate = new PayeRate();
 
-        $prate->income_to = request('income_to');
+        if(request('i_from') > request('i_to')){
+            return redirect()->back()->withErrors("Income to must be greater than income from!!!")->withInput();  
+        }
+        $prate->income_from = request('i_from');
+
+        $prate->income_to = request('i_to');
 
         $prate->percentage = request('percentage');
 
