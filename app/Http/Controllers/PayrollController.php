@@ -31,6 +31,7 @@ use Maatwebsite\Excel\Classes\PHPExcel;
 use Maatwebsite\Excel\Facades\Excel;
 use Zizaco\Entrust\Entrust;
 use Illuminate\Http\Request;
+use Symfony\Component\Console\Input\Input as InputInput;
 
 class PayrollController extends Controller
 {
@@ -151,7 +152,7 @@ class PayrollController extends Controller
 
     public function valid()
     {
-        $period = Input::get('period');
+        $period = request('period');
 
         //print_r($accounts);
 
@@ -397,7 +398,7 @@ class PayrollController extends Controller
             ->where('organization_id', Auth::user()->organization_id)
             ->get();
         $period = $period;
-        $account = Input::get('account');
+        $account = request('account');
         $earnings = Earningsetting::all();
         $overtimes = Overtime::all();
         $allowances = Allowance::all();
@@ -834,7 +835,7 @@ class PayrollController extends Controller
             $total_deductions = number_format(Payroll::total_deductions($employee->id, $fperiod), 2);
             $net = number_format(Payroll::net($employee->id, $fperiod), 2);
 
-            $totalsalary = $totalsalary + (float)Payroll::basicpay($employee->id, Input::get('period'));
+            $totalsalary = $totalsalary + (float)Payroll::basicpay($employee->id, request('period'));
             $totalhourly = $totalhourly + (float)Payroll::overtimes($employee->id, 'Hourly', $fperiod);
             $totaldaily = $totaldaily + (float)Payroll::overtimes($employee->id, 'Daily', $fperiod);
             $totalgross = $totalgross + (float)Payroll::gross($employee->id, $fperiod);
@@ -1018,17 +1019,11 @@ class PayrollController extends Controller
                     $payroll->user_id = Auth::user()->id;
                     $payroll->basic_pay = Payroll::basicpay($employee->id, request('period'));
                     $payroll->earning_amount = Payroll::total_benefits($employee->id, request('period'));
-<<<<<<< HEAD
                     $payroll->taxable_income = Payroll::taxablePay($employee->id, request('period'));
                     $payroll->gross_tax = Payroll::totaltax($employee->id, request('period'));
                     $payroll->paye = Payroll::tax($employee->id, request('period'));
                     $payroll->insurance_relief = Payroll::insuranceRelief($employee->id, request('period'));
                     $payroll->relief = 2400;
-=======
-                    $payroll->taxable_income = Payroll::gross($employee->id, request('period'));
-                    $payroll->paye = Payroll::tax($employee->id, request('period'));
-                    $payroll->relief = 1408;
->>>>>>> 7089ad041d92857d0a60234577bfe0f9d3d30b1e
                     $payroll->nssf_amount = Payroll::nssf($employee->id, request('period'));
                     $payroll->nhif_amount = Payroll::nhif($employee->id, request('period'));
                     $payroll->housing_levy = Payroll::housingLevy($employee->id, request('period'));
@@ -1057,15 +1052,10 @@ class PayrollController extends Controller
 
                 $payroll->earning_amount = Payroll::total_benefits($employee->id, request('period'));
                 $payroll->taxable_income = Payroll::gross($employee->id, request('period'));
-<<<<<<< HEAD
                 $payroll->gross_tax = Payroll::totaltax($employee->id, request('period'));
                 $payroll->paye = Payroll::tax($employee->id, request('period'));                
                 $payroll->insurance_relief = Payroll::insuranceRelief($employee->id, request('period'));
                 $payroll->relief = 2400;
-=======
-                $payroll->paye = Payroll::tax($employee->id, request('period'));
-                $payroll->relief = 1408;
->>>>>>> 7089ad041d92857d0a60234577bfe0f9d3d30b1e
                 $payroll->nssf_amount = Payroll::nssf($employee->id, request('period'));
                 $payroll->nhif_amount = Payroll::nhif($employee->id, request('period'));
                 $payroll->housing_levy = Payroll::housingLevy($employee->id, request('period'));
@@ -1285,8 +1275,8 @@ class PayrollController extends Controller
                             'deduction_name' => $ded->deduction_name,
                             'deduction_id' => $ded->deduction_id,
                             'deduction_amount' => $ded->deduction_amount,
-                            'financial_month_year' => Input::get('period'),
-                            'process_type' => Input::get('type')
+                            'financial_month_year' => request('period'),
+                            'process_type' => request('type')
                         ]
                     );
                 }
@@ -1417,8 +1407,8 @@ class PayrollController extends Controller
                             'organization_id' => Auth::user()->organization_id,
                             'earning_name' => $earn->earning_name,
                             'earning_amount' => $earn->earnings_amount,
-                            'financial_month_year' => Input::get('period'),
-                            'process_type' => Input::get('type')
+                            'financial_month_year' => request('period'),
+                            'process_type' => request('type')
                         ]
                     );
                 }
@@ -1486,8 +1476,8 @@ class PayrollController extends Controller
                             'overtime_id' => $overtime->id,
                             'overtime_period' => $overtime->period,
                             'overtime_amount' => $overtime->amount,
-                            'financial_month_year' => Input::get('period'),
-                            'process_type' => Input::get('type')
+                            'financial_month_year' => request('period'),
+                            'process_type' => request('type')
                         ]
                     );
                 }
@@ -1516,7 +1506,7 @@ class PayrollController extends Controller
                 ->get();
 
             foreach ($rels as $rel) {
-                DB::table('transact_reliefs')->insert(
+                DB::table('x_transact_reliefs')->insert(
                     [
                         'employee_id' => $rel->eid,
                         'organization_id' => Auth::user()->organization_id,
@@ -1524,8 +1514,8 @@ class PayrollController extends Controller
                         'relief_name' => $rel->relief_name,
                         'relief_id' => $rel->relief_id,
                         'relief_amount' => $rel->relief_amount,
-                        'financial_month_year' => Input::get('period'),
-                        'process_type' => Input::get('type')
+                        'financial_month_year' => request('period'),
+                        'process_type' => request('type')
                     ]
                 );
             }
@@ -1580,8 +1570,8 @@ class PayrollController extends Controller
                             'allowance_name' => $allw->allowance_name,
                             'allowance_id' => $allw->allowance_id,
                             'allowance_amount' => $allw->allowance_amount,
-                            'financial_month_year' => Input::get('period'),
-                            'process_type' => Input::get('type'),
+                            'financial_month_year' => request('period'),
+                            'process_type' => request('type'),
                         ]
                     );
                 }
@@ -1650,8 +1640,8 @@ class PayrollController extends Controller
                             'nontaxable_name' => $nontax->name,
                             'nontaxable_id' => $nontax->nontaxable_id,
                             'nontaxable_amount' => $nontax->nontaxable_amount,
-                            'financial_month_year' => Input::get('period'),
-                            'process_type' => Input::get('type'),
+                            'financial_month_year' => request('period'),
+                            'process_type' => request('type'),
                         ]
                     );
                 }
@@ -1720,8 +1710,8 @@ class PayrollController extends Controller
                             'deduction_name' => $ded->deduction_name,
                             'deduction_id' => $ded->deduction_id,
                             'deduction_amount' => $ded->deduction_amount,
-                            'financial_month_year' => Input::get('period'),
-                            'process_type' => Input::get('type')
+                            'financial_month_year' => request('period'),
+                            'process_type' => request('type')
                         ]
                     );
                 }
@@ -1850,8 +1840,8 @@ class PayrollController extends Controller
                             'organization_id' => Auth::user()->organization_id,
                             'earning_name' => $earn->earning_name,
                             'earning_amount' => $earn->earnings_amount,
-                            'financial_month_year' => Input::get('period'),
-                            'process_type' => Input::get('type')
+                            'financial_month_year' => request('period'),
+                            'process_type' => request('type')
                         ]
                     );
                 }
@@ -1919,8 +1909,8 @@ class PayrollController extends Controller
                             'overtime_id' => $overtime->id,
                             'overtime_period' => $overtime->period,
                             'overtime_amount' => $overtime->amount,
-                            'financial_month_year' => Input::get('period'),
-                            'process_type' => Input::get('type')
+                            'financial_month_year' => request('period'),
+                            'process_type' => request('type')
                         ]
                     );
                 }
@@ -2013,7 +2003,7 @@ class PayrollController extends Controller
             return Redirect::back()->withErrors($validator)->withInput();
         }
 
-        $deduction->deduction_name = Input::get('name');
+        $deduction->deduction_name = request('name');
         $deduction->update();
 
         return Redirect::route('deductions.index');
