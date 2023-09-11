@@ -13053,8 +13053,8 @@ class ReportsController extends Controller
         if ($request->type == "Excel") {
             return Excel::download(new P9FormExports($year, $employee, $organization), $ename . '_P9Form_' . $year . ".xls");
         } else {
-            $pdf = PDF::loadview('pdf.p9Pdf', compact('organization', 'employee', 'year'));
-            return $pdf->stream($employee->first_name . '_' . $employee->last_name . '_' . $year);
+            $pdf = app('dompdf.wrapper')->loadview('pdf.p9Pdf', compact('organization', 'employee', 'year'));
+            return $pdf->stream('senor');
         }
     }
 

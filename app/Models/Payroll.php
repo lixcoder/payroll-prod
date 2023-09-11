@@ -1120,13 +1120,13 @@ class Payroll extends Model
                 if ($taxable >= 13686 && $taxable < 23884) {
                     $paye = 1229.8 + ($taxable - 12298.33) * 15 / 100;
                     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
-                } else if ($taxable > 24000 && $taxable =< 32333) {
+                } else if ($taxable > 24000 && $taxable <= 32333) {
                     $paye = 24000 * 10/100 + ($taxable-24000)*25/100;
                     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
-                } else if ($taxable >32333  && $taxable =< 500000) {
+                } else if ($taxable >32333  && $taxable <= 500000) {
                     $paye = 24000*0.1 + 8333 * 0.25 + ($taxable - 32333) * 0.3;
                     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
-                } else if ($taxable >500000 $$ $taxable =< 800000 ) {
+                } else if ($taxable >500000 && $taxable <= 800000 ) {
                     $paye = 2400 + 2083.25 + 467667*.3 + ($taxable - 500000)*0.325;
                     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
                 } else if ($taxable > 800000 ) {
@@ -1137,7 +1137,7 @@ class Payroll extends Model
                     $paye = 0.00;
                 }
             } else if ($emp->income_tax_applicable == '1' && $emp->income_tax_relief_applicable == '0') {
-                if ($taxable =< 24000) {
+                if ($taxable <= 24000) {
                     $paye = 24000 * 10 / 100;
                     $paye = $paye - static::taxrelief($id, $period);
                 } else if ($taxable >= 23884 && $taxable < 35470) {
@@ -1175,17 +1175,16 @@ class Payroll extends Model
             if ($emp->income_tax_applicable == '0') {
                 $paye = 0.00;
             } else if ($emp->income_tax_applicable == '1' && $emp->income_tax_relief_applicable == '1') {
-                if ($taxable =< 24000) {
+                if ($taxable <= 24000) {
                     $paye = 24000 * 10 / 100;
-                } else if ($taxable > 24000 && $taxable =< 32333) {
+                } else if ($taxable > 24000 && $taxable <= 32333) {
                     $paye = 24000 * 10/100 + ($taxable-24000)*25/100;
-                } else if ($taxable >32333  && $taxable =< 500000) {
+                } else if ($taxable >32333  && $taxable <= 500000) {
                     $paye = 24000*0.1 + 8333 * 0.25 + ($taxable - 32333) * 0.3;
                     $paye = $paye;
-                } else if ($taxable >500000 $$ $taxable =< 800000 ) {
+                } else if ($taxable >500000 && $taxable <= 800000 ) {
                     $paye = 2400 + 2083.25 + 467667*.3 + ($taxable - 500000)*0.325;
                     $paye = $paye;
-                }
                 } else if ($taxable > 800000 ) {
                     $paye = 2400 + 2083.25 + 467667*0.3 + 300000 * 0.325 + ($taxable - 800000) * 0.35;
                     $paye = $paye;
