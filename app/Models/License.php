@@ -17,9 +17,9 @@ class License extends Model
            $currentSub = json_decode($currentSub, true); 
 
             if(Carbon::now()->greaterThan(Carbon::parse($currentSub[0]['trial_end_date']))){
-               return "Your subscripption has depleted purchase a new package";
+               return 0;
             }else{
-                return "Your Subscription Expiry Date is: ".$currentSub[0]['trial_end_date'];
+                return 1;
             }
             
         }
