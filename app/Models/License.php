@@ -17,13 +17,16 @@ class License extends Model
            $currentSub = json_decode($currentSub, true); 
 
             if(Carbon::now()->greaterThan(Carbon::parse($currentSub[0]['trial_end_date']))){
+                //indicates new subscrition needed to keep using services
                return 0;
             }else{
+                //indicates subscrition is still active
                 return 1;
             }
             
         }
         else{
+            //indicates new subscrition needed to keep using services
             return 0;
         }
     }
