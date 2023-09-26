@@ -1001,8 +1001,6 @@ class PayrollController extends Controller
                 ->get();
         }
 
-        return count($employees);
-
 
 
         foreach ($employees as $employee) {
