@@ -13,7 +13,7 @@ class License extends Model
         $currentSub = License::where('business_id', $id)->get();
 
         if(count($currentSub)>=1){
-           return $currentSub->end_date; 
+           return $currentSub; 
         }
         else{
             return 0;
