@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\EmployeeProbation;
 use Carbon\Carbon;
 use App\Models\Bank;
+use App\Models\License;
 use App\Models\Audit;
 use App\Models\EType;
 use App\Models\Branch;
@@ -255,9 +256,10 @@ class EmployeesController extends Controller
         $employees = count(Employee::where('organization_id', Auth::user()->organization_id)->get());
 //        dd($employees);
         #echo "<pre>"; print_r($organization->licensed); echo "</pre>"; die;
-        if ($organization->licensed <= $employees) {
+        if(!(License::checkSubscription(Auth::user()->organization_id))){
             return View::make('employees.employeelimit');
-        } else {
+        }
+         else {
             try {
                 $currency = Currency::where('organization_id', Auth::user()->organization_id)->first();
 //            $currency = Currency::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->first();
@@ -279,6 +281,7 @@ class EmployeesController extends Controller
                     $pfn = preg_replace('/\D/', '', $pfn);
 
                 }
+                //return $bbranches;
                 return View::make('employees.create', compact('currency', 'citizenships', 'pfn', 'branches', 'departments', 'jobtitles', 'etypes', 'jgroups', 'banks', 'bbranches', 'educations'));
             }
             catch (\Exception $e){}
@@ -362,7 +365,9 @@ class EmployeesController extends Controller
             if ($request->get('education') == '') {
                 $employee->education_type_id = null;
             } else {
-                $employee->education_type_id = $request->get('education');
+                // Set education type id as null to avoid errors, this should be corrected to indicate correct details
+                // $employee->education_type_id = $request->get('education_type_id');
+                $employee->education_type_id =0;
             }
             $a = str_replace(',', '', $request->get('pay'));
             $employee->basic_pay = $a;
@@ -372,7 +377,8 @@ class EmployeesController extends Controller
             if ($request->get('citizenship') == '') {
                 $employee->citizenship_id = null;
             } else {
-                $employee->citizenship_id = $request->get('citizenship');
+                //$employee->citizenship_id = $request->get('citizenship');
+                $employee->citizenship_id = 0;
             }
             $employee->mode_of_payment = $request->get('modep');
             if ($request->get('bank_account_number') != null) {
@@ -436,7 +442,8 @@ class EmployeesController extends Controller
             if ($request->get('type_id') == '') {
                 $employee->type_id = null;
             } else {
-                $employee->type_id = $request->get('type_id');
+                // $employee->type_id = $request->get('type_id');
+                $employee->type_id = 0;
             }
             if ($request->get('i_tax') != null) {
                 $employee->income_tax_applicable = '1';
@@ -460,8 +467,10 @@ class EmployeesController extends Controller
             }
             $employee->custom_field1 = $request->get('omode');
             $employee->organization_id = Auth::user()->organization_id;
-            $employee->start_date = $request->get('startdate');
-            $employee->end_date = $request->get('enddate');
+            // $employee->start_date = $request->get('startdate');
+            // $employee->end_date = $request->get('enddate');
+            $employee->start_date = Carbon::now();
+            $employee->end_date = null;
             if ($request->get('active') != null) {
                 $employee->in_employment = 'Y';
             } else {
@@ -682,7 +691,9 @@ class EmployeesController extends Controller
         if ($request->get('education') == '') {
             $employee->education_type_id = null;
         } else {
-            $employee->education_type_id = $request->get('education');
+            // Setting employee education id as null to avoid an error, this should be corrected after testing
+            //$employee->education_type_id = $request->get('education_id');
+            $employee->education_type_id = null;
         }
         $a = str_replace(',', '', $request->get('pay'));
         $employee->basic_pay = $a;
