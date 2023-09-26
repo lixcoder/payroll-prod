@@ -467,8 +467,10 @@ class EmployeesController extends Controller
             }
             $employee->custom_field1 = $request->get('omode');
             $employee->organization_id = Auth::user()->organization_id;
-            $employee->start_date = $request->get('startdate');
-            $employee->end_date = $request->get('enddate');
+            // $employee->start_date = $request->get('startdate');
+            // $employee->end_date = $request->get('enddate');
+            $employee->start_date = Carbon::now();
+            $employee->end_date = null;
             if ($request->get('active') != null) {
                 $employee->in_employment = 'Y';
             } else {
