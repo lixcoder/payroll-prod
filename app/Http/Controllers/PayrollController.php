@@ -983,7 +983,6 @@ class PayrollController extends Controller
                     ->orWhere('organization_id', Auth::user()->organization_id)
                     ->where('job_group_name', request()->type)
                     ->first();
-        return request()->type;
 
         if (request('type') == 'management') {
 
