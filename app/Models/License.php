@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class License extends Model
@@ -14,7 +15,13 @@ class License extends Model
 
         if(count($currentSub)>=1){
            $currentSub = json_decode($currentSub, true); 
-            return $currentSub[0]['trial_end_date'];
+
+            if(Carbon::now() > Carbon::parse($currentSub[0]['trial_end_date']){
+               return "Your subscripption has depleted purchase a new package";
+            }else{
+                return "Your Subscription Expiry Date is: ".$currentSub[0]['trial_end_date'];
+            }
+            
         }
         else{
             return 0;
