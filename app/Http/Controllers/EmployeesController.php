@@ -365,7 +365,7 @@ class EmployeesController extends Controller
             if ($request->get('education') == '') {
                 $employee->education_type_id = null;
             } else {
-                $employee->education_type_id = $request->get('education');
+                return $employee->education_type_id = $request->get('education');
             }
             $a = str_replace(',', '', $request->get('pay'));
             $employee->basic_pay = $a;
