@@ -1001,7 +1001,7 @@ class PayrollController extends Controller
                 ->get();
         }
 
-        return json_decode($employees);
+        return count($employees);
 
 
 
