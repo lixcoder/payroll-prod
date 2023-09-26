@@ -981,8 +981,9 @@ class PayrollController extends Controller
         //     })->first();
         $jgroup = Jobgroup::whereNull('organization_id')
                     ->orWhere('organization_id', Auth::user()->organization_id)
+                    ->where('job_group_name',$request()->type)
                     ->first();
-        return request();
+        return request()->type;
 
         if (request('type') == 'management') {
 
