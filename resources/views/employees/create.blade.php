@@ -491,7 +491,10 @@
                                                     <div class="form-group col-sm-4">
                                                         <label for="bbranch_id">Bank Branch</label>
                                                         <select name="bbranch_id" id="bbranch_id" class="form-control">
-                                                            <option></option>
+                                                            @foreach($bbranches as $bank)
+                                                                <option
+                                                                    value="{{ $bank->id }}"> {{ $bank->bank_branch_name }}</option>
+                                                            @endforeach
                                                         </select>
 
                                                     </div>
