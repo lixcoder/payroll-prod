@@ -1326,12 +1326,11 @@ class Payroll extends Model
 
         $other_ded = 0.00;
 
-        $jgroup = Jobgroup::where('job_group_name', 'Management')
+        $jgroup = Jobgroup::where('job_group_name', request()->type)
             ->where(function ($query) {
                 $query->whereNull('organization_id')
                     ->orWhere('organization_id', Auth::user()->organization_id);
             })->first();
-        return request();
 
         if ($type == 'management') {
 
