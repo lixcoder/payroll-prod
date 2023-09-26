@@ -172,6 +172,7 @@ class PayrollController extends Controller
         if (!Auth::user()->can('reprocess_payroll') && $unlock == 0) {
             $check = DB::table('x_transact')
                 ->where('financial_month_year', '=', request('period'))
+                ->where('organization_id',Auth::user()->organization_id)
                 ->count();
 
             if ($check > 0) {
