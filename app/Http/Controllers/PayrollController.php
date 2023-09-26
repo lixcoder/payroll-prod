@@ -996,7 +996,7 @@ class PayrollController extends Controller
             $employees = DB::table('x_employee')
                 ->where('in_employment', '=', 'Y')
                 ->where('organization_id', Auth::user()->organization_id)
-                ->where('job_group_id', '!=', $jgroup->id)
+                ->where('job_group_id', $jgroup->id)
                 ->whereDate('date_joined', '<=', $end)
                 ->get();
         }
