@@ -377,7 +377,8 @@ class EmployeesController extends Controller
             if ($request->get('citizenship') == '') {
                 $employee->citizenship_id = null;
             } else {
-                $employee->citizenship_id = $request->get('citizenship');
+                //$employee->citizenship_id = $request->get('citizenship');
+                $employee->citizenship_id = 0;
             }
             $employee->mode_of_payment = $request->get('modep');
             if ($request->get('bank_account_number') != null) {
