@@ -18,7 +18,7 @@ class DeductionsController extends Controller {
      */
     public function index()
     {
-        $deductions = Deduction::all();
+        $deductions = Deduction::where('organization_id', Auth::user()->organization_id)->get();
 
         Audit::logaudit(now('Africa/Nairobi'),Auth::user()->username, 'view', 'viewed deduction list ');
 
