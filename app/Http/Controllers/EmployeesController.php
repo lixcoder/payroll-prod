@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\EmployeeProbation;
-use App\Models\Subscriptions;
 use Carbon\Carbon;
 use App\Models\Bank;
 use App\Models\Audit;
@@ -29,6 +28,7 @@ use Illuminate\Http\Request;
 use App\Exports\EmployeeExport;
 use App\Imports\EmployeeImport;
 use App\Models\Employeebenefit;
+use App\Models\Subscriptions;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
