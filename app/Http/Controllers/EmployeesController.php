@@ -442,7 +442,8 @@ class EmployeesController extends Controller
             if ($request->get('type_id') == '') {
                 $employee->type_id = null;
             } else {
-                $employee->type_id = $request->get('type_id');
+                // $employee->type_id = $request->get('type_id');
+                $employee->type_id = 0;
             }
             if ($request->get('i_tax') != null) {
                 $employee->income_tax_applicable = '1';
