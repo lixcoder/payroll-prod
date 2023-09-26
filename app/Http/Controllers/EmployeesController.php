@@ -256,13 +256,11 @@ class EmployeesController extends Controller
         $employees = count(Employee::where('organization_id', Auth::user()->organization_id)->get());
 //        dd($employees);
         #echo "<pre>"; print_r($organization->licensed); echo "</pre>"; die;
-        if ($organization->licensed <= $employees) {
-            if(!(License::checkSubscription(Auth::user()->organization_id))){
-                return "Here we Go!!!";
-                return View::make('employees.employeelimit');
-            }
-            
-        } else {
+        if(!(License::checkSubscription(Auth::user()->organization_id))){
+            return "Here we Go!!!";
+            return View::make('employees.employeelimit');
+        }
+         else {
             try {
                 $currency = Currency::where('organization_id', Auth::user()->organization_id)->first();
 //            $currency = Currency::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->first();
