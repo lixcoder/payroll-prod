@@ -50,11 +50,11 @@ class NhifController extends BaseController {
 
         $nrate = new NhifRates;
 
-        $nrate->minimum = request('minimum');
+        $nrate->income_from = request('minimum');
 
-        $nrate->maximum = request('maximum');
+        $nrate->income_to = request('maximum');
 
-        $nrate->contribution = request('contribution');
+        $nrate->hi_amount = request('contribution');
 
         $nrate->organization_id = Auth::user()->organizattion_id;
 
