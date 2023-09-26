@@ -281,6 +281,7 @@ class EmployeesController extends Controller
                     $pfn = preg_replace('/\D/', '', $pfn);
 
                 }
+                return $branches;
                 return View::make('employees.create', compact('currency', 'citizenships', 'pfn', 'branches', 'departments', 'jobtitles', 'etypes', 'jgroups', 'banks', 'bbranches', 'educations'));
             }
             catch (\Exception $e){}
