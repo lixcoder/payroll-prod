@@ -7,9 +7,9 @@ class NhifRates extends Model {
 	public $table = "x_hospital_insurance";
 
 public static $rules = [
-		'income_from' => 'required',
-		'income_to' => 'required',
-		'hi_amount' => 'required',
+		'minimum' => 'required',
+		'maximum' => 'required',
+		'contribution' => 'required',
 	];
 
 public static $messages = array(
