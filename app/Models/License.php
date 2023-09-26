@@ -21,7 +21,7 @@ class License extends Model
                return 0;
             }else{
                 //indicates subscrition is still active
-                return 1;
+                return 0;
             }
             
         }
