@@ -257,8 +257,10 @@ class EmployeesController extends Controller
 //        dd($employees);
         #echo "<pre>"; print_r($organization->licensed); echo "</pre>"; die;
         if ($organization->licensed <= $employees) {
-            return License::checkSubscription(Auth::user()->organization_id);
-            return View::make('employees.employeelimit');
+            if(!(License::checkSubscription(Auth::user()->organization_id))){
+                return View::make('employees.employeelimit');
+            }
+            
         } else {
             try {
                 $currency = Currency::where('organization_id', Auth::user()->organization_id)->first();
