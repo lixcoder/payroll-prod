@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 class Organization extends Model
 {
+    // protected $table = 'x_organizations';
     protected $table = 'x_organizations';
     // Add your validation rules here
     public static $rules = [
