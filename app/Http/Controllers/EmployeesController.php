@@ -366,7 +366,8 @@ class EmployeesController extends Controller
                 $employee->education_type_id = null;
             } else {
                 // Set education type id as null to avoid errors, this should be corrected to indicate correct details
-                $employee->education_type_id = $request->get('education_type_id');
+                // $employee->education_type_id = $request->get('education_type_id');
+                $employee->education_type_id =0;
             }
             $a = str_replace(',', '', $request->get('pay'));
             $employee->basic_pay = $a;
