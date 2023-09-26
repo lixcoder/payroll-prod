@@ -483,7 +483,7 @@ class EmployeesController extends Controller
             else{
                 $employee->confirmed = 'N';
             }
-            $employee->save();
+            // $employee->save();
 
             // Probation
             $probation = Probation::where('id',$request->probationPeriod)->pluck('period')->first();
@@ -496,7 +496,7 @@ class EmployeesController extends Controller
             $probationEmp->end_date = Carbon::now()->addMonths($months);
             $probationEmp->save();
 
-            Audit::logaudit('Employee', 'create', 'created: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name);
+            Audit::logaudit(Carbon::now(), 'create', 'created: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name);
 
             $insertedId = $employee->id;
             if (($request->get('kin_first_name')[0]) !== null) {
