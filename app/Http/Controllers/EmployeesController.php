@@ -483,7 +483,7 @@ class EmployeesController extends Controller
             else{
                 $employee->confirmed = 'N';
             }
-            // $employee->save();
+            $employee->save();
 
             // Probation
             $probation = Probation::where('id',$request->probationPeriod)->pluck('period')->first();
