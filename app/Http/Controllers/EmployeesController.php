@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\EmployeeProbation;
 use Carbon\Carbon;
 use App\Models\Bank;
+use App\Models\License;
 use App\Models\Audit;
 use App\Models\EType;
 use App\Models\Branch;
@@ -256,7 +257,7 @@ class EmployeesController extends Controller
 //        dd($employees);
         #echo "<pre>"; print_r($organization->licensed); echo "</pre>"; die;
         if ($organization->licensed <= $employees) {
-            Subscriptions::checkSubscription(Auth::user()->organization_id);
+            License::checkSubscription(Auth::user()->organization_id);
             return View::make('employees.employeelimit');
         } else {
             try {
