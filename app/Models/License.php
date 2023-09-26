@@ -18,4 +18,5 @@ class License extends Model
         else{
             return "No Subscription for Current user!!!";
         }
+    }
 }
