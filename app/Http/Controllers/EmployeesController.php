@@ -256,7 +256,6 @@ class EmployeesController extends Controller
 //        dd($employees);
         #echo "<pre>"; print_r($organization->licensed); echo "</pre>"; die;
         if ($organization->licensed <= $employees) {
-            return "senor";
             return View::make('employees.employeelimit');
         } else {
             try {
