@@ -13,10 +13,10 @@ class License extends Model
         $currentSub = License::where('business_id', $id)->get();
 
         if(count($currentSub)>=1){
-           return json_decode($currentSub); 
+           return $currentSub->end_date; 
         }
         else{
-            return "No Subscription for Current user!!!";
+            return 0;
         }
     }
 }
