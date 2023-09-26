@@ -53,7 +53,7 @@ class HousingLevyController extends Controller
 
         $hrate->percentage = request('percentage');
 
-        $hrate->organization_id = Auth::user()->organization_id);
+        $hrate->organization_id = Auth::user()->organization_id;
 
         $hrate->save();
 
