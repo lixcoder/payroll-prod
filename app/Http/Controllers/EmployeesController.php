@@ -258,6 +258,7 @@ class EmployeesController extends Controller
         #echo "<pre>"; print_r($organization->licensed); echo "</pre>"; die;
         if ($organization->licensed <= $employees) {
             if(!(License::checkSubscription(Auth::user()->organization_id))){
+                return "Here we Go!!!";
                 return View::make('employees.employeelimit');
             }
             
