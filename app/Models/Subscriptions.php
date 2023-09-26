@@ -11,6 +11,13 @@ class Subscriptions extends Model
 
     public static function checkSubscription($id){
         $currentSub = Sbscription::where('business_id', $id)->get();
-        return json_decode($currentSub);
+
+        if(count($currentSub)>=1){
+           return json_decode($currentSub); 
+        }
+        else{
+            return "No Subscription for Current user!!!";
+        }
+        
     }
 }
