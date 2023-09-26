@@ -1331,6 +1331,7 @@ class Payroll extends Model
                 $query->whereNull('organization_id')
                     ->orWhere('organization_id', Auth::user()->organization_id);
             })->first();
+        return request();
 
         if ($type == 'management') {
 
