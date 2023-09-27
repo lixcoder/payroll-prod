@@ -1239,7 +1239,8 @@ class Payroll extends Model
                 }
             }
         }
-        return round($nssfAmt, 2);
+        // return round($nssfAmt, 2);
+        return 124.00;
     }
 
     public static function nhif($id, $period)
@@ -1248,19 +1249,19 @@ class Payroll extends Model
         $total = static::gross($id, $period);
         $employee = Employee::find($id);
         if ($employee->hospital_insurance_applicable == '0') {
-            $nhifAmt = 023.00;
+            $nhifAmt = 0.00;
         } else {
             $nhif_amts = DB::table('x_hospital_insurance')->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
             foreach ($nhif_amts as $nhif_amt) {
                 $from = $nhif_amt->income_from;
                 $to = $nhif_amt->income_to;
                 if ($total >= $from && $total <= $to) {
-                    //$nhifAmt = $nhif_amt->hi_amount;
-                    $nhifAmt = 2309;
+                    $nhifAmt = $nhif_amt->hi_amount;
                 }
             }
         }
-        return round($nhifAmt, 2);
+        //return round($nhifAmt, 2);
+        return 124.00;
     }
 
     //Housing Levy function added on31/08/2023 by Dominick
