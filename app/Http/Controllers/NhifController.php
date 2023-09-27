@@ -56,7 +56,7 @@ class NhifController extends BaseController {
 
         $nrate->hi_amount = request('contribution');
 
-        $nrate->organization_id = Auth::user()->organizattion_id;
+        $nrate->organization_id = Auth::user()->organization_id;
 
         $nrate->save();
 
