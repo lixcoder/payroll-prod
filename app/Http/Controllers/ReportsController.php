@@ -93,7 +93,7 @@ class ReportsController extends Controller
                 break;
         }
 
-        $organization = Organization::find(1);
+        $organization = Organization::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
         //return $members;
         if ($request->get('format') == 'pdf') {
             $pdf = app('dompdf.wrapper')->loadView('pdf.memberlist', compact('members', 'organization'))->setPaper('a4');
@@ -4379,8 +4379,9 @@ class ReportsController extends Controller
                 $jgroup = Jobgroup::where(function ($query) {
                     $query->whereNull('organization_id')
                         ->orWhere('organization_id', Auth::user()->organization_id);
-                })->where('job_group_name', 'Management')
+                })->where('job_group_name', $type)
                     ->first();
+		return $type;
 
                 $empall = DB::table('x_transact')
                     ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
