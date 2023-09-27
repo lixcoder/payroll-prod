@@ -70,7 +70,7 @@ class NssfController extends Controller {
 
         $nrate->graduated_scale = request('graduated_scale');
 
-        $nrate->organization_id = ->Auth::user()->organization_id;
+        $nrate->organization_id = Auth::user()->organization_id;
 
         $nrate->save();
 
