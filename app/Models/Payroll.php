@@ -1250,7 +1250,7 @@ class Payroll extends Model
         if ($employee->hospital_insurance_applicable == '0') {
             $nhifAmt = 0.00;
         } else {
-            $nhif_amts = DB::table('x_hospital_insurance')->where('organization_id', 0)->orWhere('organization_id', Auth::user()->organization_id)->get();
+            $nhif_amts = DB::table('x_hospital_insurance')->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
             foreach ($nhif_amts as $nhif_amt) {
                 $from = $nhif_amt->income_from;
                 $to = $nhif_amt->income_to;
