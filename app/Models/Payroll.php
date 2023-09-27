@@ -1239,8 +1239,7 @@ class Payroll extends Model
                 }
             }
         }
-        // return round($nssfAmt, 2);
-        return 124.00;
+        return round($nssfAmt, 2);
     }
 
     public static function nhif($id, $period)
@@ -1260,8 +1259,7 @@ class Payroll extends Model
                 }
             }
         }
-        //return round($nhifAmt, 2);
-        return 124.00;
+        return round($nhifAmt, 2);
     }
 
     //Housing Levy function added on31/08/2023 by Dominick
