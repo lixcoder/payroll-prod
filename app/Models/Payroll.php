@@ -1225,7 +1225,7 @@ class Payroll extends Model
         if ($employee->social_security_applicable == '0') {
             $nssfAmt = 0.00;
         } else {
-            $nssf_amts = DB::table('x_social_security')->get();
+            $nssf_amts = DB::table('x_social_security')->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
             foreach ($nssf_amts as $nssf_amt) {
                 $nssfLowerEarning = $nssf_amt->nssf_lower_earning;
                 $to = $nssf_amt->nssf_upper_earning;
@@ -1255,7 +1255,8 @@ class Payroll extends Model
                 $from = $nhif_amt->income_from;
                 $to = $nhif_amt->income_to;
                 if ($total >= $from && $total <= $to) {
-                    $nhifAmt = $nhif_amt->hi_amount;
+                    //$nhifAmt = $nhif_amt->hi_amount;
+                    $nhifAmt = 2309;
                 }
             }
         }
