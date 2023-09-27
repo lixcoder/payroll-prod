@@ -4381,7 +4381,7 @@ class ReportsController extends Controller
                         ->orWhere('organization_id', Auth::user()->organization_id);
                 })->where('job_group_name', $type)
                     ->first();
-		return $type;
+		return "senor";
 
                 $empall = DB::table('x_transact')
                     ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
