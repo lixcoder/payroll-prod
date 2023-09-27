@@ -4376,7 +4376,7 @@ class ReportsController extends Controller
                 $organization = Organization::find(Auth::user()->organization_id);
 
                 $type = $request->type;
-		$return $request;
+		return $request;
                 $jgroup = Jobgroup::where(function ($query) {
                     $query->whereNull('organization_id')
                         ->orWhere('organization_id', Auth::user()->organization_id);
