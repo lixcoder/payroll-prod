@@ -4375,13 +4375,12 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $type = $request->get("type");
+                $type = $request->type;
                 $jgroup = Jobgroup::where(function ($query) {
                     $query->whereNull('organization_id')
                         ->orWhere('organization_id', Auth::user()->organization_id);
                 })->where('job_group_name', $type)
                     ->first();
-		return "senor";
 
                 $empall = DB::table('x_transact')
                     ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
