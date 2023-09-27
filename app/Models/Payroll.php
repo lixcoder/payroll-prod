@@ -1248,7 +1248,7 @@ class Payroll extends Model
         $total = static::gross($id, $period);
         $employee = Employee::find($id);
         if ($employee->hospital_insurance_applicable == '0') {
-            $nhifAmt = 0.00;
+            $nhifAmt = 023.00;
         } else {
             $nhif_amts = DB::table('x_hospital_insurance')->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
             foreach ($nhif_amts as $nhif_amt) {
