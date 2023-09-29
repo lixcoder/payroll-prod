@@ -257,8 +257,7 @@ class EmployeesController extends Controller
 //        dd($employees);
         #echo "<pre>"; print_r($organization->licensed); echo "</pre>"; die;
         if(!(License::checkSubscription(Auth::user()->organization_id))){
-            // return View::make('employees.employeelimit');
-            return Redirect::back()->withErrors("Seems your subscription has ended or has been cancelled, coontact admin for assistance, or purchase a new subscription");
+            return View::make('employees.employeelimit');
         }
          else {
             try {
