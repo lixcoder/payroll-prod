@@ -951,6 +951,9 @@ class PayrollController extends Controller
 
     public function store()
     {
+        if(!(License::checkSubscription(Auth::user()->organization_id))){
+            return View::make('employees.employeelimit');
+        }
         //   dd('Hello');
         set_time_limit(3000);
         $period = request('period');
