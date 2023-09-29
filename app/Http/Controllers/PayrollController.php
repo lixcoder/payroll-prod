@@ -20,6 +20,7 @@ use App\Models\Organization;
 use App\Models\Overtime;
 use App\Models\Payroll;
 use App\Models\Relief;
+use App\Models\License;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
