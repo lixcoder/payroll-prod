@@ -257,7 +257,8 @@ class EmployeesController extends Controller
 //        dd($employees);
         #echo "<pre>"; print_r($organization->licensed); echo "</pre>"; die;
         if(!(License::checkSubscription(Auth::user()->organization_id))){
-            return View::make('employees.employeelimit');
+            // return View::make('employees.employeelimit');
+            return License::checkSubscription(Auth::user()->organization_id);
         }
          else {
             try {
