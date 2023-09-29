@@ -16,10 +16,10 @@ class License extends Model
         if(count($currentSub)>=1){
            $currentSub = json_decode($currentSub, true); 
 
-            if(Carbon::now()->greaterThan(Carbon::parse($currentSub[0]['trial_end_date']))  || $currentSub[0]['status'] == 'aproved' || $currentSub[0]['deleted_at'] == NULL){
+            if(Carbon::now()->greaterThan(Carbon::parse($currentSub[0]['trial_end_date']))  || $currentSub[0]['status'] != 'approved' || $currentSub[0]['deleted_at'] != NULL){
                 // && $currentSub[0]['status'] == 'approved' && $currentSub[0]['deleted_at'] == NULL
                 //indicates new subscrition needed to keep using services
-               return var_dump($currentSub[0]['deleted_at']);
+               return "Kindly";
             }else{
                 //indicates subscrition is still active
                 return 1;
