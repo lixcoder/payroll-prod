@@ -256,7 +256,8 @@ class EmployeesController extends Controller
         $employees = count(Employee::where('organization_id', Auth::user()->organization_id)->get());
 //        dd($employees);
         #echo "<pre>"; print_r($organization->licensed); echo "</pre>"; die;
-        if(!(License::checkSubscription(Auth::user()->organization_id))){
+        // if(!(License::checkSubscription(Auth::user()->organization_id))){
+        if((License::checkSubscription(Auth::user()->organization_id))){
             // return View::make('employees.employeelimit');
             return License::checkSubscription(Auth::user()->organization_id);
         }
