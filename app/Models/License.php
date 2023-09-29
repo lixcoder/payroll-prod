@@ -22,7 +22,7 @@ class License extends Model
                return 0;
             }else{
                 //indicates subscrition is still active
-                return $currentSub->status;
+                return $currentSub[0]['status'];
             }
             
         }
