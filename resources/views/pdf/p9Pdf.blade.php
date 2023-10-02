@@ -17,7 +17,7 @@
             display: block;
           }
         
-          th, td {
+          tr {
             display: block;
             width: 100%; /* Make cells take full width */
           }
@@ -41,7 +41,7 @@
         <td style="text-align: right">
             Employer's Pin: KRA PIN
         </td>
-    </tr> <br><br>
+    </tr>
     <tr>
         <td>
             Employee's Main Name: NELson Sammy
