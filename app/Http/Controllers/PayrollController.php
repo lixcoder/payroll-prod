@@ -45,7 +45,7 @@ class PayrollController extends Controller
      */
     public function index()
     {
-        if(!isset(Auth::user()->organization_id))){
+        if(!isset(Auth::user()->organization_id)){
             return redirect('login');
         }
         $accounts = Account::where('organization_id', Auth::user()->organization_id)->get();
