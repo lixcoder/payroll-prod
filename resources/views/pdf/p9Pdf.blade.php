@@ -30,7 +30,7 @@
         <td style="text-align: right">
             Employer's Pin: KRA PIN
         </td>
-    </tr>
+    </tr> <br><br>
     <tr>
         <td>
             Employee's Main Name: NELson Sammy
