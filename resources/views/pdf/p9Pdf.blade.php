@@ -24,18 +24,12 @@
     <P>Domestic Taxes Department</P>
     <P>Tax Deduction Card Year 2022</P>
 </center>
-
-    <table>
-       <tr>
-            <td>Sir Dommy</td>
-        </tr> 
-    </table>
     
 <table class="table">
     
     <tr>
         <td>
-            Employer Name: Company
+            Employer Name: {{$organization}}
         </td>
         <td style="text-align: right">
             Employer's Pin: KRA PIN
