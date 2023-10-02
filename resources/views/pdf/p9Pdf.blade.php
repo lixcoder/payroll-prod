@@ -45,7 +45,7 @@
         </td>
     </tr>
 </table>
-<table id="data" class="table table-bordered">
+<!-- <table id="data" class="table table-bordered">
     <tr>
         <td>MONTH</td>
         <td>
@@ -107,7 +107,7 @@
             <p>Ksh.</p>
         </td>
     </tr>
-</table>
+</table> -->
 
 </body>
 </html>
