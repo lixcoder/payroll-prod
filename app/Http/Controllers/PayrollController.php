@@ -204,7 +204,7 @@ class PayrollController extends Controller
                     ->orWhere('organization_id', Auth::user()->organization_id);
             })->first();
         //        dd($jgroup);
-        return $jgroup;
+        return $request;
 
         if (request('type') == 'management') {
 
