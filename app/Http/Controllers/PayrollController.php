@@ -168,7 +168,7 @@ class PayrollController extends Controller
      *
      * @return \Illuminate\Contracts\View\View
      */
-    public function create()
+    public function create(Request $request)
     {
         set_time_limit(2000);
         $unlock = Lockpayroll::where('user_id', Auth::user()->id)->where('period', request('period'))->count();
