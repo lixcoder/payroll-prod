@@ -24,11 +24,14 @@
     <P>Domestic Taxes Department</P>
     <P>Tax Deduction Card Year 2022</P>
 </center>
-<table class="table">
 
-    <tr>
-        <td>Sir Dommy</td>
-    </tr>
+    <table>
+       <tr>
+            <td>Sir Dommy</td>
+        </tr> 
+    </table>
+    
+<table class="table">
     
     <tr>
         <td>
