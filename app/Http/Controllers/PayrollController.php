@@ -210,7 +210,7 @@ class PayrollController extends Controller
                 $query->whereNull('organization_id')
                     ->orWhere('organization_id', Auth::user()->organization_id);
             })->count() == 0){
-            return Redirect::back()->withErrors("No Management Employee Record Found, Please Create Some!!!");
+            return redirect()->back()->with('notice', 'There are no employees in the management category, Kindly add employees to this category to continue...');
         }
 
         if (request('type') == 'management') {
