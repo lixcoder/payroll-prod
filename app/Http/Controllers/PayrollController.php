@@ -205,6 +205,14 @@ class PayrollController extends Controller
             })->first();
         //        dd($jgroup);
 
+        if(request('type') == "management" && Jobgroup::where('job_group_name', request('type'))
+            ->where(function ($query) {
+                $query->whereNull('organization_id')
+                    ->orWhere('organization_id', Auth::user()->organization_id);
+            })->count() == 0){
+            return "No management records found!!!";
+        }
+
         if (request('type') == 'management') {
 
             $employees = DB::table('x_employee')
