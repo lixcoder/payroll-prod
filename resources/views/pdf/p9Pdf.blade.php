@@ -12,7 +12,20 @@
         #data td {
             border: 1px solid black;
         }
+        /* Apply this CSS within a media query for smaller screens */
+        @media (max-width: 768px) {
+          table {
+            display: block;
+          }
+        
+          th, td {
+            display: block;
+            width: 100%; /* Make cells take full width */
+          }
+        }
+
     </style>
+    
 
 </head>
 <body>
