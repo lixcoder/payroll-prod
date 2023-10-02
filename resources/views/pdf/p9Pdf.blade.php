@@ -12,15 +12,6 @@
         #data td {
             border: 1px solid black;
         }
-        /* Apply this CSS within a media query for smaller screens */
-          table {
-            display: block;
-          }
-        
-          tr {
-            display: block;
-            width: 100%; /* Make cells take full width */
-          }
 
     </style>
     
