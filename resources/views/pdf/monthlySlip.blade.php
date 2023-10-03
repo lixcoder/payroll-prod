@@ -78,8 +78,15 @@
 
             use App\Models\Employee;
             use Illuminate\Support\Facades\Auth;
+            use Illuminate\Http\Request;
 
-            $empall = Employee::where('organization_id', Auth::user()->organization_id)->get();
+            if(request('employeeid') == 'All'){
+                 $empall = Employee::where('organization_id', Auth::user()->organization_id)->get();   
+            }
+            else{
+                $empall = Employee::where('id', request('employeeid'))->get();
+            }
+
         ?>
     </div>
 @foreach($empall as $emp)
