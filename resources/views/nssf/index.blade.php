@@ -13,8 +13,8 @@
                             <hr>
                         </div>
                         <div class="col-lg-12">
-                            <div class="card">
-                                <div class="card-body">
+                        <div class="md-card-content" style="overflow-x: auto;">
+                                <div class="card-body" style="width: 500px">
                                     <div class="mb-2">
                                         <a class="btn btn-info btn-sm" href="{{ URL::to('nssf/create')}}">new nssf
                                             rate</a>
@@ -23,8 +23,7 @@
                                            class="table table-condensed table-bordered table-hover">
                                         <thead>
                                         <tr>
-                                            <th>Action</th>
-                                            <th>id</th>
+                                            <th>#</th>
                                             <th>employee contribution</th>
                                             <th>employer contribution</th>
                                             <th>total contribution</th>
@@ -34,7 +33,7 @@
                                             <th>nssf upper earning</th>
                                             <th>employer nssf upper earning</th>
                                             <th>graduated scale</th>
-                                            
+                                            <th>Action</th> 
                                         </tr>
                                         </thead>
                                         <tbody>
