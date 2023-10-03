@@ -4355,7 +4355,7 @@ class ReportsController extends Controller
                 })->download('xls');
             }
         } elseif ($request->get('format') == "pdf") {
-            if ($request->get("employeeid") != 'All') {
+            if ($request->get("employeeid") == 'All') {
 
                 $period = $request->get("period");
                 $select = $request->get("employeeid");
