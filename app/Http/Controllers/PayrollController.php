@@ -168,7 +168,7 @@ class PayrollController extends Controller
      *
      * @return \Illuminate\Contracts\View\View
      */
-    public function create()
+    public function create(Request $request)
     {
         set_time_limit(2000);
         $unlock = Lockpayroll::where('user_id', Auth::user()->id)->where('period', request('period'))->count();
@@ -204,6 +204,14 @@ class PayrollController extends Controller
                     ->orWhere('organization_id', Auth::user()->organization_id);
             })->first();
         //        dd($jgroup);
+
+        if(request('type') == "management" && Jobgroup::where('job_group_name', request('type'))
+            ->where(function ($query) {
+                $query->whereNull('organization_id')
+                    ->orWhere('organization_id', Auth::user()->organization_id);
+            })->count() == 0){
+            return redirect()->back()->with('notice', 'There are no employees in the management category, Kindly add employees to this category to continue...');
+        }
 
         if (request('type') == 'management') {
 
