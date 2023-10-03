@@ -22,7 +22,7 @@
                                         @endforeach
                                     @endif
 
-                                    <form method="POST" action="{{{ URL::to('nssf/update/'.$nrate->id) }}}"
+                                    <form method="POST" action="{{{ URL::to('nssf') }}}"
                                           accept-charset="UTF-8">
                                         @csrf
                                         <fieldset>
