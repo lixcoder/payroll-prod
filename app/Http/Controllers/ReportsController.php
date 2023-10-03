@@ -4417,7 +4417,6 @@ class ReportsController extends Controller
                 $id = $request->get('employeeid');
 
                 $empall = DB::table('x_transact')
-                    ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('x_employee.organization_id', Auth::user()->organization_id)
 		    ->where('x_transact.employeeId',$id)
@@ -4438,11 +4437,10 @@ class ReportsController extends Controller
                 // })->where('job_group_name', $type)
                 //     ->first();
                 $transacts = DB::table('x_transact')
-                    ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('x_employee.organization_id', Auth::user()->organization_id)
 		    ->where('x_transact.employeeId',$id)
-                    ->first();
+                    ->get();
 
                     // Commented out by dominick Kyengo on 31/08/2023
                     //->where('x_employee.id', '=', $request->get('employeeid'))
