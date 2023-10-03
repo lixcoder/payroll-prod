@@ -4449,7 +4449,7 @@ class ReportsController extends Controller
                 // return view('payslips.payslips', compact('empall', 'select', 'period', 'currency', 'organization'));
                 // return view('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization'));
                 $pdf = app('dompdf.wrapper')->loadView('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization', 'transacts'))->setPaper('a4');
-		    return "senor";
+		    return $transacts;
                 return $pdf->stream('Payslips.pdf');
 
 
