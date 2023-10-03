@@ -4418,7 +4418,7 @@ class ReportsController extends Controller
 
                 $empall = DB::table('x_transact')
                     ->where('financial_month_year', '=', $request->get('period'))
-                    ->where('x_employee.organization_id', Auth::user()->organization_id)
+                    ->where('organization_id', Auth::user()->organization_id)
 		    ->where('x_transact.employeeId',$id)
                     ->get();
 
@@ -4438,7 +4438,7 @@ class ReportsController extends Controller
                 //     ->first();
                 $transacts = DB::table('x_transact')
                     ->where('financial_month_year', '=', $request->get('period'))
-                    ->where('x_employee.organization_id', Auth::user()->organization_id)
+                    ->where('organization_id', Auth::user()->organization_id)
 		    ->where('x_transact.employeeId',$id)
                     ->get();
 
