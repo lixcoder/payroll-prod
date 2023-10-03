@@ -4448,7 +4448,7 @@ class ReportsController extends Controller
                 Audit::logaudit(Carbon::now(), 'view', 'viewed payslip for all employees for period ' . $request->get('period'));
                 // return view('payslips.payslips', compact('empall', 'select', 'period', 'currency', 'organization'));
                 // return view('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization'));
-                $pdf = app('dompdf.wrapper')->loadView('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency1', 'organization', 'transacts'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization', 'transacts'))->setPaper('a4');
                 return $pdf->stream('Payslips.pdf');
 
 
