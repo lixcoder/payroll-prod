@@ -4416,19 +4416,19 @@ class ReportsController extends Controller
                 $select = $request->get("employeeid");
                 $id = $request->get('employeeid');
 
-                $empall = DB::table('x_transact')
+                $empall1 = DB::table('x_transact')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('organization_id', Auth::user()->organization_id)
 		    ->where('employeeId',$id)
                     ->get();
 
 
-                $currency = DB::table('x_currencies')
+                $currency1 = DB::table('x_currencies')
                     ->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)
                     ->select('shortname')
                     ->first();
 
-                $organization = Organization::find(Auth::user()->organization_id);
+                $organization1 = Organization::find(Auth::user()->organization_id);
 
                 // $type = $request->type;
                 // $jgroup = Jobgroup::where(function ($query) {
@@ -4436,7 +4436,7 @@ class ReportsController extends Controller
                 //         ->orWhere('organization_id', Auth::user()->organization_id);
                 // })->where('job_group_name', $type)
                 //     ->first();
-                $transacts = DB::table('x_transact')
+                $transacts1 = DB::table('x_transact')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('organization_id', Auth::user()->organization_id)
 		    ->where('employeeId',$id)
@@ -4448,8 +4448,7 @@ class ReportsController extends Controller
                 Audit::logaudit(Carbon::now(), 'view', 'viewed payslip for all employees for period ' . $request->get('period'));
                 // return view('payslips.payslips', compact('empall', 'select', 'period', 'currency', 'organization'));
                 // return view('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization'));
-                $pdf = app('dompdf.wrapper')->loadView('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization', 'transacts'))->setPaper('a4');
-		    return $transacts;
+                $pdf = app('dompdf.wrapper')->loadView('pdf.monthlySlip', compact('empall1', 'select', 'period', 'currency1', 'organization1', 'transacts1'))->setPaper('a4');
                 return $pdf->stream('Payslips.pdf');
 
 
