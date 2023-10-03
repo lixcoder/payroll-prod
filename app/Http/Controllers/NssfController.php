@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Auth;
 
 class NssfController extends Controller {
 
@@ -19,7 +20,7 @@ class NssfController extends Controller {
      */
     public function index()
     {
-        $nrates = DB::table('x_social_security')->get();
+        $nrates = DB::table('x_social_security')->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
         //$nrates = DB::table('x_social_security')->where('income_from', '!=', 0.00)->get();
 
         return View::make('nssf.index', compact('nrates'));
@@ -69,7 +70,7 @@ class NssfController extends Controller {
 
         $nrate->graduated_scale = request('graduated_scale');
 
-        $nrate->organization_id = '1';
+        $nrate->organization_id = Auth::user()->organization_id;
 
         $nrate->save();
 

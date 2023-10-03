@@ -5,6 +5,7 @@ use App\Models\NhifRates;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Auth;
 
 class NhifController extends BaseController {
 
@@ -15,7 +16,7 @@ class NhifController extends BaseController {
      */
     public function index()
     {
-        $nrates = DB::table('x_hospital_insurance')->get();
+        $nrates = DB::table('x_hospital_insurance')->where('organization_id', Auth::user()->organization_id)->get();
 //		$nrates = DB::table('x_hospital_insurance')->where('income_from', '!=', 0)->get();
 //        dd($nrates);
 
@@ -49,13 +50,13 @@ class NhifController extends BaseController {
 
         $nrate = new NhifRates;
 
-        $nrate->minimum = request('income_from');
+        $nrate->income_from = request('minimum');
 
-        $nrate->maximum = request('income_to');
+        $nrate->income_to = request('maximum');
 
-        $nrate->contribution = request('amount');
+        $nrate->hi_amount = request('contribution');
 
-        $nrate->organization_id = '1';
+        $nrate->organization_id = Auth::user()->organization_id;
 
         $nrate->save();
 

@@ -496,10 +496,11 @@ class EmployeesController extends Controller
             $probationEmp->end_date = Carbon::now()->addMonths($months);
             $probationEmp->save();
 
-            Audit::logaudit('Employee', 'create', 'created: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name);
+            Audit::logaudit(Carbon::now(), 'create', 'created: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name);
 
             $insertedId = $employee->id;
-            if (($request->get('kin_first_name')[0]) !== null) {
+            // if (($request->get('kin_first_name')[0]) !== null) {
+            if (isset($request->get('kin_first_name')[0])) {
                 for ($i = 0; $i < count($request->get('kin_first_name')); $i++) {
                     if (($request->get('kin_first_name')[$i] != '' || $request->get('kin_first_name')[$i] != null) && ($request->get('kin_last_name')[$i] != '' || $request->get('kin_last_name')[$i] != null)) {
                         $kin = new Nextofkin;

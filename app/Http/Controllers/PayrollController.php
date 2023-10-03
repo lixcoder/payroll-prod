@@ -20,6 +20,7 @@ use App\Models\Organization;
 use App\Models\Overtime;
 use App\Models\Payroll;
 use App\Models\Relief;
+use App\Models\License;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -44,6 +45,9 @@ class PayrollController extends Controller
      */
     public function index()
     {
+        if(!isset(Auth::user()->organization_id)){
+            return redirect('login');
+        }
         $accounts = Account::where('organization_id', Auth::user()->organization_id)->get();
 
         $department = Department::whereNull('organization_id')
@@ -172,6 +176,7 @@ class PayrollController extends Controller
         if (!Auth::user()->can('reprocess_payroll') && $unlock == 0) {
             $check = DB::table('x_transact')
                 ->where('financial_month_year', '=', request('period'))
+                ->where('organization_id',Auth::user()->organization_id)
                 ->count();
 
             if ($check > 0) {
@@ -198,7 +203,7 @@ class PayrollController extends Controller
                 $query->whereNull('organization_id')
                     ->orWhere('organization_id', Auth::user()->organization_id);
             })->first();
-               // dd($jgroup);
+        //        dd($jgroup);
 
         if (request('type') == 'management') {
 
@@ -950,6 +955,9 @@ class PayrollController extends Controller
 
     public function store()
     {
+        if(!(License::checkSubscription(Auth::user()->organization_id))){
+            return View::make('employees.employeelimit');
+        }
         //   dd('Hello');
         set_time_limit(3000);
         $period = request('period');
@@ -973,13 +981,15 @@ class PayrollController extends Controller
             })->first();
 
 
-        $jgroup = Jobgroup::where('job_group_name', 'Management')
-            ->where(function ($query) {
-                $query->whereNull('organization_id')
-                    ->orWhere('organization_id', Auth::user()->organization_id);
-            })->first();
+        // $jgroup = Jobgroup::where('job_group_name', 'Management')
+        //     ->where(function ($query) {
+        //         $query->whereNull('organization_id')
+        //             ->orWhere('organization_id', Auth::user()->organization_id);
+        //     })->first();
         $jgroup = Jobgroup::whereNull('organization_id')
-                    ->orWhere('organization_id', Auth::user()->organization_id)->first();
+                    ->orWhere('organization_id', Auth::user()->organization_id)
+                    ->where('job_group_name', request()->type)
+                    ->first();
 
         if (request('type') == 'management') {
 
@@ -993,12 +1003,10 @@ class PayrollController extends Controller
             $employees = DB::table('x_employee')
                 ->where('in_employment', '=', 'Y')
                 ->where('organization_id', Auth::user()->organization_id)
-                ->where('job_group_id', '!=', $jgroup->id)
+                ->where('job_group_id', $jgroup->id)
                 ->whereDate('date_joined', '<=', $end)
                 ->get();
         }
-
-
 
 
 

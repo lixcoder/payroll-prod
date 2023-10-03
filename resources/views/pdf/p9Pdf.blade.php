@@ -12,38 +12,40 @@
         #data td {
             border: 1px solid black;
         }
+
     </style>
+    
 
 </head>
 <body>
 <center>
-    <P><img src="https://www.kra.go.ke/templates/kra/images/kra/logo.png" alt="logo"> <br> </P>
+    <img src="https://www.kra.go.ke/templates/kra/images/kra/logo.png" alt="logo">
     <P>kenya Revenue Authority</P>
     <P>Domestic Taxes Department</P>
-    <P>Tax Deduction Card Year 2022 {{}}</P>
+    <P>Tax Deduction Card Year 2022</P>
 </center>
-
-
+    
 <table class="table">
+    
     <tr>
         <td>
-            Employer Name: Company
+            Employer Name: {{$organization}}
         </td>
         <td style="text-align: right">
-            Employer`s Pin: KRA PIN
+            Employer's Pin: KRA PIN
         </td>
     </tr>
     <tr>
         <td>
-            Employee`s Main Name: NELson Sammy
+            Employee's Main Name: NELson Sammy
         </td>
     </tr>
-    <tr>
+    <tr >
         <td>
-            Employee`s Other Names: Ngei
+            Employee's Other Names: Ngei
         </td>
         <td style="text-align: right">
-            Employee`s Pin 1101001
+            Employee's Pin 1101001
         </td>
     </tr>
 </table>

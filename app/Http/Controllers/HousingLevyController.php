@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Auth;
 
 
 class HousingLevyController extends Controller
@@ -19,7 +20,7 @@ class HousingLevyController extends Controller
      */
     public function index()
     {
-        $hrates = DB::table('housing_levy')->get();
+        $hrates = DB::table('housing_levy')->where('organization_id', Auth::user()->organization_id)->get();
       
 
         return View::make('housinglevy.index', compact('hrates'));
@@ -53,7 +54,7 @@ class HousingLevyController extends Controller
 
         $hrate->percentage = request('percentage');
 
-        $hrate->organization_id = '1';
+        $hrate->organization_id = Auth::user()->organization_id;
 
         $hrate->save();
 

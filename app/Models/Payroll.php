@@ -1225,7 +1225,7 @@ class Payroll extends Model
         if ($employee->social_security_applicable == '0') {
             $nssfAmt = 0.00;
         } else {
-            $nssf_amts = DB::table('x_social_security')->get();
+            $nssf_amts = DB::table('x_social_security')->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
             foreach ($nssf_amts as $nssf_amt) {
                 $nssfLowerEarning = $nssf_amt->nssf_lower_earning;
                 $to = $nssf_amt->nssf_upper_earning;
@@ -1326,7 +1326,7 @@ class Payroll extends Model
 
         $other_ded = 0.00;
 
-        $jgroup = Jobgroup::where('job_group_name', 'Management')
+        $jgroup = Jobgroup::where('job_group_name', request()->type)
             ->where(function ($query) {
                 $query->whereNull('organization_id')
                     ->orWhere('organization_id', Auth::user()->organization_id);

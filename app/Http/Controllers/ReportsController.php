@@ -93,7 +93,7 @@ class ReportsController extends Controller
                 break;
         }
 
-        $organization = Organization::find(1);
+        $organization = Organization::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
         //return $members;
         if ($request->get('format') == 'pdf') {
             $pdf = app('dompdf.wrapper')->loadView('pdf.memberlist', compact('members', 'organization'))->setPaper('a4');
@@ -4375,12 +4375,12 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $type = $request->get("type");
-                $jgroup = Jobgroup::where(function ($query) {
-                    $query->whereNull('organization_id')
-                        ->orWhere('organization_id', Auth::user()->organization_id);
-                })->where('job_group_name', 'Management')
-                    ->first();
+                // $type = $request->type;
+                // $jgroup = Jobgroup::where(function ($query) {
+                //     $query->whereNull('organization_id')
+                //         ->orWhere('organization_id', Auth::user()->organization_id);
+                // })->where('job_group_name', $type)
+                //     ->first();
 
                 $empall = DB::table('x_transact')
                     ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
@@ -4391,7 +4391,6 @@ class ReportsController extends Controller
                 $empall = DB::table('x_transact')
                     ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
                     ->where('financial_month_year', '=', $request->get('period'))
-                    ->where('job_group_id', '!=', $jgroup->id)
                     ->where('x_employee.organization_id', Auth::user()->organization_id)
                     ->get();
                 $transacts = DB::table('x_transact')

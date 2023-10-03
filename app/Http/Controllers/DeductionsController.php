@@ -18,7 +18,7 @@ class DeductionsController extends Controller {
      */
     public function index()
     {
-        $deductions = Deduction::all();
+        $deductions = Deduction::where('organization_id', Auth::user()->organization_id)->get();
 
         Audit::logaudit(now('Africa/Nairobi'),Auth::user()->username, 'view', 'viewed deduction list ');
 
@@ -53,11 +53,11 @@ class DeductionsController extends Controller {
 
         $deduction->deduction_name = request('name');
 
-        $deduction->organization_id = '1';
+        $deduction->organization_id = Auth::user()->organization_id;
 
         $deduction->save();
 
-        Audit::logaudit('Deductions', 'create', 'created: '.$deduction->deduction_name);
+        Audit::logaudit(now('Africa/Nairobi'), 'create', 'created: '.$deduction->deduction_name);
 
         return Redirect::route('deductions.index');
     }
