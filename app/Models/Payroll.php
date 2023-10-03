@@ -96,7 +96,7 @@ class Payroll extends Model
     }
     public static function totalTaxablePay($period){
         // Use the `DB::raw` method to apply COALESCE in the SQL query
-        $sum = XTransact::select(\DB::raw('COALESCE(SUM(amount), 0) as total'))
+        $sum = Payroll::select(\DB::raw('COALESCE(SUM(amount), 0) as total'))
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year',$period)
             ->first()->total;
