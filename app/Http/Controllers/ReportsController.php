@@ -4422,7 +4422,7 @@ class ReportsController extends Controller
                     ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('x_employee.organization_id', Auth::user()->organization_id)
-		    ->where('x_transact.employee_id',$id)
+		    ->where('x_transact.employeeId',$id)
                     ->get();
 
 
@@ -4443,7 +4443,7 @@ class ReportsController extends Controller
                     ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('x_employee.organization_id', Auth::user()->organization_id)
-		    ->where('x_transact.employee_id',$id)
+		    ->where('x_transact.employeeId',$id)
                     ->first();
 
                     // Commented out by dominick Kyengo on 31/08/2023
