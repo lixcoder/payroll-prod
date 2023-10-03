@@ -4419,7 +4419,7 @@ class ReportsController extends Controller
                 $empall = DB::table('x_transact')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('organization_id', Auth::user()->organization_id)
-		    ->where('x_transact.employeeId',$id)
+		    ->where('employeeId',$id)
                     ->get();
 
 
@@ -4439,7 +4439,7 @@ class ReportsController extends Controller
                 $transacts = DB::table('x_transact')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('organization_id', Auth::user()->organization_id)
-		    ->where('x_transact.employeeId',$id)
+		    ->where('employeeId',$id)
                     ->get();
 
                     // Commented out by dominick Kyengo on 31/08/2023
@@ -4449,6 +4449,7 @@ class ReportsController extends Controller
                 // return view('payslips.payslips', compact('empall', 'select', 'period', 'currency', 'organization'));
                 // return view('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization'));
                 $pdf = app('dompdf.wrapper')->loadView('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization', 'transacts'))->setPaper('a4');
+		    return "senor";
                 return $pdf->stream('Payslips.pdf');
 
 
