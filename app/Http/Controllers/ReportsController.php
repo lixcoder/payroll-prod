@@ -4416,6 +4416,8 @@ class ReportsController extends Controller
                 $select = $request->get("employeeid");
                 $id = $request->get('employeeid');
 
+		    return $id;
+
                 $empall = DB::table('x_transact')
                     ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
                     ->where('financial_month_year', '=', $request->get('period'))
