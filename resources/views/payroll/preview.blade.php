@@ -305,6 +305,7 @@ function asMoney($value)
                                                         <?php
                                                         $totalnontaxable . $nontaxable->id = $totalnontaxable + (double)App\Models\Payroll::totalnontaxable($nontaxable->id, $period, $type);
                                                         ?>
+
                                                         <td align='right'>
                                                             <strong>{{asMoney($totalnontaxable.$nontaxable->id)}}</strong>
                                                         </td>
@@ -322,11 +323,20 @@ function asMoney($value)
                                                     <td align='right'><strong>{{asMoney($totalnssf)}}</strong></td>
                                                     <td align='right'><strong>{{asMoney($totalnhif)}}</strong></td>
                                                     @foreach($deductions as $deduction)
-                                                        <?php
+                                                        <?php 
                                                         $otherdeduction . $deduction->id = $otherdeduction + (double)App\Models\Payroll::totaldeductions($deduction->id, $period, $type);
                                                         ?>
-                                                        <td align='right'>
-                                                            <strong>{{asMoney($otherdeduction.$deduction->id)}}</strong></td>
+
+                                                            @if($deduction->deduction_name=='Housing Levy')
+                                                                <td align="right">{{ asMoney((double)App\Models\Payroll::totalHousingLevy($period, request('type'))) }}</td>
+                                                            @endif
+                                                            @if($deduction->deduction_name!='Housing Levy')
+                                                                <td align='right'>
+                                                                    <strong>{{asMoney($otherdeduction.$deduction->id)}}</strong>
+                                                                </td>
+                                                            @endif
+                                                        
+                                                        
                                                     @endforeach
                                                     <td align='right'><strong>{{asMoney($totalpension)}}</strong></td>
                                                     <td align='right'><strong>{{asMoney($totaldeduction)}}</strong></td>
