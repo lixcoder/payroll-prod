@@ -4410,6 +4410,51 @@ class ReportsController extends Controller
 
 
             } 
+	    else if ($request->get("employeeid") != 'All') {
+
+                $period = $request->get("period");
+                $select = $request->get("employeeid");
+                $id = $request->get('employeeid');
+
+                $empall = DB::table('x_transact')
+                    ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
+                    ->where('financial_month_year', '=', $request->get('period'))
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
+		    ->where('x_transact.employee_id',$id)
+                    ->get();
+
+
+                $currency = DB::table('x_currencies')
+                    ->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)
+                    ->select('shortname')
+                    ->first();
+
+                $organization = Organization::find(Auth::user()->organization_id);
+
+                // $type = $request->type;
+                // $jgroup = Jobgroup::where(function ($query) {
+                //     $query->whereNull('organization_id')
+                //         ->orWhere('organization_id', Auth::user()->organization_id);
+                // })->where('job_group_name', $type)
+                //     ->first();
+                $transacts = DB::table('x_transact')
+                    ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
+                    ->where('financial_month_year', '=', $request->get('period'))
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
+		    ->where('x_transact.employee_id',$id)
+                    ->first();
+
+                    // Commented out by dominick Kyengo on 31/08/2023
+                    //->where('x_employee.id', '=', $request->get('employeeid'))
+
+                Audit::logaudit(Carbon::now(), 'view', 'viewed payslip for all employees for period ' . $request->get('period'));
+                // return view('payslips.payslips', compact('empall', 'select', 'period', 'currency', 'organization'));
+                // return view('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization'));
+                $pdf = app('dompdf.wrapper')->loadView('pdf.monthlySlip', compact('empall', 'select', 'period', 'currency', 'organization', 'transacts'))->setPaper('a4');
+                return $pdf->stream('Payslips.pdf');
+
+
+            }
             else {
                 if ($data = DB::table('x_transact')
                         ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
