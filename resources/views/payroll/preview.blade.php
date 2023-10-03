@@ -300,7 +300,7 @@ function asMoney($value)
                                                     @endforeach
 
                                                     <td align='right'><strong>{{asMoney($totalgross)}}</strong></td>
-                                                    <td align='right'><strong>Tot taxable</strong></td>
+                                                    <td align='right'><strong>{{App\Models\Payroll::totalTaxablePay($period)}}</strong></td>
                                                     @foreach($nontaxables as $nontaxable)
                                                         <?php
                                                         $totalnontaxable . $nontaxable->id = $totalnontaxable + (double)App\Models\Payroll::totalnontaxable($nontaxable->id, $period, $type);
