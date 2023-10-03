@@ -13,7 +13,7 @@
                             <hr>
                         </div>
                         <div class="col-lg-12">
-                            <div class="md-card-content" style="overflow-x: auto;">
+                            <div class="md-card-content" style="overflow-x: scroll;">
                                 <div class="card-body" style="width: 500px">
                                     <div class="mb-2">
                                         <a class="btn btn-info btn-sm" href="{{ URL::to('nssf/create')}}">new nssf
