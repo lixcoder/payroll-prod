@@ -1197,7 +1197,7 @@ class Payroll extends Model
         if ($paye < 0) {
             $paye = 0.00;
         }
-        return round($paye, 2);
+        return round($taxable, 2);
     }
 
 
