@@ -3,6 +3,7 @@
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\PayeRate;
 
 
 class Payroll extends Model
@@ -1140,25 +1141,41 @@ class Payroll extends Model
             if ($emp->income_tax_applicable == '0') {
                 $paye = 0.00;
             } else if ($emp->income_tax_applicable == '1' && $emp->income_tax_relief_applicable == '1') {
-                if ($taxable >= 13686 && $taxable < 23884) {
-                    $paye = 1229.8 + ($taxable - 12298.33) * 15 / 100;
-                    $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
-                } else if ($taxable > 24000 && $taxable <= 32333) {
-                    $paye = 24000 * 10/100 + ($taxable-24000)*25/100;
-                    $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
-                } else if ($taxable >32333  && $taxable <= 500000) {
-                    $paye = 24000*0.1 + 8333 * 0.25 + ($taxable - 32333) * 0.3;
-                    $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
-                } else if ($taxable >500000 && $taxable <= 800000 ) {
-                    $paye = 2400 + 2083.25 + 467667*.3 + ($taxable - 500000)*0.325;
-                    $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
-                } else if ($taxable > 800000 ) {
-                    $paye = 2400 + 2083.25 + 467667*0.3 + 300000 * 0.325 + ($taxable - 800000) * 0.35;
-                    $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
-                } 
-                else {
-                    $paye = 0.00;
+
+                //Automated PAYE calculation added by Dominick on 4/10/2023...
+                $rates = PayeRate::where('organization_id', Auth::user()->organization_id)->get();
+
+                $paye = 0.00;
+                foreach($rates as $rate){
+                    if($rate->income_from <= $taxable){
+                        $paye +=($rate->income_to)* ($rate->percentage)/100;
+                    }
+                    else if($rate->income_from >= $taxable){
+                        return $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
+                    }
                 }
+
+                return round($paye, 2);
+                
+                // if ($taxable >= 13686 && $taxable < 23884) {
+                //     $paye = 1229.8 + ($taxable - 12298.33) * 15 / 100;
+                //     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
+                // } else if ($taxable > 24000 && $taxable <= 32333) {
+                //     $paye = 24000 * 10/100 + ($taxable-24000)*25/100;
+                //     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
+                // } else if ($taxable >32333  && $taxable <= 500000) {
+                //     $paye = 24000*0.1 + 8333 * 0.25 + ($taxable - 32333) * 0.3;
+                //     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
+                // } else if ($taxable >500000 && $taxable <= 800000 ) {
+                //     $paye = 2400 + 2083.25 + 467667*.3 + ($taxable - 500000)*0.325;
+                //     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
+                // } else if ($taxable > 800000 ) {
+                //     $paye = 2400 + 2083.25 + 467667*0.3 + 300000 * 0.325 + ($taxable - 800000) * 0.35;
+                //     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
+                // } 
+                // else {
+                //     $paye = 0.00;
+                // }
             } else if ($emp->income_tax_applicable == '1' && $emp->income_tax_relief_applicable == '0') {
                 if ($taxable <= 24000) {
                     $paye = 24000 * 10 / 100;
