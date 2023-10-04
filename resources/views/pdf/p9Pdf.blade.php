@@ -1,70 +1,113 @@
-<!DOCTYPE html>
-<html lang="en">
+<html lang="">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tax Deduction Card Year 2022</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
     <style>
         p {
             text-transform: uppercase;
         }
 
-        #data td {
+        #data th {
             border: 1px solid black;
         }
     </style>
+
 </head>
 <body>
-    <center>
-        <img src="https://www.kra.go.ke/templates/kra/images/kra/logo.png" alt="logo">
-        <p>Kenya Revenue Authority</p>
-        <p>Domestic Taxes Department</p>
-        <p>Tax Deduction Card Year 2022</p>
-    </center>
-    <div class="container">
-        <table class="table">
-            <tr>
-                <td>
-                    Employer Name: Company
-                </td>
-                <td style="text-align: right">
-                    Employer's Pin: KRA PIN
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Employee's Main Name: Nelson Sammy
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    Employee's Other Names: Ngei
-                </td>
-                <td style="text-align: right">
-                    Employee's Pin: 1101001
-                </td>
-            </tr>
-        </table>
-        <table id="data" class="table table-bordered">
-            <tr>
-                <td>MONTH</td>
-                <td>Basic Salary <p>Ksh</p></td>
-                <td>Benefits Non Cash <p>Ksh</p></td>
-                <td>Value of Quarters <p>Ksh</p></td>
-                <td style="text-align: justify; width: 90px">Total Gross Pay <p>Ksh</p></td>
-                <td>Defined Contribution <br/> Retirement Scheme <p>Ksh</p></td>
-                <td>Owner Occupied Interest <p>Ksh</p></td>
-                <td>Retirement <br> Contribution & <br> Owner Occupied <br> Interest <p>Ksh</p></td>
-                <td>Chargeable Pay <p>Ksh.</p></td>
-                <td>Tax Charged <p>Ksh.</p></td>
-                <td>Personal Relief <p>Ksh.</p></td>
-                <td>Insurance Relief <p>Ksh.</p></td>
-                <td>Paye Tax <br> (J-K) <p>Ksh.</p></td>
-            </tr>
-            <!-- Add data rows here -->
-        </table>
-    </div>
+<center>
+    <img src="https://www.kra.go.ke/templates/kra/images/kra/logo.png" alt="logo">
+    <P>kenya Revenue Authority</P>
+    <P>Domestic Taxes Department</P>
+    <P>Tax Deduction Card Year 2022</P>
+</center>
+<table class="table">
+    <tr>
+        <th>
+            Employer Name: Company
+        </th>
+        <th style="text-align: right">
+            Employer's Pin: KRA PIN
+        </th>
+    </tr>
+    <tr>
+        <th>
+            Employee's Main Name: NELson Sammy
+        </th>
+    </tr>
+    <tr >
+        <th>
+            Employee's Other Names: Ngei
+        </th>
+        <th style="text-align: right">
+            Employee's Pin 1101001
+        </th>
+    </tr>
+</table>
+<table id="data" class="table table-bordered">
+    <tr>
+        <th>MONTH</th>
+        <th>
+            Basic Salary
+            <p>Ksh</p>
+        </th>
+        <th>
+            Benefits Non Cash
+            <p>Ksh</p>
+        </th>
+        <th>
+            Value of Quarters
+            <p>Ksh</p>
+        </th>
+        <th style="text-align: justify; width: 90px">
+            Total Gross Pay
+            <p>Ksh</p>
+        </th>
+        <th>
+            Defined Contribution
+            <br/>
+            Retirement Scheme
+            <p>Ksh</p>
+        </th>
+        <th>
+            Owner Occupied Interest
+            <p>Ksh</p>
+        </th>
+        <th>
+            Retirement
+            <br>
+            Contribution &
+            <br>
+            Owner Occupied
+            <br>
+            Interest
+            <p>Ksh</p>
+        </th>
+        <th>
+            Chargeable Pay
+            <p>Ksh.</p>
+        </th>
+        <th>
+            Tax Charged
+            <p>Ksh.</p>
+        </th>
+        <th>
+            Personal Relief
+            <p>Ksh.</p>
+        </th>
+        <th>
+            Insurance Relief
+            <p>Ksh.</p>
+        </th>
+        <th>
+            Paye Tax
+            <br>
+            (J-K)
+            <p>Ksh.</p>
+        </th>
+    </tr>
+</table>
+</div>
 </body>
 </html>
