@@ -1150,9 +1150,9 @@ class Payroll extends Model
                     if($rate->income_from <= $taxable){
                         $paye +=($rate->income_to)* ($rate->percentage)/100;
                     }
-                    else if($rate->income_from >= $taxable){
-                        return $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
-                    }
+                    // else if($rate->income_from >= $taxable){
+                    //     return $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
+                    // }
                 }
 
                 return round($paye, 2);
