@@ -1154,7 +1154,7 @@ class Payroll extends Model
                         }
                         if($rate->income_to >= $taxable){
                             $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
-                            $paye = $personalRelief ;
+                            $paye - = ($personalRelief - static::insuranceRelief($id, $period)) ;
                                 // - static::insuranceRelief($id, $period)
                         }
                         else{
