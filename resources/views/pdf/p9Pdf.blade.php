@@ -22,6 +22,7 @@
     <P>Domestic Taxes Department</P>
     <P>Tax Deduction Card Year 2022</P>
 </center>
+<div class="container">
 <table class="table">
     <tr>
         <td>
@@ -108,6 +109,6 @@
         </td>
     </tr>
 </table>
-
+</div>
 </body>
 </html>
