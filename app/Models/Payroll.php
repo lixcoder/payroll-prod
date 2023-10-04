@@ -1152,7 +1152,7 @@ class Payroll extends Model
                             $paye +=0.0;
                         }
                         else{
-                            $paye +=(($rate->income_to) * ($rate->percentage)/100);                           
+                            $paye +=(($rate->income_to - $rate->income_from) * ($rate->percentage)/100);                           
                         }
 
                     }
