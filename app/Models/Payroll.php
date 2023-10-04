@@ -1148,8 +1148,7 @@ class Payroll extends Model
                 foreach($rates as $rate){
                     if($rate->income_from <= $taxable){
                         if($rate->income_to >= $taxable){
-                            // $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
-                            $paye +=0.0;
+                            $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
                         }
                         else{
                             $paye +=(($rate->income_to - $rate->income_from) * ($rate->percentage)/100);                           
