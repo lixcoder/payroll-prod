@@ -6,6 +6,7 @@ use App\Models\PayeRate;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Auth;
 
 class PayeController extends Controller
 {
@@ -16,7 +17,9 @@ class PayeController extends Controller
      */
     public function index()
     {
-        $prates = DB::table('paye')->get();
+        $prates = DB::table('paye')
+                 ->where('organization_id', Auth::user()->organization_id)
+                 ->get();
 
 
         return View::make('paye.index', compact('prates'));
@@ -55,7 +58,7 @@ class PayeController extends Controller
 
         $prate->percentage = request('percentage');
 
-        $prate->organization_id = '1';
+        $prate->organization_id = Auth::user()->organization_id;
 
         $prate->save();
 
