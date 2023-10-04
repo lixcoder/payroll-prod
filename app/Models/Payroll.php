@@ -1154,7 +1154,6 @@ class Payroll extends Model
                     // }
                 }
 
-                return round($paye, 2);
                 
                 // if ($taxable >= 13686 && $taxable < 23884) {
                 //     $paye = 1229.8 + ($taxable - 12298.33) * 15 / 100;
