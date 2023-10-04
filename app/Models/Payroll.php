@@ -1146,6 +1146,9 @@ class Payroll extends Model
                 $rates = PayeRate::where('organization_id', Auth::user()->organization_id)->get();
 
                 $personalRelief = 0.00;
+                if(count($rates) > 1){
+                    return redirect()->back()->withErrors("No tax slab found, add a tax slab in payroll settings!!!")->withInput();
+                }
 
                 foreach($rates as $rate){
                     if($rate->income_from <= $taxable){
