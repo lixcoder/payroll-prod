@@ -9,22 +9,11 @@
 <style>
         .table-container {
             overflow-x: auto; 
+             flex-grow: 1;
+             max-width: 1024px;
+             width: 100%;
         }
 
-        @media print {
-            body {
-                font-size: 12px; 
-            }
-
-            .table th,
-            .table td {
-                padding: 5px;
-            }
-
-            .card {
-                page-break-before: always; 
-            }
-        }
     </style>
 <body>
         <center>
@@ -67,7 +56,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="md-table-content" style="overflow-x: auto;">
-                    <div class="table-body" style="width: 500px">
+                    <div class="table-body" style="width: 1024px">
                         <table id="data" class="table table-condensed table-bordered table-hover">
                             <tr>
                                 <th>Month</th>
