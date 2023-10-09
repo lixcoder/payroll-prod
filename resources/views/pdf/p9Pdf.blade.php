@@ -1,8 +1,8 @@
-<?php
-use app\Models\Organization;
+// <?php
+// use app\Models\Organization;
 
-$organizations = Organization::where('id', '$organization')->get();
-?>
+// $organizations = Organization::where('id', '$organization')->get();
+// ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
