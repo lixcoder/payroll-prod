@@ -52,7 +52,7 @@
         </div>
 
     <div class="table-container">
-        <div class="container">
+        <div class="container-xxl">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="md-table-content" style="overflow-x: auto;">
