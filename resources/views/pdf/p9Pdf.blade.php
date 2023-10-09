@@ -2,6 +2,7 @@
 $transactions = DB::table('x_transact')
     ->where('financial_month_year', 'LIKE', '%' . $year)
     ->where('organization_id', $organization->id)
+    ->where('employeeId', $employee->id)
     ->get();
 
 ?>
@@ -55,7 +56,7 @@ $transactions = DB::table('x_transact')
                     <tr>
                         
                         <th>
-                            Employer Name: {{$organization->name ." ".$transactions}}
+                            Employer Name: {{$organization->name}}
                         </th>
                         <th style="text-align: right">
                             Employer's Pin: {{$organization->tax_number_1}}
@@ -69,10 +70,10 @@ $transactions = DB::table('x_transact')
                     </tr>
                     <tr >
                         <th>
-                            Employee's Other Names: {{$employee->middle_name ." : ".$employee->id}}
+                            Employee's Other Names: {{$employee->middle_name}}
                         </th>
                         <th style="text-align: right">
-                            Employee's pin {{$employee->pin ." : ".$employee->id}}
+                            Employee's pin {{$employee->pin}}
                         </th>
                     </tr>
                 </table>
@@ -154,67 +155,24 @@ $transactions = DB::table('x_transact')
 
 
                         <!--          Table rows containing data                    -->
-                            <tr>
-                                <th>Month</th>
-                                <th>
-                                    Basic Salary
-                                    <p>Ksh</p>
-                                </th>
-                                <th>
-                                    Benefits Non Cash
-                                    <p>Ksh</p>
-                                </th>
-                                <th>
-                                    Value of Quarters
-                                    <p>Ksh</p>
-                                </th>
-                                <th style="text-align: justify; width: 90px">
-                                    Total Gross Pay
-                                    <p>Ksh</p>
-                                </th>
-                                <th>
-                                    Defined Contribution
-                                    <br/>
-                                    Retirement Scheme
-                                    <p>Ksh</p>
-                                </th>
-                                <th>
-                                    Owner Occupied Interest
-                                    <p>Ksh</p>
-                                </th>
-                                <th>
-                                    Retirement
-                                    <br>
-                                    Contribution &
-                                    <br>
-                                    Owner Occupied
-                                    <br>
-                                    Interest
-                                    <p>Ksh</p>
-                                </th>
-                                <th>
-                                    Chargeable Pay
-                                    <p>Ksh.</p>
-                                </th>
-                                <th>
-                                    Tax Charged
-                                    <p>Ksh.</p>
-                                </th>
-                                <th>
-                                    Personal Relief
-                                    <p>Ksh.</p>
-                                </th>
-                                <th>
-                                    Insurance Relief
-                                    <p>Ksh.</p>
-                                </th>
-                                <th>
-                                    Paye Tax
-                                    <br>
-                                    (J-K)
-                                    <p>Ksh.</p>
-                                </th>
-                            </tr>
+                            @foreach($transactions as $transaction)
+                                <tr>
+                                    <td>{{transaction->financial_month_year}}</td>
+                                    <td>{{transaction->basic_pay}}</td>
+
+                                    <td>{{transaction->relief}}</td>
+                                    <td>{{'undetermined'}}</td>
+                                    <td>{{transaction->earning_amount}}</td>
+                                    <td>{{transaction->nssf_amount}}</td>
+                                    <td>{{'undetermined'}}</td>
+                                    <td>{{'undetermined'}}</td>
+                                    <td>{{taxable_income}}</td>
+                                    <td>{{transaction->gross_tax}}</td>
+                                    <td>{{transaction->relief}}</td>
+                                    <td>{{transaction->insurance_relief}}</td>
+                                    <td>{{transaction->paye}}</td>
+                                </tr>
+                            @endforeach
 
                             //
                         </table>
