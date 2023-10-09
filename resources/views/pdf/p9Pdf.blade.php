@@ -1,7 +1,8 @@
 <?php
 $transactions = DB::table('x_transact')
-    ->whereRaw("financial_month_year LIKE %", [$year])
+    ->where('financial_month_year', 'LIKE', '%' . $year)
     ->get();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
