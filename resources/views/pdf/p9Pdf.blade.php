@@ -44,21 +44,21 @@
             <img src="https://www.kra.go.ke/templates/kra/images/kra/logo.png" alt="logo" class="img-fluid">
             <P>Kenya Revenue Authority</P>
             <P>Domestic Taxes Department</P>
-            <P>Tax Deduction Card <b>{{2022}}</b></P>
+            <P>Tax Deduction Card <b>{{$year}}</b></P>
         </center>
 
         <div class="row">
             <div class="col-lg-6">
                 <table class="table table-bordered">
                     <tr>
-                        @foreach($organizations as $organization)
+                        
                         <th>
                             Employer Name: {{$organization->name}}
                         </th>
                         <th style="text-align: right">
                             Employer's Pin: {{$organization->tax_number_1}}
                         </th>
-                        @endforeach
+                        
                     </tr>
                     <tr>
                         <th>
@@ -67,7 +67,7 @@
                     </tr>
                     <tr >
                         <th>
-                            Employee's Other Names: {{$employee->middle_name ." ". $organization ." ". $year}}
+                            Employee's Other Names: {{$employee->middle_name}}
                         </th>
                         <th style="text-align: right">
                             Employee's pin {{$employee->pin}}
