@@ -59,7 +59,7 @@ $organizations = Organization::where('id', '$organization')->get();
                     </tr>
                     <tr >
                         <th>
-                            Employee's Other Names: {{$employee->middle_name ." ". $organization ." ". $period}}
+                            Employee's Other Names: {{$employee->middle_name ." ". $organization ." ". $year}}
                         </th>
                         <th style="text-align: right">
                             Employee's pin {{$employee->pin}}
