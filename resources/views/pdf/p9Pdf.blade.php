@@ -1,7 +1,7 @@
 <?php
-use app\Models\Transact;
-
-$transactions = Transact::where('id', '$organization')->get();
+$transactions = DB::table('x_transact')
+    ->whereRaw("YEAR(financial_month_year) LIKE ?", [$year])
+    ->get();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,7 +45,7 @@ $transactions = Transact::where('id', '$organization')->get();
                     <tr>
                         
                         <th>
-                            Employer Name: {{$organization->name}}
+                            Employer Name: {{$organization->name ." ".$transactions}}
                         </th>
                         <th style="text-align: right">
                             Employer's Pin: {{$organization->tax_number_1}}
