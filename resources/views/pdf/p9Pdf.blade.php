@@ -1,7 +1,7 @@
 <?php
 use app\Models\Organization;
 
-$organization = Organization::where(id, '$organization_id')->get();
+$organization = Organization::where('id', '$organization_id')->get();
 ?>
 <!DOCTYPE html>
 <html lang="en">
