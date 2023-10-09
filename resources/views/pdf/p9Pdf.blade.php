@@ -162,7 +162,7 @@ $transactions = DB::table('x_transact')
 
                                     <td>{{$transaction->relief}}</td>
                                     <td>{{'undetermined'}}</td>
-                                    <td>{{app\Models\Payroll::gross($employee->id,$transaction->financial_month_year)}}</td>
+                                    <td>{{use app\Models\Payroll::gross($employee->id,$transaction->financial_month_year)}}</td>
                                     <td>{{$transaction->nssf_amount}}</td>
                                     <td>{{'undetermined'}}</td>
                                     <td>{{'undetermined'}}</td>
