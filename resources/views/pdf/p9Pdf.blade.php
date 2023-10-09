@@ -67,7 +67,7 @@ $transactions = Transact::where('id', '$organization')->get();
                     </tr>
                     <tr >
                         <th>
-                            Employee's Other Names: {{$employee->middle_name ." : "$employee->id}}
+                            Employee's Other Names: {{$employee->middle_name ." : ".$employee->id}}
                         </th>
                         <th style="text-align: right">
                             Employee's pin {{$employee->pin}}
