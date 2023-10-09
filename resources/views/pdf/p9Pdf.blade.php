@@ -1,7 +1,7 @@
 <?php
 $transactions = DB::table('x_transact')
     ->where('financial_month_year', 'LIKE', '%' . $year)
-    ->where('organizatio_id', $organization->id)
+    ->where('organization_id', $organization->id)
     ->get();
 
 ?>
