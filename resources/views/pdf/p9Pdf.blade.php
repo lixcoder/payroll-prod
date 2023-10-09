@@ -1,5 +1,5 @@
 <?php
-use app/Model/Organization;
+use app\Model\Organization;
 
 $organization = Organization::where(id, '$organization_id')->get();
 ?>
