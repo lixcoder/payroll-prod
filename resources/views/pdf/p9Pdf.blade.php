@@ -39,23 +39,23 @@
                 <table class="table table-bordered">
                     <tr>
                         <th>
-                            Employer Name: Company
+                            Employer Name: {{$employee->organization_id}}
                         </th>
                         <th style="text-align: right">
-                            Employer's Pin: KRA PIN
+                            Employer's Pin: {{$employee->pin}}
                         </th>
                     </tr>
                     <tr>
                         <th>
-                            Employee's Main Name: Nelson Sammy
+                            Employee's Main Name: {{$employee->first_name ." ". $employee->last_name}}
                         </th>
                     </tr>
                     <tr >
                         <th>
-                            Employee's Other Names: Ngei
+                            Employee's Other Names: {{$employee->middle_name}}
                         </th>
                         <th style="text-align: right">
-                            Employee's Pin 1101001
+                            Employee's pin {{{{$employee->pin}}}}
                         </th>
                     </tr>
                 </table>
