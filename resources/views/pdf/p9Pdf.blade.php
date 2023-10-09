@@ -1,8 +1,8 @@
-// <?php
-// use app\Models\Organization;
+<?php
+use app\Models\Transact;
 
-// $organizations = Organization::where('id', '$organization')->get();
-// ?>
+$transactions = Transact::where('id', '$organization')->get();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,7 +67,7 @@
                     </tr>
                     <tr >
                         <th>
-                            Employee's Other Names: {{$employee->middle_name}}
+                            Employee's Other Names: {{$employee->middle_name ." : "$employee->id}}
                         </th>
                         <th style="text-align: right">
                             Employee's pin {{$employee->pin}}
@@ -149,6 +149,72 @@
                                     <p>Ksh.</p>
                                 </th>
                             </tr>
+
+
+                        <!--          Table rows containing data                    -->
+                            <tr>
+                                <th>Month</th>
+                                <th>
+                                    Basic Salary
+                                    <p>Ksh</p>
+                                </th>
+                                <th>
+                                    Benefits Non Cash
+                                    <p>Ksh</p>
+                                </th>
+                                <th>
+                                    Value of Quarters
+                                    <p>Ksh</p>
+                                </th>
+                                <th style="text-align: justify; width: 90px">
+                                    Total Gross Pay
+                                    <p>Ksh</p>
+                                </th>
+                                <th>
+                                    Defined Contribution
+                                    <br/>
+                                    Retirement Scheme
+                                    <p>Ksh</p>
+                                </th>
+                                <th>
+                                    Owner Occupied Interest
+                                    <p>Ksh</p>
+                                </th>
+                                <th>
+                                    Retirement
+                                    <br>
+                                    Contribution &
+                                    <br>
+                                    Owner Occupied
+                                    <br>
+                                    Interest
+                                    <p>Ksh</p>
+                                </th>
+                                <th>
+                                    Chargeable Pay
+                                    <p>Ksh.</p>
+                                </th>
+                                <th>
+                                    Tax Charged
+                                    <p>Ksh.</p>
+                                </th>
+                                <th>
+                                    Personal Relief
+                                    <p>Ksh.</p>
+                                </th>
+                                <th>
+                                    Insurance Relief
+                                    <p>Ksh.</p>
+                                </th>
+                                <th>
+                                    Paye Tax
+                                    <br>
+                                    (J-K)
+                                    <p>Ksh.</p>
+                                </th>
+                            </tr>
+
+                            //
                         </table>
                      </div>
                     </div>
