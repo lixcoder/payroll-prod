@@ -9,13 +9,13 @@
 <style>
         .table-container {
             overflow-x: auto; 
-<<<<<<< HEAD
+
              flex-grow: 1;
              max-width: 1024px;
              width: 100%;
         }
 
-=======
+
         }
 
         @media print {
@@ -32,7 +32,7 @@
                 page-break-before: always; 
             }
         }
->>>>>>> a74086dfddb2151145f34f73d0fc803d61b67f64
+
     </style>
 <body>
         <center>
@@ -75,11 +75,11 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="md-table-content" style="overflow-x: auto;">
-<<<<<<< HEAD
+
                     <div class="table-body" style="width: 1024px">
-=======
+
                     <div class="table-body" style="width: 500px">
->>>>>>> a74086dfddb2151145f34f73d0fc803d61b67f64
+
                         <table id="data" class="table table-condensed table-bordered table-hover">
                             <tr>
                                 <th>Month</th>
