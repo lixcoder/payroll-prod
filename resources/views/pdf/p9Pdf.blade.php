@@ -3,6 +3,7 @@ $transactions = DB::table('x_transact')
     ->where('financial_month_year', 'LIKE', '%' . $year)
     ->where('organization_id', $organization->id)
     ->where('employeeId', $employee->id)
+    ->orderBy('financial_month_year', 'asc')
     ->get();
 
 ?>
