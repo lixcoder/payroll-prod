@@ -1,7 +1,7 @@
 <?php
 use app\Models\Organization;
 
-$organization = Organization::where('id', '$organization_id')->get();
+$organizations = Organization::where('id', '$organization_id')->get();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -43,12 +43,14 @@ $organization = Organization::where('id', '$organization_id')->get();
             <div class="col-lg-6">
                 <table class="table table-bordered">
                     <tr>
+                        @foreach($organizations as $organization)
                         <th>
                             Employer Name: {{$organization->name}}
                         </th>
                         <th style="text-align: right">
                             Employer's Pin: {{$organization->tax_number_1}}
                         </th>
+                        @endforeach
                     </tr>
                     <tr>
                         <th>
