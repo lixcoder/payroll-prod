@@ -1,6 +1,7 @@
 <?php
 $transactions = DB::table('x_transact')
     ->where('financial_month_year', 'LIKE', '%' . $year)
+    ->where('organizatio_id', $organization->id)
     ->get();
 
 ?>
@@ -71,7 +72,7 @@ $transactions = DB::table('x_transact')
                             Employee's Other Names: {{$employee->middle_name ." : ".$employee->id}}
                         </th>
                         <th style="text-align: right">
-                            Employee's pin {{$employee->pin}}
+                            Employee's pin {{$employee->pin ." : ".$employee->id}}
                         </th>
                     </tr>
                 </table>
