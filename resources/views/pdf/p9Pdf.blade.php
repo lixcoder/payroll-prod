@@ -145,20 +145,20 @@ $transactions = DB::table('x_transact')
                         <!--          Table rows containing data                    -->
                             @foreach($transactions as $transaction)
                                 <tr>
-                                    <td>{{transaction->financial_month_year}}</td>
-                                    <td>{{transaction->basic_pay}}</td>
+                                    <td>{{$transaction->financial_month_year}}</td>
+                                    <td>{{$transaction->basic_pay}}</td>
 
-                                    <td>{{transaction->relief}}</td>
+                                    <td>{{$transaction->relief}}</td>
                                     <td>{{'undetermined'}}</td>
-                                    <td>{{transaction->earning_amount}}</td>
-                                    <td>{{transaction->nssf_amount}}</td>
+                                    <td>{{$transaction->earning_amount}}</td>
+                                    <td>{{$transaction->nssf_amount}}</td>
                                     <td>{{'undetermined'}}</td>
                                     <td>{{'undetermined'}}</td>
-                                    <td>{{taxable_income}}</td>
-                                    <td>{{transaction->gross_tax}}</td>
-                                    <td>{{transaction->relief}}</td>
-                                    <td>{{transaction->insurance_relief}}</td>
-                                    <td>{{transaction->paye}}</td>
+                                    <td>{{$taxable_income}}</td>
+                                    <td>{{$transaction->gross_tax}}</td>
+                                    <td>{{$transaction->relief}}</td>
+                                    <td>{{$transaction->insurance_relief}}</td>
+                                    <td>{{$transaction->paye}}</td>
                                 </tr>
                             @endforeach
 
