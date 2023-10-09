@@ -1,3 +1,8 @@
+<?php
+use app/Model/Organization;
+
+$organization = Organization::where(id, '$organization_id')->get();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,7 +44,7 @@
             <img src="https://www.kra.go.ke/templates/kra/images/kra/logo.png" alt="logo" class="img-fluid">
             <P>Kenya Revenue Authority</P>
             <P>Domestic Taxes Department</P>
-            <P>Tax Deduction Card Year 2022</P>
+            <P>Tax Deduction Card <b>{{$period}}</b></P>
         </center>
 
         <div class="row">
@@ -47,10 +52,10 @@
                 <table class="table table-bordered">
                     <tr>
                         <th>
-                            Employer Name: {{$employee->organization_id}}
+                            Employer Name: {{$organization->name}}
                         </th>
                         <th style="text-align: right">
-                            Employer's Pin: {{$employee->pin}}
+                            Employer's Pin: {{$organization->tax_number_1}}
                         </th>
                     </tr>
                     <tr>
