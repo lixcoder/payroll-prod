@@ -36,7 +36,7 @@ $organization = Organization::where('id', '$organization_id')->get();
             <img src="https://www.kra.go.ke/templates/kra/images/kra/logo.png" alt="logo" class="img-fluid">
             <P>Kenya Revenue Authority</P>
             <P>Domestic Taxes Department</P>
-            <P>Tax Deduction Card <b>{{$period}}</b></P>
+            <P>Tax Deduction Card <b>{{2022}}</b></P>
         </center>
 
         <div class="row">
