@@ -56,7 +56,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="md-table-content" style="overflow-x: auto;">
-                    <div class="table-body" style="width: 1024px">
+                    <div class="table-body" style="max-width: 1024px">
                         <table id="data" class="table table-condensed table-bordered table-hover">
                             <tr>
                                 <th>Month</th>
