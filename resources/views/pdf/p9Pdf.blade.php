@@ -154,7 +154,7 @@ $transactions = DB::table('x_transact')
                                     <td>{{$transaction->nssf_amount}}</td>
                                     <td>{{'undetermined'}}</td>
                                     <td>{{'undetermined'}}</td>
-                                    <td>{{$taxable_income}}</td>
+                                    <td>{{$transaction->taxable_income}}</td>
                                     <td>{{$transaction->gross_tax}}</td>
                                     <td>{{$transaction->relief}}</td>
                                     <td>{{$transaction->insurance_relief}}</td>
