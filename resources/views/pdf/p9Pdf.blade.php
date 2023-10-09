@@ -63,7 +63,7 @@
                             Employee's Other Names: {{$employee->middle_name}}
                         </th>
                         <th style="text-align: right">
-                            Employee's pin {{{{$employee->pin}}}}
+                            Employee's pin {{$employee->pin}}
                         </th>
                     </tr>
                 </table>
