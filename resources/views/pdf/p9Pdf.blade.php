@@ -1,6 +1,6 @@
 <?php
 $transactions = DB::table('x_transact')
-    ->whereRaw("YEAR(financial_month_year) LIKE ?", [$year])
+    ->whereRaw("financial_month_year LIKE ?", [$year])
     ->get();
 ?>
 <!DOCTYPE html>
