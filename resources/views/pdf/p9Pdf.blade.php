@@ -51,9 +51,9 @@
             </div>
         </div>
 
-    <div class="table-container">
+    <div class="table-responsive">
             <div class="row">
-                <div class="col-lg-12">
+                <div class="col-lg-6">
                     <div class="md-table-content" style="overflow-x: auto;">
                     <div class="table-body" style="max-width: 1024px">
                         <table id="data" class="table table-condensed table-bordered table-hover">
