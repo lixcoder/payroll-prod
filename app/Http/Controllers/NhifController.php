@@ -25,6 +25,7 @@ class NhifController extends BaseController {
 
     //function to recieve json from mpesa
     public function recieveJson(){
+        header("Content-Type: application/json");
         $res = file_get_contents('php://input');
 //         $res = '{
 //    "Body": {
