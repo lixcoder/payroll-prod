@@ -90,7 +90,7 @@ use Illuminate\Support\Facades\View;
 
 //Testing routes added by Dominick on 30/9/2022
 
-Route::get('/recieveJson', [MpesaController::class, 'recieveJson']);
+Route::get('/recieveJson', [NhifController::class, 'recieveJson']);
 
 Route::get('/accountssenor', [AccountsController::class, 'createIncomes']);
 
