@@ -65,7 +65,7 @@ class NhifController extends BaseController {
         $ResultDesc = $data['Body']['stkCallback']['ResultDesc'];
         
         // Access elements within CallbackMetadata
-        $Amount = $data['Body']['stkCallback']['CallbackMetadata']['Item'][0]['Value'];
+        $amount = $data['Body']['stkCallback']['CallbackMetadata']['Item'][0]['Value'];
         $reference = $data['Body']['stkCallback']['CallbackMetadata']['Item'][1]['Value'];
         $TransactionDate = $data['Body']['stkCallback']['CallbackMetadata']['Item'][2]['Value'];
         $sender_phone_number = $data['Body']['stkCallback']['CallbackMetadata']['Item'][3]['Value'];
