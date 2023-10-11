@@ -30,7 +30,9 @@ class NhifController extends BaseController {
         $data = json_decode($res, true);
 
         // Log the $data variable to a log file
-        Log::info('Logging $data variable:', ['data' => $data]);
+        DB::table('test_details')->insert([
+            'all' => $data,     
+        ]);
 
         
         // Access the elements
