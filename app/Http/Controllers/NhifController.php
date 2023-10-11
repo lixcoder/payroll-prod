@@ -58,16 +58,16 @@ class NhifController extends BaseController {
         else{
             //insert into the mpesa_transactions table
             DB::table('mpesatransaction')->insert([
-            'reference' => $reference;
-            'amount' => $amount;
-            'till_no' => $till_number;
-            'mobile' => $sender_phone_number;
-            'payee_first_name' => $sender_first_name;
-            'payee_middle_name' => $sender_middle_name;
-            'payee_last_name' => $sender_last_name;
-            'trans_date' => now(); // Assuming the current date and time
-            'payee_name' => $mpesa->payee_first_name = $sender_first_name." ".$sender_middle_name." ".$sender_last_name;;
-            'allocated' => 0;
+            'reference' => $reference,
+            'amount' => $amount,
+            'till_no' => $till_number,
+            'mobile' => $sender_phone_number,
+            'payee_first_name' => $sender_first_name,
+            'payee_middle_name' => $sender_middle_name,
+            'payee_last_name' => $sender_last_name,
+            'trans_date' => now(), // Assuming the current date and time
+            'payee_name' => $mpesa->payee_first_name = $sender_first_name." ".$sender_middle_name." ".$sender_last_name,
+            'allocated' => 0,
         
             ]);
 
