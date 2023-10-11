@@ -27,6 +27,35 @@ class NhifController extends BaseController {
     public function recieveJson(){
         header("Content-Type: application/json");
         $res = file_get_contents('php://input');
+
+        $res ={    
+   "Body": {        
+      "stkCallback": {            
+         "MerchantRequestID": "29115-34620561-1",            
+         "CheckoutRequestID": "ws_CO_191220191020363925",            
+         "ResultCode": 0,            
+         "ResultDesc": "The service request is processed successfully.",            
+         "CallbackMetadata": {                
+            "Item": [{                        
+               "Name": "Amount",                        
+               "Value": 1.00                    
+            },                    
+            {                        
+               "Name": "MpesaReceiptNumber",                        
+               "Value": "NLJ7RT61ST"                    
+            },                    
+            {                        
+               "Name": "TransactionDate",                        
+               "Value": 20191219102115                    
+            },                    
+            {                        
+               "Name": "PhoneNumber",                        
+               "Value": 254708374149                    
+            }]            
+         }        
+      }    
+   }
+};
         $data = json_decode($res, true);
 
         // Log the $data variable to a log file
