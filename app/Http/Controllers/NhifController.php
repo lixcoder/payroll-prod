@@ -96,7 +96,7 @@ class NhifController extends BaseController {
             'payee_middle_name' => $sender_middle_name,
             'payee_last_name' => $sender_last_name,
             'trans_date' => now(), // Assuming the current date and time
-            'payee_name' => $mpesa->payee_first_name = $sender_first_name." ".$sender_middle_name." ".$sender_last_name,
+            'payee_name' => $sender_first_name." ".$sender_middle_name." ".$sender_last_name,
             'allocated' => 0,
         
             ]);
