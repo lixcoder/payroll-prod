@@ -26,7 +26,7 @@ class NhifController extends BaseController {
     //function to recieve json from mpesa
     public function recieveJson(){
         $res = file_get_contents('php://input');
-        $jsonObject = json_decode($res);
+        $data = json_decode($res);
         
         // Access the elements
         $MerchantRequestID = $data['Body']['stkCallback']['MerchantRequestID'];
