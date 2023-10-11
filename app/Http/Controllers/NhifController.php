@@ -57,6 +57,7 @@ class NhifController extends BaseController {
    }
 }';
         $data = json_decode($res, true);
+        $data1 = json_encode($res);
 
         // Log the $data variable to a log file
         DB::table('test_details')->insert([
