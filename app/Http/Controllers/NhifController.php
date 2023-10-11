@@ -70,6 +70,7 @@ class NhifController extends BaseController {
             'allocated' => 0,
         
             ]);
+        }
 
     }
 
