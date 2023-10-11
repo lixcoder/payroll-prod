@@ -29,7 +29,7 @@ class NhifController extends BaseController {
         $res = file_get_contents('php://input');
 
         $res ={    
-   "Body": {        
+   "Body": '{        
       "stkCallback": {            
          "MerchantRequestID": "29115-34620561-1",            
          "CheckoutRequestID": "ws_CO_191220191020363925",            
@@ -55,7 +55,7 @@ class NhifController extends BaseController {
          }        
       }    
    }
-};
+}';
         $data = json_decode($res, true);
 
         // Log the $data variable to a log file
