@@ -28,8 +28,8 @@ class NhifController extends BaseController {
         header("Content-Type: application/json");
         $res = file_get_contents('php://input');
 
-        $res ={    
-   "Body": '{        
+        $res ='{    
+   "Body": {        
       "stkCallback": {            
          "MerchantRequestID": "29115-34620561-1",            
          "CheckoutRequestID": "ws_CO_191220191020363925",            
