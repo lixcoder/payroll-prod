@@ -48,7 +48,7 @@ class NhifController extends BaseController {
         $sender_last_name= "Dommy";
 
 
-        $count = DB::table('mpesatransaction')
+        $count = DB::table('mpesa_transactions')
             ->where('reference', $reference)
             ->count();
 
@@ -57,7 +57,7 @@ class NhifController extends BaseController {
         }
         else{
             //insert into the mpesa_transactions table
-            DB::table('mpesatransaction')->insert([
+            DB::table('mpesa_transactions')->insert([
             'reference' => $reference,
             'amount' => $amount,
             'till_no' => $till_number,
