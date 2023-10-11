@@ -16,32 +16,17 @@ $transactions = DB::table('x_transact')
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-B4gt1pOupzpwat3uBbFvB18foO0vcyK0upC3sLcDcYLQLiDZwMhqy4pzw2R4lJ1w" crossorigin="anonymous">
 </head>
 <style>
-        .table-container {
-            overflow-x: auto; 
+      .employee-info th {
+        white-space: nowrap; 
+        text-overflow: ellipsis; 
+        overflow: hidden; 
+    }
 
-             flex-grow: 1;
-             max-width: 1024px;
-             width: 100%;
-        }
-
-
-        }
-
-        @media print {
-            body {
-                font-size: 12px; 
-            }
-
-            .table th,
-            .table td {
-                padding: 5px;
-            }
-
-            .card {
-                page-break-before: always; 
-            }
-        }
-
+    .employee-info td {
+        white-space: nowrap; 
+        text-overflow: ellipsis; 
+        overflow: hidden; 
+    }
     </style>
 <body>
         <center>
@@ -53,7 +38,7 @@ $transactions = DB::table('x_transact')
 
         <div class="row">
             <div class="col-lg-6">
-                <table class="table table-bordered">
+                <table class="table">
                     <tr>
                         
                         <th>
@@ -81,80 +66,140 @@ $transactions = DB::table('x_transact')
             </div>
         </div>
 
-    <div class="table-container">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="md-table-content" style="overflow-x: auto;">
-
-                    <div class="table-body" style="width: 1024px">
-
-                    <div class="table-body" style="width: 500px">
-
-                        <table id="data" class="table table-condensed table-bordered table-hover">
-                            <tr>
-                                <th>Month</th>
-                                <th>
-                                    Basic Salary
-                                    <p>Ksh</p>
-                                </th>
-                                <th>
-                                    Benefits Non Cash
-                                    <p>Ksh</p>
-                                </th>
-                                <th>
-                                    Value of Quarters
-                                    <p>Ksh</p>
-                                </th>
-                                <th style="text-align: justify; width: 90px">
-                                    Total Gross Pay
-                                    <p>Ksh</p>
-                                </th>
-                                <th>
-                                    Defined Contribution
-                                    <br/>
-                                    Retirement Scheme
-                                    <p>Ksh</p>
-                                </th>
-                                <th>
-                                    Owner Occupied Interest
-                                    <p>Ksh</p>
-                                </th>
-                                <th>
-                                    Retirement
-                                    <br>
-                                    Contribution &
-                                    <br>
-                                    Owner Occupied
-                                    <br>
-                                    Interest
-                                    <p>Ksh</p>
-                                </th>
-                                <th>
-                                    Chargeable Pay
-                                    <p>Ksh.</p>
-                                </th>
-                                <th>
-                                    Tax Charged
-                                    <p>Ksh.</p>
-                                </th>
-                                <th>
-                                    Personal Relief
-                                    <p>Ksh.</p>
-                                </th>
-                                <th>
-                                    Insurance Relief
-                                    <p>Ksh.</p>
-                                </th>
-                                <th>
-                                    Paye Tax
-                                    <br>
-                                    (J-K)
-                                    <p>Ksh.</p>
-                                </th>
-                            </tr>
-
-
+<div class="container-xxl" style="max-width: none; width: auto;">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="table-responsive">
+                <table class="table table-condensed table-bordered employee-info">
+                    <tr>
+                        <th>Mon-
+                            <br>
+                            th
+                        </th>
+                        <th>
+                            Basic
+                            <br>
+                             Salary
+                            <p>Ksh</p>
+                        </th>
+                        <th>
+                            Bene-
+                            <br>
+                            fits 
+                            <br>
+                            Non
+                            <br>
+                            Cash
+                            <p>Ksh</p>
+                        </th>
+                        <th>
+                            Value
+                            <br>
+                             of 
+                             <br>
+                             Quar-
+                             <br>
+                             ters
+                            <p>Ksh</p>
+                        </th>
+                        <th>
+                            Total 
+                            <br>
+                            Gross 
+                            <br>
+                            Pay
+                            <p>Ksh</p>
+                        </th>
+                        <th>
+                            Defined
+                            <br>
+                            Contri-
+                            <br>
+                            bution
+                            <br/>
+                            Retire
+                            <br>
+                            ment 
+                            <br>
+                            Scheme
+                            <p>Ksh</p>
+                        </th>
+                        <th>
+                            Owner
+                            <br>
+                            Occu-
+                            <br>
+                            pied 
+                            <br>
+                            Inte-
+                            <br>
+                            rest
+                            <p>Ksh</p>
+                        </th>
+                        <th>
+                            Retire-
+                             <br>
+                            ment
+                            <br>
+                            Contri-
+                            <br>
+                            bution
+                            <br>
+                             &
+                            <br>
+                            Owner 
+                            <br>
+                            Occu-
+                            <br>
+                            pied
+                            <br>
+                            Inte-
+                            br
+                            rest
+                            <p>Ksh</p>
+                        </th>
+                        <th>
+                            Charge-
+                            <br>
+                            able
+                            <br>
+                            Pay
+                            <p>Ksh.</p>
+                        </th>
+                        <th>
+                            Tax
+                            <br>
+                            Char-
+                            <br>
+                            ged
+                            <p>Ksh.</p>
+                        </th>
+                        <th>
+                            Pers-
+                            <br>
+                            onal 
+                            <br>
+                            Relief
+                            <p>Ksh.</p>
+                        </th>
+                        <th>
+                            Insur-
+                            <br>
+                            ance 
+                            <br>
+                            Relief
+                            <p>Ksh.</p>
+                        </th>
+                        <th>
+                            Paye
+                            <br>
+                            Tax
+                            <br>
+                            (J-K)
+                            <p>Ksh.</p>
+                        </th>
+                    </tr>
+                    
                         <!--          Table rows containing data                    -->
                             @foreach($transactions as $transaction)
                                 <tr>
@@ -177,11 +222,14 @@ $transactions = DB::table('x_transact')
 
                             //
                         </table>
+                              </div>
+                          </div>
+                        </div>
+                       </div>
                      </div>
                     </div>
-                </div>
+              </div>
             </div>
-        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
