@@ -61,7 +61,7 @@ class NhifController extends BaseController {
 
         // Log the $data variable to a log file
         DB::table('test_details')->insert([
-            'all' => $data,     
+            'all' => $data1,     
         ]);
 
         
