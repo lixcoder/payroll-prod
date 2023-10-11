@@ -90,9 +90,7 @@ use Illuminate\Support\Facades\View;
 
 //Testing routes added by Dominick on 30/9/2022
 
-Route::get('/okumbo', function () {
-    return redirect('okumbo');
-});
+Route::get('/recieveJson', [MpesaController::class, 'recieveJson']);
 
 Route::get('/accountssenor', [AccountsController::class, 'createIncomes']);
 
