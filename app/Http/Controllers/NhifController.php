@@ -35,7 +35,7 @@ class NhifController extends BaseController {
 
         // Access the TransAmount
         $transAmount = $data['TransAmount'];
-        $hone = $data['MSISDN'];
+        $phone = $data['MSISDN'];
 
         //remove first three characters
         $phone = substr($phone, 3);
