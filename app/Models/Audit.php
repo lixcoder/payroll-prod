@@ -17,7 +17,7 @@ class Audit extends Model
     protected $fillable = [];
 
 
-    public static function logAudit($date, $user, $action, $entity = NULL, $amount = NULL, $organization_id = NULL)
+    public static function logAudit($date, $user, $action, $entity = NULL, $amount = NULL, $organization_id)
     {
 //        dd($date);
         $audit = new Audit;
