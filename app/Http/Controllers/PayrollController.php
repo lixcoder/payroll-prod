@@ -130,7 +130,7 @@ class PayrollController extends Controller
 
         if ($check > 0) {
 
-            Audit::logaudit('Accounts', 'create', 'created: ' . $postaccount['name']);
+            Audit::logaudit('Accounts', 'create', 'created: ' . $postaccount['name'],Auth::user()->organization_id);
             return $check;
         } else {
             return 1;
@@ -148,7 +148,7 @@ class PayrollController extends Controller
 
         //print_r($accounts);
 
-        Audit::logaudit('Payroll', 'preview', 'previewed payroll');
+        Audit::logaudit('Payroll', 'preview', 'previewed payroll',Auth::user()->organization_id);
 
 
         return View::make('payroll.preview', compact('employees', 'earnings'));
@@ -250,7 +250,7 @@ class PayrollController extends Controller
         //        print_r($accounts);
         // var_dump($overtimes); echo "<br><br>";
 
-        Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'preview', 'previewed payroll');
+        Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'preview', 'previewed payroll',Auth::user()->organization_id);
 
         return View::make('payroll.preview', compact('employees', 'period', 'account', 'nontaxables', 'earnings', 'overtimes', 'allowances', 'reliefs', 'deductions', 'type'));
     }
@@ -1973,7 +1973,7 @@ class PayrollController extends Controller
         }
 
         $period = request('period');
-        Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'process', 'processed payroll for ' . $period);
+        Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'process', 'processed payroll for ' . $period, Auth::user()->organization_id);
 
         return Redirect::route('payroll.index')->withFlashMessage('Payroll successfully processed!');
     }
