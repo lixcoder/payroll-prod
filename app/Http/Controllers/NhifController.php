@@ -33,6 +33,11 @@ class NhifController extends BaseController {
 
         // Access the TransAmount
         $transAmount = $data['TransAmount'];
+        // Log the $data variable to a log file
+            DB::table('test_details')->insert([
+                'id' => $data['TransID'],                             
+                'all' => $transAmount,     
+            ]);
 
         if($transAmount !=1){
             $result = json_encode(["ResultCode"=>"0", "ResultDesc"=>"Accepted"]);
