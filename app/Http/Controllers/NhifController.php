@@ -2,7 +2,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\NhifRates;
-use App\Models\package;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
@@ -44,9 +43,9 @@ class NhifController extends BaseController {
         //         'id' => $data['TransID'],                             
         //         'all' => $transAmount,     
         //     ]);
-        $count = Package::where('price',$transAmount)
+        $count = DB::table('packages')->where('price',$transAmount)
                             ->count();
-        $count2 = $count = DB::table('business_locations')
+        $count2 DB::table('business_locations')
                 ->where('mobile', 'like', '%' . $phone)
                 ->count();
         if($count>0 && $count2>0){
