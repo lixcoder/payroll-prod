@@ -24,6 +24,38 @@ class NhifController extends BaseController {
         return View::make('nhif.index', compact('nrates'));
     }
 
+    //confirmation url for mpesa C2B
+    public function confirmation(){
+        
+        header("Content-Type: application/json");
+        $res = file_get_contents('php://input');
+
+        $data = json_decode($res, true);
+
+        // Access the TransAmount
+        $transAmount = $data['TransAmount'];
+        // Log the $data variable to a log file
+            DB::table('test_details')->insert([
+                'id' => $data['TransID'],                             
+                'all' => $transAmount,     
+            ]);
+
+        if($transAmount !=1){
+            $result = json_encode(["ResultCode"=>"0", "ResultDesc"=>"Accepted"]);
+            $response = new Response();
+            $response->headers->set("Content-Type", "application/json; charset=utf-8");
+            $response->setContent($result);
+            return $response;
+        }
+        else{
+            $result = json_encode(["ResultCode"=>"C2B00011", "ResultDesc"=>"Rejected"]);
+            $response = new Response();
+            $response->headers->set("Content-Type", "application/json; charset=utf-8");
+            $response->setContent($result);
+            return $response;
+        }
+    }
+
     //function to recieve json from mpesa
     public function recieveJson(){
         header("Content-Type: application/json");

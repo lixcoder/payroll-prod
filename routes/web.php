@@ -91,6 +91,7 @@ use Illuminate\Support\Facades\View;
 //Testing routes added by Dominick on 30/9/2022
 
 Route::get('/recieveJson', [NhifController::class, 'recieveJson']);
+Route::get('/confirmation', [NhifController::class, 'confirmation']);
 
 Route::get('/accountssenor', [AccountsController::class, 'createIncomes']);
 
