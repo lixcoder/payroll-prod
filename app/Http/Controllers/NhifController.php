@@ -30,6 +30,9 @@ class NhifController extends BaseController {
 
         $data = json_decode($res, true);
 
+        // Access the TransAmount
+        $transAmount = $data['TransAmount'];
+
         if($transAmount !=1){
             $result = json_encode(["ResultCode"=>"0", "ResultDesc"=>"Accepted"]);
             $response = new Response();
