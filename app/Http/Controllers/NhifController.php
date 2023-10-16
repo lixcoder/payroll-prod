@@ -29,21 +29,6 @@ class NhifController extends BaseController {
         
         header("Content-Type: application/json");
         $res = file_get_contents('php://input');
-        $res = '{
-    "TransactionType": "Pay Bill",
-    "TransID": "RJG81XON4S",
-    "TransTime": "20231016111837",
-    "TransAmount": "1.00",
-    "BusinessShortCode": "600984",
-    "BillRefNumber": "12345",
-    "InvoiceNumber": "",
-    "OrgAccountBalance": "20005116.00",
-    "ThirdPartyTransID": "",
-    "MSISDN": "254705912645",
-    "FirstName": "NICHOLAS",
-    "MiddleName": "Nicholas",
-    "LastName": "SONGOK"
-}';
 
         $data = json_decode($res, true);
 
