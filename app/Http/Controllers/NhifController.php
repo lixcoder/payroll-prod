@@ -60,7 +60,7 @@ class NhifController extends BaseController {
         //     ]);
         $count = DB::table('packages')->where('price',$transAmount)
                             ->count();
-        $count2 DB::table('business_locations')
+        $count2 = DB::table('business_locations')
                 ->where('mobile', 'like', '%' . $phone)
                 ->count();
         if($count>0 && $count2>0){
