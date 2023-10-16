@@ -250,7 +250,7 @@ class PayrollController extends Controller
         //        print_r($accounts);
         // var_dump($overtimes); echo "<br><br>";
 
-        Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'preview', 'previewed payroll',Auth::user()->organization_id);
+        Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'preview', 'previewed payroll',NULL,Auth::user()->organization_id);
 
         return View::make('payroll.preview', compact('employees', 'period', 'account', 'nontaxables', 'earnings', 'overtimes', 'allowances', 'reliefs', 'deductions', 'type'));
     }
