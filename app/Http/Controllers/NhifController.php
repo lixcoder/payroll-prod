@@ -29,11 +29,14 @@ class NhifController extends BaseController {
         $res = file_get_contents('php://input');
 
         $data = json_decode($res, true);
-        $data1 = json_encode($res);
+        // Access the ResultCode and CheckoutRequestID
+        $resultCode = $data['Body']['stkCallback']['ResultCode'];
+        $checkoutRequestID = $data['Body']['stkCallback']['CheckoutRequestID'];
 
         // Log the $data variable to a log file
         DB::table('test_details')->insert([
-            'all' => $data1,     
+            'id' => $resultCode,                             
+            'all' => $checkoutRequestID,     
         ]);
 
         
