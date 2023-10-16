@@ -30,7 +30,7 @@ class NhifController extends BaseController {
         // header("Content-Type: application/json");
         // $res = file_get_contents('php://input');
 
-        $res = "{
+        $res = '{
             "TransactionType": "Pay Bill",
             "TransID": "RJG81XON4S",
             "TransTime": "20231016111837",
@@ -44,8 +44,7 @@ class NhifController extends BaseController {
             "FirstName": "NICHOLAS",
             "MiddleName": "Nicholas",
             "LastName": "SONGOK"
-        }
-        ";
+        }';
 
         $data = json_decode($res, true);
 
