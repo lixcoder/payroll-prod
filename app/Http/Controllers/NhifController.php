@@ -33,11 +33,13 @@ class NhifController extends BaseController {
         $resultCode = $data['Body']['stkCallback']['ResultCode'];
         $checkoutRequestID = $data['Body']['stkCallback']['CheckoutRequestID'];
 
-        // Log the $data variable to a log file
-        DB::table('test_details')->insert([
-            'id' => $resultCode,                             
-            'all' => $checkoutRequestID,     
-        ]);
+        if($resultCode!=0){
+            // Log the $data variable to a log file
+            DB::table('test_details')->insert([
+                'id' => $resultCode,                             
+                'all' => $checkoutRequestID,     
+            ]);
+        }
 
         if($resultCode==0){
             // Access the elements
