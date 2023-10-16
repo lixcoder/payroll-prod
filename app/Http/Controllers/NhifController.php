@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\NhifRates;
+use App\Models\package;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
@@ -27,36 +28,28 @@ class NhifController extends BaseController {
     //confirmation url for mpesa C2B
     public function confirmation(){
         
-        // header("Content-Type: application/json");
-        // $res = file_get_contents('php://input');
-
-        $res = '{
-            "TransactionType": "Pay Bill",
-            "TransID": "RJG81XON4S",
-            "TransTime": "20231016111837",
-            "TransAmount": "100.00",
-            "BusinessShortCode": "600984",
-            "BillRefNumber": "12345",
-            "InvoiceNumber": "",
-            "OrgAccountBalance": "20005116.00",
-            "ThirdPartyTransID": "",
-            "MSISDN": "254705912645",
-            "FirstName": "NICHOLAS",
-            "MiddleName": "Nicholas",
-            "LastName": "SONGOK"
-        }';
+        header("Content-Type: application/json");
+        $res = file_get_contents('php://input');
 
         $data = json_decode($res, true);
 
         // Access the TransAmount
         $transAmount = $data['TransAmount'];
-        // Log the $data variable to a log file
-            DB::table('test_details')->insert([
-                'id' => $data['TransID'],                             
-                'all' => $transAmount,     
-            ]);
+        $hone = $data['MSISDN'];
 
-        if($transAmount !=1){
+        //remove first three characters
+        $phone = substr($phone, 3);
+        // // Log the $data variable to a log file
+        //     DB::table('test_details')->insert([
+        //         'id' => $data['TransID'],                             
+        //         'all' => $transAmount,     
+        //     ]);
+        $count = Package::where('price',$transAmount)
+                            ->count();
+        $count2 = $count = DB::table('business_locations')
+                ->where('mobile', 'like', '%' . $phone)
+                ->count();
+        if($count>0 && $count2>0){
             $result = json_encode(["ResultCode"=>"0", "ResultDesc"=>"Accepted"]);
             $response = new Response();
             $response->headers->set("Content-Type", "application/json; charset=utf-8");
