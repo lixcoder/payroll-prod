@@ -1814,7 +1814,7 @@ class ReportsController extends Controller
                     ->sum('amount');
 
                 $data = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->join('banks', 'employee.bank_id', '=', 'banks.id')
                     ->join('bank_branches', 'employee.bank_branch_id', '=', 'bank_branches.id')
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -1910,7 +1910,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PAYROLL NO.', 'EMPLOYEE', 'AMOUNT'
+                            'PAYROLL NO.', 'x_employee', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -1972,7 +1972,7 @@ class ReportsController extends Controller
                 $sels = DB::table('branches')->find($request->get('branch'));
 
                 $total = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->where('branch_id', '=', $request->get('branch'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
                     ->where('financial_month_year', '=', $request->get('period'))
@@ -1981,7 +1981,7 @@ class ReportsController extends Controller
                 $currency = Currency::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->first();
 
                 $data = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->join('branches', 'employee.branch_id', '=', 'branches.id')
                     ->where('branch_id', '=', $request->get('branch'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -2075,7 +2075,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PAYROLL NO.', 'EMPLOYEE', 'AMOUNT'
+                            'PAYROLL NO.', 'x_employee', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -2136,14 +2136,14 @@ class ReportsController extends Controller
                 $sels = DB::table('departments')->find($request->get('department'));
 
                 $total = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->where('department_id', '=', $request->get('department'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->sum('amount');
 
                 $data = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->join('departments', 'employee.department_id', '=', 'departments.id')
                     ->where('department_id', '=', $request->get('department'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -2239,7 +2239,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PAYROLL NO.', 'EMPLOYEE', 'AMOUNT'
+                            'PAYROLL NO.', 'x_employee', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -2301,7 +2301,7 @@ class ReportsController extends Controller
                 $selDt = DB::table('departments')->find($request->get('department'));
 
                 $total = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->where('branch_id', '=', $request->get('branch'))
                     ->where('department_id', '=', $request->get('department'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -2310,7 +2310,7 @@ class ReportsController extends Controller
 
 
                 $data = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->join('branches', 'employee.branch_id', '=', 'branches.id')
                     ->join('departments', 'employee.department_id', '=', 'departments.id')
                     ->where('branch_id', '=', $request->get('branch'))
@@ -2407,7 +2407,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PAYROLL NO.', 'EMPLOYEE', 'AMOUNT'
+                            'PAYROLL NO.', 'x_employee', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -2552,7 +2552,7 @@ class ReportsController extends Controller
                 $sels = DB::table('departments')->find($request->get('department'));
 
                 $total_amount = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->where('department_id', '=', $request->get('department'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
                     ->where('financial_month_year', '=', $period)
@@ -2564,7 +2564,7 @@ class ReportsController extends Controller
                     ->get();
 
                 $sums = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->join('departments', 'employee.department_id', '=', 'departments.id')
                     ->where('department_id', '=', $request->get('department'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -2595,7 +2595,7 @@ class ReportsController extends Controller
                 $selDt = DB::table('departments')->find($request->get('department'));
 
                 $total_amount = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->where('branch_id', '=', $request->get('branch'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
                     ->where('department_id', '=', $request->get('department'))
@@ -2609,7 +2609,7 @@ class ReportsController extends Controller
                     ->get();
 
                 $sums = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->join('branches', 'employee.branch_id', '=', 'branches.id')
                     ->join('departments', 'employee.department_id', '=', 'departments.id')
                     ->where('branch_id', '=', $request->get('branch'))
@@ -2843,7 +2843,7 @@ class ReportsController extends Controller
                         ));
 
                         $sheet->row(12, array(
-                            'PAYROLL NO.', 'EMPLOYEE', 'ID NO.', 'BANK', 'BANK BRANCH', 'BANK ACCOUNT', 'SWIFT CODE', 'AMOUNT'
+                            'PAYROLL NO.', 'x_employee', 'ID NO.', 'BANK', 'BANK BRANCH', 'BANK ACCOUNT', 'SWIFT CODE', 'AMOUNT'
                         ));
 
                         $sheet->row(12, function ($r) {
@@ -2921,7 +2921,7 @@ class ReportsController extends Controller
             } else if ($request->get('department') == 'All') {
 
                 $total = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->where('branch_id', '=', $request->get('branch'))
                     ->where('mode_of_payment', '=', 'Bank')
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -2929,7 +2929,7 @@ class ReportsController extends Controller
                     ->sum('amount');
 
                 $data = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->join('banks', 'employee.bank_id', '=', 'banks.id')
                     ->join('bank_branches', 'employee.bank_branch_id', '=', 'bank_branches.id')
                     ->where('branch_id', '=', $request->get('branch'))
@@ -3081,7 +3081,7 @@ class ReportsController extends Controller
                         ));
 
                         $sheet->row(12, array(
-                            'PAYROLL NO.', 'EMPLOYEE', 'ID NO.', 'BANK', 'BANK BRANCH', 'BANK ACCOUNT', 'SWIFT CODE', 'AMOUNT'
+                            'PAYROLL NO.', 'x_employee', 'ID NO.', 'BANK', 'BANK BRANCH', 'BANK ACCOUNT', 'SWIFT CODE', 'AMOUNT'
                         ));
 
                         $sheet->row(12, function ($r) {
@@ -3158,7 +3158,7 @@ class ReportsController extends Controller
                 })->download('xls');
             } else if ($request->get('branch') == 'All') {
                 $total = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->where('department_id', '=', $request->get('department'))
                     ->where('mode_of_payment', '=', 'Bank')
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -3166,7 +3166,7 @@ class ReportsController extends Controller
                     ->sum('amount');
 
                 $data = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->join('banks', 'employee.bank_id', '=', 'banks.id')
                     ->join('bank_branches', 'employee.bank_branch_id', '=', 'bank_branches.id')
                     ->where('department_id', '=', $request->get('department'))
@@ -3317,7 +3317,7 @@ class ReportsController extends Controller
                         ));
 
                         $sheet->row(12, array(
-                            'PAYROLL NO.', 'EMPLOYEE', 'ID NO.', 'BANK', 'BANK BRANCH', 'BANK ACCOUNT', 'SWIFT CODE', 'AMOUNT'
+                            'PAYROLL NO.', 'x_employee', 'ID NO.', 'BANK', 'BANK BRANCH', 'BANK ACCOUNT', 'SWIFT CODE', 'AMOUNT'
                         ));
 
                         $sheet->row(12, function ($r) {
@@ -3394,7 +3394,7 @@ class ReportsController extends Controller
                 })->download('xls');
             } else if ($request->get('branch') != 'All' && $request->get('department') != 'All') {
                 $total = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->where('branch_id', '=', $request->get('branch'))
                     ->where('department_id', '=', $request->get('department'))
                     ->where('mode_of_payment', '=', 'Bank')
@@ -3403,7 +3403,7 @@ class ReportsController extends Controller
                     ->sum('amount');
 
                 $data = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->join('banks', 'employee.bank_id', '=', 'banks.id')
                     ->join('bank_branches', 'employee.bank_branch_id', '=', 'bank_branches.id')
                     ->where('branch_id', '=', $request->get('branch'))
@@ -3556,7 +3556,7 @@ class ReportsController extends Controller
                         ));
 
                         $sheet->row(12, array(
-                            'PAYROLL NO.', 'EMPLOYEE', 'ID NO.', 'BANK', 'BANK BRANCH', 'BANK ACCOUNT', 'SWIFT CODE', 'AMOUNT'
+                            'PAYROLL NO.', 'x_employee', 'ID NO.', 'BANK', 'BANK BRANCH', 'BANK ACCOUNT', 'SWIFT CODE', 'AMOUNT'
                         ));
 
                         $sheet->row(12, function ($r) {
@@ -3685,7 +3685,7 @@ class ReportsController extends Controller
                 return $pdf->stream('Advance_Remittance_' . $month . '.pdf');
             } else if ($request->get('department') == 'All') {
                 $total = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->where('branch_id', '=', $request->get('branch'))
                     ->where('mode_of_payment', '=', 'Bank')
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -3698,7 +3698,7 @@ class ReportsController extends Controller
                     ->get();
 
                 $rems = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->join('banks', 'employee.bank_id', '=', 'banks.id')
                     ->join('bank_branches', 'employee.bank_branch_id', '=', 'bank_branches.id')
                     ->where('branch_id', '=', $request->get('branch'))
@@ -3738,7 +3738,7 @@ class ReportsController extends Controller
 
             } else if ($request->get('branch') == 'All') {
                 $total = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->join('banks', 'employee.bank_id', '=', 'banks.id')
                     ->join('bank_branches', 'employee.bank_branch_id', '=', 'bank_branches.id')
                     ->where('department_id', '=', $request->get('department'))
@@ -3752,7 +3752,7 @@ class ReportsController extends Controller
                     ->get();
 
                 $rems = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->where('department_id', '=', $request->get('department'))
                     ->where('financial_month_year', '=', $period)
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -3789,7 +3789,7 @@ class ReportsController extends Controller
 
             } else if ($request->get('branch') != 'All' && $request->get('department') != 'All') {
                 $total = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->where('branch_id', '=', $request->get('branch'))
                     ->where('department_id', '=', $request->get('department'))
                     ->where('mode_of_payment', '=', 'Bank')
@@ -3803,7 +3803,7 @@ class ReportsController extends Controller
                     ->get();
 
                 $rems = DB::table('transact_advances')
-                    ->join('employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact_advances.employee_id', '=', 'employee.personal_file_number')
                     ->join('banks', 'employee.bank_id', '=', 'banks.id')
                     ->join('bank_branches', 'employee.bank_branch_id', '=', 'bank_branches.id')
                     ->where('branch_id', '=', $request->get('branch'))
@@ -3896,14 +3896,14 @@ class ReportsController extends Controller
                 $employee = Employee::find($id);
 
                 $data = DB::table('x_transact')
-                    ->join('employee', 'x_transact.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'x_transact.employee_id', '=', 'employee.personal_file_number')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('employee.id', '=', $request->get('employeeid'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
                     ->first();
 
                 $nontaxables = DB::table('transact_nontaxables')
-                    ->join('employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
+                    ->join('x_employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('employee.id', '=', $request->get('employeeid'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -3912,7 +3912,7 @@ class ReportsController extends Controller
                     ->get();
 
                 $allws = DB::table('transact_allowances')
-                    ->join('employee', 'transact_allowances.employee_id', '=', 'employee.id')
+                    ->join('x_employee', 'transact_allowances.employee_id', '=', 'employee.id')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('employee.id', '=', $request->get('employeeid'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -3921,7 +3921,7 @@ class ReportsController extends Controller
                     ->get();
 
                 $earnings = DB::table('transact_earnings')
-                    ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                    ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('employee.id', '=', $request->get('employeeid'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -3930,7 +3930,7 @@ class ReportsController extends Controller
                     ->get();
 
                 $deds = DB::table('transact_deductions')
-                    ->join('employee', 'transact_deductions.employee_id', '=', 'employee.id')
+                    ->join('x_employee', 'transact_deductions.employee_id', '=', 'employee.id')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('employee.id', '=', $request->get('employeeid'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -3939,7 +3939,7 @@ class ReportsController extends Controller
                     ->get();
 
                 $overtimes = DB::table('transact_overtimes')
-                    ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                    ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('employee.id', '=', $request->get('employeeid'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -3948,7 +3948,7 @@ class ReportsController extends Controller
                     ->get();
 
                 $rels = DB::table('transact_reliefs')
-                    ->join('employee', 'transact_reliefs.employee_id', '=', 'employee.id')
+                    ->join('x_employee', 'transact_reliefs.employee_id', '=', 'employee.id')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('employee.id', '=', $request->get('employeeid'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -3957,7 +3957,7 @@ class ReportsController extends Controller
                     ->get();
 
                 $pension = DB::table('transact_pensions')
-                    ->join('employee', 'transact_pensions.employee_id', '=', 'employee.id')
+                    ->join('x_employee', 'transact_pensions.employee_id', '=', 'employee.id')
                     ->where('financial_month_year', '=', $request->get('period'))
                     ->where('employee.id', '=', $request->get('employeeid'))
                     ->where('employee.organization_id', Auth::user()->organization_id)
@@ -4572,8 +4572,8 @@ class ReportsController extends Controller
 
                     Audit::logaudit(Carbon::now(), 'view', 'viewed payslip for ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $request->get('period'));
 
-                    //return view('pdf.monthlySlip', compact('nontaxables','empall','select','name','employee','x_transact','allws','deds','earnings','overtimes','pension','rels','period','currency', 'organization','id'));
-                    $pdf = app('dompdf.wrapper')->loadView('pdf.monthlySlip', compact('nontaxables', 'empall', 'select', 'name', 'employee', 'transacts', 'allws', 'deds', 'earnings', 'overtimes', 'pension', 'rels', 'period', 'currency', 'organization', 'id'))->setPaper('a5');
+                    //return view('pdf.monthlySlip', compact('nontaxables','empall','select','name','x_employee','x_transact','allws','deds','earnings','overtimes','pension','rels','period','currency', 'organization','id'));
+                    $pdf = app('dompdf.wrapper')->loadView('pdf.monthlySlip', compact('nontaxables', 'empall', 'select', 'name', 'x_employee', 'transacts', 'allws', 'deds', 'earnings', 'overtimes', 'pension', 'rels', 'period', 'currency', 'organization', 'id'))->setPaper('a5');
 
                     return $pdf->stream($employee->personal_file_number . '_' . $employee->first_name . '_' . $employee->last_name . '_' . $month . '.pdf');
                 }
@@ -4783,7 +4783,7 @@ class ReportsController extends Controller
                         ->sum('net');
 
                     $data = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
@@ -4791,7 +4791,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_allowance = DB::table('transact_allowances')
-                        ->join('employee', 'transact_allowances.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_allowances.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
@@ -4799,7 +4799,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_nontax = DB::table('transact_nontaxables')
-                        ->join('employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
@@ -4807,7 +4807,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_earnings = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
@@ -4815,14 +4815,14 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_overtime = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->get();
 
                     $data_overtime_hourly = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('overtime_type', '=', 'Hourly')
@@ -4830,7 +4830,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_overtime_daily = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('overtime_type', '=', 'Daily')
@@ -4838,7 +4838,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_relief = DB::table('transact_reliefs')
-                        ->join('employee', 'transact_reliefs.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_reliefs.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
@@ -4846,7 +4846,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_deduction = DB::table('transact_deductions')
-                        ->join('employee', 'transact_deductions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_deductions.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
@@ -5068,7 +5068,7 @@ class ReportsController extends Controller
                         ->sum('net');
 
                     $data = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('process_type', '=', $request->get('type'))
@@ -5077,7 +5077,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_allowance = DB::table('transact_allowances')
-                        ->join('employee', 'transact_allowances.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_allowances.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('process_type', '=', $request->get('type'))
@@ -5086,7 +5086,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_nontax = DB::table('transact_nontaxables')
-                        ->join('employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('process_type', '=', $request->get('type'))
@@ -5095,7 +5095,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_earnings = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -5104,7 +5104,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_overtime = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -5112,7 +5112,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_overtime_hourly = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -5121,7 +5121,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_overtime_daily = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -5130,7 +5130,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_relief = DB::table('transact_reliefs')
-                        ->join('employee', 'transact_reliefs.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_reliefs.employee_id', '=', 'employee.id')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -5139,7 +5139,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $data_deduction = DB::table('transact_deductions')
-                        ->join('employee', 'transact_deductions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_deductions.employee_id', '=', 'employee.id')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6053,7 +6053,7 @@ class ReportsController extends Controller
 
                 } else {
                     $total_pay = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6061,7 +6061,7 @@ class ReportsController extends Controller
                         ->sum('transact.basic_pay');
 
                     $total_earning = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6069,7 +6069,7 @@ class ReportsController extends Controller
                         ->sum('earning_amount');
 
                     $total_gross = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6077,7 +6077,7 @@ class ReportsController extends Controller
                         ->sum('taxable_income');
 
                     $total_paye = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6085,7 +6085,7 @@ class ReportsController extends Controller
                         ->sum('paye');
 
                     $total_nssf = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6093,7 +6093,7 @@ class ReportsController extends Controller
                         ->sum('nssf_amount');
 
                     $total_nhif = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6101,7 +6101,7 @@ class ReportsController extends Controller
                         ->sum('nhif_amount');
 
                     $total_others = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6109,7 +6109,7 @@ class ReportsController extends Controller
                         ->sum('other_deductions');
 
                     $total_deds = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6117,7 +6117,7 @@ class ReportsController extends Controller
                         ->sum('total_deductions');
 
                     $total_net = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6130,7 +6130,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $sums = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->join('branches', 'employee.branch_id', '=', 'branches.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('branch_id', '=', $request->get('branch'))
@@ -6245,7 +6245,7 @@ class ReportsController extends Controller
                         ->get();
                 } else {
                     $total_pay = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6253,7 +6253,7 @@ class ReportsController extends Controller
                         ->sum('transact.basic_pay');
 
                     $total_earning = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6261,7 +6261,7 @@ class ReportsController extends Controller
                         ->sum('earning_amount');
 
                     $total_gross = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6269,7 +6269,7 @@ class ReportsController extends Controller
                         ->sum('taxable_income');
 
                     $total_paye = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6277,7 +6277,7 @@ class ReportsController extends Controller
                         ->sum('paye');
 
                     $total_nssf = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6285,7 +6285,7 @@ class ReportsController extends Controller
                         ->sum('nssf_amount');
 
                     $total_nhif = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6293,7 +6293,7 @@ class ReportsController extends Controller
                         ->sum('nhif_amount');
 
                     $total_others = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6301,7 +6301,7 @@ class ReportsController extends Controller
                         ->sum('other_deductions');
 
                     $total_deds = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6309,7 +6309,7 @@ class ReportsController extends Controller
                         ->sum('total_deductions');
 
                     $total_net = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6322,7 +6322,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $sums = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->join('departments', 'employee.department_id', '=', 'departments.id')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6361,7 +6361,7 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $total_pay = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6369,7 +6369,7 @@ class ReportsController extends Controller
                         ->sum('transact.basic_pay');
 
                     $total_earning = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6377,7 +6377,7 @@ class ReportsController extends Controller
                         ->sum('earning_amount');
 
                     $total_gross = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6385,7 +6385,7 @@ class ReportsController extends Controller
                         ->sum('taxable_income');
 
                     $total_paye = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6393,7 +6393,7 @@ class ReportsController extends Controller
                         ->sum('paye');
 
                     $total_nssf = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6401,7 +6401,7 @@ class ReportsController extends Controller
                         ->sum('nssf_amount');
 
                     $total_nhif = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6409,7 +6409,7 @@ class ReportsController extends Controller
                         ->sum('nhif_amount');
 
                     $total_others = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6417,7 +6417,7 @@ class ReportsController extends Controller
                         ->sum('other_deductions');
 
                     $total_deds = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6425,7 +6425,7 @@ class ReportsController extends Controller
                         ->sum('total_deductions');
 
                     $total_net = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6438,7 +6438,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $sums = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->join('branches', 'employee.branch_id', '=', 'branches.id')
                         ->join('departments', 'employee.department_id', '=', 'departments.id')
                         ->where('branch_id', '=', $request->get('branch'))
@@ -6449,7 +6449,7 @@ class ReportsController extends Controller
                         ->get();
                 } else {
                     $total_pay = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6458,7 +6458,7 @@ class ReportsController extends Controller
                         ->sum('transact.basic_pay');
 
                     $total_earning = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6467,7 +6467,7 @@ class ReportsController extends Controller
                         ->sum('earning_amount');
 
                     $total_gross = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6476,7 +6476,7 @@ class ReportsController extends Controller
                         ->sum('taxable_income');
 
                     $total_paye = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6485,7 +6485,7 @@ class ReportsController extends Controller
                         ->sum('paye');
 
                     $total_nssf = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6494,7 +6494,7 @@ class ReportsController extends Controller
                         ->sum('nssf_amount');
 
                     $total_nhif = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6503,7 +6503,7 @@ class ReportsController extends Controller
                         ->sum('nhif_amount');
 
                     $total_others = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6512,7 +6512,7 @@ class ReportsController extends Controller
                         ->sum('other_deductions');
 
                     $total_deds = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6521,7 +6521,7 @@ class ReportsController extends Controller
                         ->sum('total_deductions');
 
                     $total_net = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6535,7 +6535,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $sums = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->join('branches', 'employee.branch_id', '=', 'branches.id')
                         ->join('departments', 'employee.department_id', '=', 'departments.id')
                         ->where('branch_id', '=', $request->get('branch'))
@@ -6607,27 +6607,27 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $total = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
                     $data = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->get();
                 } else {
 
                     $total = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('process_type', '=', $request->get('type'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
                     $data = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('process_type', '=', $request->get('type'))
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6777,14 +6777,14 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $total = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
                     $data = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6792,7 +6792,7 @@ class ReportsController extends Controller
                 } else {
 
                     $total = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('process_type', '=', $request->get('type'))
@@ -6800,7 +6800,7 @@ class ReportsController extends Controller
                         ->sum('net');
 
                     $data = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('process_type', '=', $request->get('type'))
@@ -6945,14 +6945,14 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $total = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
                     $data = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -6960,7 +6960,7 @@ class ReportsController extends Controller
 
                 } else {
                     $total = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('process_type', '=', $request->get('type'))
@@ -6968,7 +6968,7 @@ class ReportsController extends Controller
                         ->sum('net');
 
                     $data = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('process_type', '=', $request->get('type'))
@@ -7116,7 +7116,7 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $total = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -7124,7 +7124,7 @@ class ReportsController extends Controller
                         ->sum('net');
 
                     $data = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -7132,7 +7132,7 @@ class ReportsController extends Controller
                         ->get();
                 } else {
                     $total = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -7141,7 +7141,7 @@ class ReportsController extends Controller
                         ->sum('net');
 
                     $data = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -7438,14 +7438,14 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $total = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
                     $rems = DB::table('x_transact')
-                        ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                        ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -7625,7 +7625,7 @@ class ReportsController extends Controller
             if ($request->get('earning') == 'All') {
                 if ($request->get('type') == 'All') {
                     $data = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->select('personal_file_number', 'first_name', 'last_name', 'middle_name', 'transact_earnings.earning_name', 'transact_earnings.earning_amount')
@@ -7637,7 +7637,7 @@ class ReportsController extends Controller
                         ->sum("earning_amount");
                 } else {
                     $data = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('process_type', $request->get('type'))
@@ -7739,7 +7739,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'EMPLOYEE', 'Earning TYPE', 'AMOUNT'
+                            'PERSONAL FILE NUMBER', 'x_employee', 'Earning TYPE', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -7801,7 +7801,7 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $data = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('transact_earnings.earning_name', '=', $request->get('earning'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -7809,14 +7809,14 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('transact_earnings.earning_name', '=', $request->get('earning'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum("earning_amount");
                 } else {
                     $data = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('transact_earnings.earning_name', '=', $request->get('earning'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -7825,7 +7825,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('transact_earnings.earning_name', '=', $request->get('earning'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -7919,7 +7919,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'EMPLOYEE', 'AMOUNT'
+                            'PERSONAL FILE NUMBER', 'x_employee', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -7997,7 +7997,7 @@ class ReportsController extends Controller
                         ->sum("earning_amount");
                 } else {
                     $earnings = DB::table('x_transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', $request->get('type'))
@@ -8038,7 +8038,7 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $earnings = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('transact_earnings.earning_name', '=', $request->get('earning'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -8046,14 +8046,14 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('transact_earnings.earning_name', '=', $request->get('earning'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum("earning_amount");
                 } else {
                     $earnings = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('transact_earnings.earning_name', '=', $request->get('earning'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -8062,7 +8062,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('transact_earnings.earning_name', '=', $request->get('earning'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -8129,19 +8129,19 @@ class ReportsController extends Controller
             if ($request->get('allowance') == 'All') {
                 if ($request->get('type') == 'All') {
                     $data = DB::table('transact_allowances')
-                        ->join('employee', 'transact_allowances.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_allowances.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_allowances.financial_month_year', '=', $request->get('period'))
                         ->get();
 
                     $dataearning = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_earnings.financial_month_year', '=', $request->get('period'))
                         ->get();
 
                     $dataovertime = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_overtimes.financial_month_year', '=', $request->get('period'))
                         ->get();
@@ -8163,21 +8163,21 @@ class ReportsController extends Controller
 
                 } else {
                     $data = DB::table('transact_allowances')
-                        ->join('employee', 'transact_allowances.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_allowances.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_allowances.financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->get();
 
                     $dataearning = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_earnings.financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->get();
 
                     $dataovertime = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_overtimes.financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
@@ -8293,7 +8293,7 @@ class ReportsController extends Controller
 
 
                         $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'EMPLOYEE', 'ALLOWANCE TYPE', 'AMOUNT'
+                            'PERSONAL FILE NUMBER', 'x_employee', 'ALLOWANCE TYPE', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -8403,7 +8403,7 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $data = DB::table('transact_allowances')
-                        ->join('employee', 'transact_allowances.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_allowances.employee_id', '=', 'employee.id')
                         ->where('transact_allowances.allowance_name', '=', $request->get('allowance'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -8411,13 +8411,13 @@ class ReportsController extends Controller
                         ->get();
 
                     $dataearning = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_earnings.financial_month_year', '=', $request->get('period'))
                         ->get();
 
                     $dataovertime = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_overtimes.financial_month_year', '=', $request->get('period'))
                         ->get();
@@ -8439,7 +8439,7 @@ class ReportsController extends Controller
                         ->sum("overtime_amount");
                 } else {
                     $data = DB::table('transact_allowances')
-                        ->join('employee', 'transact_allowances.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_allowances.employee_id', '=', 'employee.id')
                         ->where('transact_allowances.allowance_name', '=', $request->get('allowance'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -8448,14 +8448,14 @@ class ReportsController extends Controller
                         ->get();
 
                     $dataearning = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('process_type', '=', $request->get('type'))
                         ->where('transact_earnings.financial_month_year', '=', $request->get('period'))
                         ->get();
 
                     $dataovertime = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('process_type', '=', $request->get('type'))
                         ->where('transact_overtimes.financial_month_year', '=', $request->get('period'))
@@ -8570,7 +8570,7 @@ class ReportsController extends Controller
 
 
                         $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'EMPLOYEE', 'AMOUNT'
+                            'PERSONAL FILE NUMBER', 'x_employee', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -8738,7 +8738,7 @@ class ReportsController extends Controller
                 $type = $request->get('allowance');
                 if ($request->get('type') == 'All') {
                     $allws = DB::table('transact_allowances')
-                        ->join('employee', 'transact_allowances.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_allowances.employee_id', '=', 'employee.id')
                         ->where('transact_allowances.allowance_name', '=', $request->get('allowance'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -8746,7 +8746,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_allowances')
-                        ->join('employee', 'transact_allowances.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_allowances.employee_id', '=', 'employee.id')
                         ->join('allowances', 'transact_allowances.allowance_id', '=', 'allowances.id')
                         ->where('allowances.id', '=', $request->get('allowance'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -8754,7 +8754,7 @@ class ReportsController extends Controller
                         ->sum("allowance_amount");
 
                     $earnings = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->join('earnings', 'transact_earnings.earning_id', '=', 'earnings.id')
                         ->where('earnings.id', '=', $request->get('allowance'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -8763,7 +8763,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $overtimes = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->join('overtimes', 'transact_overtimes.overtime_id', '=', 'overtimes.id')
                         ->where('overtimes.type', '=', $request->get('allowance'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -8786,7 +8786,7 @@ class ReportsController extends Controller
                         ->sum("overtime_amount");
                 } else {
                     $allws = DB::table('transact_allowances')
-                        ->join('employee', 'transact_allowances.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_allowances.employee_id', '=', 'employee.id')
                         ->where('transact_allowances.allowance_name', '=', $request->get('allowance'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
@@ -8795,7 +8795,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_allowances')
-                        ->join('employee', 'transact_allowances.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_allowances.employee_id', '=', 'employee.id')
                         ->join('allowances', 'transact_allowances.allowance_id', '=', 'allowances.id')
                         ->where('allowances.id', '=', $request->get('allowance'))
                         ->where('process_type', '=', $request->get('type'))
@@ -8804,7 +8804,7 @@ class ReportsController extends Controller
                         ->sum("allowance_amount");
 
                     $earnings = DB::table('transact_earnings')
-                        ->join('employee', 'transact_earnings.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'employee.id')
                         ->join('earnings', 'transact_earnings.earning_id', '=', 'earnings.id')
                         ->where('earnings.id', '=', $request->get('allowance'))
                         ->where('process_type', '=', $request->get('type'))
@@ -8814,7 +8814,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $overtimes = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->join('overtimes', 'transact_overtimes.overtime_id', '=', 'overtimes.id')
                         ->where('overtimes.type', '=', $request->get('allowance'))
                         ->where('process_type', '=', $request->get('type'))
@@ -8901,7 +8901,7 @@ class ReportsController extends Controller
             if ($request->get('income') == 'All') {
                 if ($request->get('type') == 'All') {
                     $data = DB::table('transact_nontaxables')
-                        ->join('employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->select('personal_file_number', 'first_name', 'last_name', 'middle_name', 'transact_nontaxables.nontaxable_name', 'transact_nontaxables.nontaxable_amount')
@@ -8914,7 +8914,7 @@ class ReportsController extends Controller
 
                 } else {
                     $data = DB::table('transact_nontaxables')
-                        ->join('employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
@@ -9016,7 +9016,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'EMPLOYEE', 'Income TYPE', 'AMOUNT'
+                            'PERSONAL FILE NUMBER', 'x_employee', 'Income TYPE', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -9078,7 +9078,7 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $data = DB::table('transact_nontaxables')
-                        ->join('employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
                         ->where('transact_nontaxables.nontaxable_name', '=', $request->get('income'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -9086,7 +9086,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_nontaxables')
-                        ->join('employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_nontaxables.nontaxable_name', '=', $request->get('income'))
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -9094,7 +9094,7 @@ class ReportsController extends Controller
 
                 } else {
                     $data = DB::table('transact_nontaxables')
-                        ->join('employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
                         ->where('transact_nontaxables.nontaxable_name', '=', $request->get('income'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -9103,7 +9103,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_nontaxables')
-                        ->join('employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_nontaxables.nontaxable_name', '=', $request->get('income'))
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -9198,7 +9198,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'EMPLOYEE', 'AMOUNT'
+                            'PERSONAL FILE NUMBER', 'x_employee', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -9315,7 +9315,7 @@ class ReportsController extends Controller
 
                 if ($request->get('income') == 'All') {
                     $nontaxables = DB::table('transact_nontaxables')
-                        ->join('employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_nontaxables.nontaxable_name', '=', $request->get('income'))
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -9323,14 +9323,14 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_nontaxables')
-                        ->join('employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_nontaxables.nontaxable_name', '=', $request->get('income'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum("nontaxable_amount");
                 } else {
                     $nontaxables = DB::table('transact_nontaxables')
-                        ->join('employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_nontaxables.nontaxable_name', '=', $request->get('income'))
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -9339,7 +9339,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_nontaxables')
-                        ->join('employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_nontaxables.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_nontaxables.nontaxable_name', '=', $request->get('income'))
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -9400,7 +9400,7 @@ class ReportsController extends Controller
             if ($request->get('overtime') == 'All') {
                 if ($request->get('type') == 'All') {
                     $data = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->select('personal_file_number', 'first_name', 'last_name', 'middle_name', 'transact_overtimes.overtime_type', 'transact_overtimes.overtime_amount')
@@ -9412,7 +9412,7 @@ class ReportsController extends Controller
                         ->sum("overtime_amount");
                 } else {
                     $data = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -9514,7 +9514,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'EMPLOYEE', 'OVERTIME TYPE', 'AMOUNT'
+                            'PERSONAL FILE NUMBER', 'x_employee', 'OVERTIME TYPE', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -9576,7 +9576,7 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $data = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('overtime_type', '=', $request->get('overtime'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -9584,14 +9584,14 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('overtime_type', '=', $request->get('overtime'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum("overtime_amount");
                 } else {
                     $data = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('overtime_type', '=', $request->get('overtime'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -9600,7 +9600,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('overtime_type', '=', $request->get('overtime'))
                         ->where('process_type', '=', $request->get('type'))
@@ -9694,7 +9694,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'EMPLOYEE', 'AMOUNT'
+                            'PERSONAL FILE NUMBER', 'x_employee', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -9815,7 +9815,7 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $overtimes = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('overtime_type', '=', $request->get('overtime'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -9823,14 +9823,14 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('overtime_type', '=', $request->get('overtime'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum("overtime_amount");
                 } else {
                     $overtimes = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('overtime_type', '=', $request->get('overtime'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -9839,7 +9839,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_overtimes')
-                        ->join('employee', 'transact_overtimes.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'employee.id')
                         ->where('overtime_type', '=', $request->get('overtime'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -9906,7 +9906,7 @@ class ReportsController extends Controller
             if ($request->get('deduction') == 'All') {
                 if ($request->get('type') == 'All') {
                     $data = DB::table('transact_deductions')
-                        ->join('employee', 'transact_deductions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_deductions.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->select('personal_file_number', 'first_name', 'last_name', 'middle_name', 'transact_deductions.deduction_name', 'transact_deductions.deduction_amount')
@@ -9918,7 +9918,7 @@ class ReportsController extends Controller
                         ->sum("deduction_amount");
                 } else {
                     $data = DB::table('transact_deductions')
-                        ->join('employee', 'transact_deductions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_deductions.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
@@ -10020,7 +10020,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'EMPLOYEE', 'DEDUCTION TYPE', 'AMOUNT'
+                            'PERSONAL FILE NUMBER', 'x_employee', 'DEDUCTION TYPE', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -10081,7 +10081,7 @@ class ReportsController extends Controller
                 $type = $request->get('deduction');
                 if ($request->get('type') == 'All') {
                     $data = DB::table('transact_deductions')
-                        ->join('employee', 'transact_deductions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_deductions.employee_id', '=', 'employee.id')
                         ->where('transact_deductions.deduction_name', '=', $request->get('deduction'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -10089,14 +10089,14 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_deductions')
-                        ->join('employee', 'transact_deductions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_deductions.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_deductions.deduction_name', '=', $request->get('deduction'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum("deduction_amount");
                 } else {
                     $data = DB::table('transact_deductions')
-                        ->join('employee', 'transact_deductions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_deductions.employee_id', '=', 'employee.id')
                         ->where('transact_deductions.deduction_name', '=', $request->get('deduction'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -10105,7 +10105,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_deductions')
-                        ->join('employee', 'transact_deductions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_deductions.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_deductions.deduction_name', '=', $request->get('deduction'))
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -10199,7 +10199,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'EMPLOYEE', 'AMOUNT'
+                            'PERSONAL FILE NUMBER', 'x_employee', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -10316,7 +10316,7 @@ class ReportsController extends Controller
                 $type = $request->get("deduction");
                 if ($request->get('type') == 'All') {
                     $deds = DB::table('transact_deductions')
-                        ->join('employee', 'transact_deductions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_deductions.employee_id', '=', 'employee.id')
                         ->where('transact_deductions.deduction_name', '=', $request->get('deduction'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -10324,14 +10324,14 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_deductions')
-                        ->join('employee', 'transact_deductions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_deductions.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_deductions.deduction_name', '=', $request->get('deduction'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum("deduction_amount");
                 } else {
                     $deds = DB::table('transact_deductions')
-                        ->join('employee', 'transact_deductions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_deductions.employee_id', '=', 'employee.id')
                         ->where('transact_deductions.deduction_name', '=', $request->get('deduction'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -10340,7 +10340,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_deductions')
-                        ->join('employee', 'transact_deductions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_deductions.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_deductions.deduction_name', '=', $request->get('deduction'))
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -10401,7 +10401,7 @@ class ReportsController extends Controller
                 if ($request->get('type') == 'All') {
 
                     $data = DB::table('transact_pensions')
-                        ->join('employee', 'transact_pensions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_pensions.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->whereBetween('year', array($from[1], $to[1]))
                         ->whereBetween('month', array($from[0], $to[0]))
@@ -10416,7 +10416,7 @@ class ReportsController extends Controller
                         ->first();
                 } else {
                     $data = DB::table('transact_pensions')
-                        ->join('employee', 'transact_pensions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_pensions.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->whereBetween('year', array($from[1], $to[1]))
                         ->whereBetween('month', array($from[0], $to[0]))
@@ -10523,7 +10523,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'YEAR', 'MONTH', 'PERSONAL FILE NUMBER', 'EMPLOYEE', 'EMPLOYEE CONTRIBUTION', 'EMPLOYEE PERCENTAGE (%)', 'EMPLOYER CONTRIBUTION', 'EMPLOYER PERCENTAGE (%)', 'INTEREST', 'MONTH CONTRIBUTION', 'COMMENTS'
+                            'YEAR', 'MONTH', 'PERSONAL FILE NUMBER', 'x_employee', 'EMPLOYEE CONTRIBUTION', 'EMPLOYEE PERCENTAGE (%)', 'EMPLOYER CONTRIBUTION', 'EMPLOYER PERCENTAGE (%)', 'INTEREST', 'MONTH CONTRIBUTION', 'COMMENTS'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -10646,7 +10646,7 @@ class ReportsController extends Controller
                 $to = explode("-", $request->get('to'));
                 if ($request->get('type') == 'All') {
                     $data = DB::table('transact_pensions')
-                        ->join('employee', 'transact_pensions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_pensions.employee_id', '=', 'employee.id')
                         ->where('transact_pensions.employee_id', '=', $request->get('employeeid'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->whereBetween('year', array($from[1], $to[1]))
@@ -10665,7 +10665,7 @@ class ReportsController extends Controller
 
                 } else {
                     $data = DB::table('transact_pensions')
-                        ->join('employee', 'transact_pensions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_pensions.employee_id', '=', 'employee.id')
                         ->where('transact_pensions.employee_id', '=', $request->get('employeeid'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->whereBetween('year', array($from[1], $to[1]))
@@ -10674,7 +10674,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_pensions')
-                        ->join('employee', 'transact_pensions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_pensions.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_pensions.employee_id', '=', $request->get('employeeid'))
                         ->whereBetween('year', array($from[1], $to[1]))
@@ -10896,7 +10896,7 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $pensions = DB::table('transact_pensions')
-                        ->join('employee', 'transact_pensions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_pensions.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->whereBetween('year', array($from[1], $to[1]))
                         ->whereBetween('month', array($from[0], $to[0]))
@@ -10971,7 +10971,7 @@ class ReportsController extends Controller
                 $type = $request->get("employeeid");
                 if ($request->get('type') == 'All') {
                     $pensions = DB::table('transact_pensions')
-                        ->join('employee', 'transact_pensions.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_pensions.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('employee_id', $request->get("employeeid"))
                         ->whereBetween('year', array($from[1], $to[1]))
@@ -11038,7 +11038,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = app('dompdf.wrapper')->loadView('pdf.pensionReport', compact('pensions', 'employee', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.pensionReport', compact('pensions', 'x_employee', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
                 return $pdf->stream('Pension_Contributions_Report_' . $month . '.pdf');
             }
@@ -11097,7 +11097,7 @@ class ReportsController extends Controller
                 $period = $f . "-" . $from[1] . " to " . $t . "-" . $to[1];
 
                 Audit::logaudit(Carbon::now(),'Pension Graph', 'view', 'viewed pension contributions graph for all employees for period ' . $period);
-                return view('pdf.graph', compact('max', 'pensions', 'employee', 'total', 'period'));
+                return view('pdf.graph', compact('max', 'pensions', 'x_employee', 'total', 'period'));
             } else if ($request->get("from") == "" || $request->get("to") == "") {
                 return Redirect::to('payrollReports/selectPension')->withDeleteMessage('Please select period!');
             } else {
@@ -11155,7 +11155,7 @@ class ReportsController extends Controller
                 $period = $f . "-" . $from[1] . " to " . $t . "-" . $to[1];
 
                 Audit::logaudit(Carbon::now(),'Pension Graph', 'view', 'viewed pension contributions graph for employee ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $period);
-                return view('pdf.graph', compact('max', 'pensions', 'employee', 'total', 'period'));
+                return view('pdf.graph', compact('max', 'pensions', 'x_employee', 'total', 'period'));
             }
         }
     }
@@ -11194,7 +11194,7 @@ class ReportsController extends Controller
             if ($request->get('relief') == 'All') {
                 if ($request->get('type') == 'All') {
                     $data = DB::table('transact_reliefs')
-                        ->join('employee', 'transact_reliefs.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_reliefs.employee_id', '=', 'employee.id')
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->select('personal_file_number', 'first_name', 'last_name', 'middle_name', 'transact_reliefs.relief_name', 'transact_reliefs.relief_amount')
@@ -11206,7 +11206,7 @@ class ReportsController extends Controller
                         ->sum("relief_amount");
                 } else {
                     $data = DB::table('transact_reliefs')
-                        ->join('employee', 'transact_reliefs.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_reliefs.employee_id', '=', 'employee.id')
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -11308,7 +11308,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'EMPLOYEE', 'RELIEF TYPE', 'AMOUNT'
+                            'PERSONAL FILE NUMBER', 'x_employee', 'RELIEF TYPE', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -11370,7 +11370,7 @@ class ReportsController extends Controller
 
                 if ($request->get('type') == 'All') {
                     $data = DB::table('transact_reliefs')
-                        ->join('employee', 'transact_reliefs.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_reliefs.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_reliefs.relief_name', '=', $request->get('relief'))
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -11378,14 +11378,14 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_reliefs')
-                        ->join('employee', 'transact_reliefs.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_reliefs.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_reliefs.relief_name', '=', $request->get('relief'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum("relief_amount");
                 } else {
                     $data = DB::table('transact_reliefs')
-                        ->join('employee', 'transact_reliefs.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_reliefs.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_reliefs.relief_name', '=', $request->get('relief'))
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -11394,7 +11394,7 @@ class ReportsController extends Controller
                         ->get();
 
                     $total = DB::table('transact_reliefs')
-                        ->join('employee', 'transact_reliefs.employee_id', '=', 'employee.id')
+                        ->join('x_employee', 'transact_reliefs.employee_id', '=', 'employee.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('transact_reliefs.relief_name', '=', $request->get('relief'))
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -11489,7 +11489,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'EMPLOYEE', 'AMOUNT'
+                            'PERSONAL FILE NUMBER', 'x_employee', 'AMOUNT'
                         ));
 
                         $sheet->row(8, function ($r) {
@@ -11965,7 +11965,7 @@ class ReportsController extends Controller
 
                 $period = $request->get('period');
 
-                $data_disabled = DB::table('employee')
+                $data_disabled = DB::table('x_employee')
                     ->where('employee.organization_id', Auth::user()->organization_id)
                     ->where('income_tax_applicable', '=', 0)
                     ->get();
@@ -12127,7 +12127,7 @@ class ReportsController extends Controller
             if (request()->get('type') == "month") {
 
                 $data = DB::table('x_transact')
-                    ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
+                    ->join('x_employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                     ->where('employee.organization_id', Auth::user()->organization_id)
                     ->where('social_security_applicable', '=', 1)
                     ->where('financial_month_year', '=', request()->get('periodmonth'))
@@ -12552,7 +12552,7 @@ class ReportsController extends Controller
                 $to = Input::get("to");
 
                 $data = DB::table('appraisals')
-                    ->join('employee', 'appraisals.employee_id', '=', 'employee.id')
+                    ->join('x_employee', 'appraisals.employee_id', '=', 'employee.id')
                     ->join('appraisalquestions', 'appraisals.appraisalquestion_id', '=', 'appraisalquestions.id')
                     ->join('users', 'appraisals.examiner', '=', 'users.id')
                     ->whereBetween('appraisaldate', array($from, $to))
@@ -12602,7 +12602,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(5, array(
-                            '#', 'EMPLOYEE', 'QUESTION', 'PERFORMANCE', 'RATE', 'EXAMINER', 'APPRAISAL DATE', 'COMMENT'
+                            '#', 'x_employee', 'QUESTION', 'PERFORMANCE', 'RATE', 'EXAMINER', 'APPRAISAL DATE', 'COMMENT'
                         ));
 
                         $sheet->row(5, function ($r) {
@@ -12647,7 +12647,7 @@ class ReportsController extends Controller
                 $employee = Employee::find($id);
 
                 $data = DB::table('appraisals')
-                    ->join('employee', 'appraisals.employee_id', '=', 'employee.id')
+                    ->join('x_employee', 'appraisals.employee_id', '=', 'employee.id')
                     ->join('appraisalquestions', 'appraisals.appraisalquestion_id', '=', 'appraisalquestions.id')
                     ->join('users', 'appraisals.examiner', '=', 'users.id')
                     ->where('employee_id', $id)
@@ -12741,7 +12741,7 @@ class ReportsController extends Controller
                 $to = Input::get("to");
 
                 $appraisals = DB::table('appraisals')
-                    ->join('employee', 'appraisals.employee_id', '=', 'employee.id')
+                    ->join('x_employee', 'appraisals.employee_id', '=', 'employee.id')
                     ->join('appraisalquestions', 'appraisals.appraisalquestion_id', '=', 'appraisalquestions.id')
                     ->join('users', 'appraisals.examiner', '=', 'users.id')
                     ->whereBetween('appraisaldate', array($from, $to))
@@ -12767,7 +12767,7 @@ class ReportsController extends Controller
                 $employee = Employee::find($id);
 
                 $appraisals = DB::table('appraisals')
-                    ->join('employee', 'appraisals.employee_id', '=', 'employee.id')
+                    ->join('x_employee', 'appraisals.employee_id', '=', 'employee.id')
                     ->join('appraisalquestions', 'appraisals.appraisalquestion_id', '=', 'appraisalquestions.id')
                     ->join('users', 'appraisals.examiner', '=', 'users.id')
                     ->where('employee_id', $id)
@@ -12778,7 +12778,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Confide::user()->organization_id);
 
-                $pdf = app('dompdf.wrapper')->loadView('pdf.individualappraisal', compact('from', 'to', 'employee', 'organization', 'appraisals'))->setPaper('a4')->setOrientation('potrait');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.individualappraisal', compact('from', 'to', 'x_employee', 'organization', 'appraisals'))->setPaper('a4')->setOrientation('potrait');
 
                 //dd($organization);
 
@@ -12804,7 +12804,7 @@ class ReportsController extends Controller
                 $to = $request->get("to");
 
                 $data = DB::table('properties')
-                    ->join('employee', 'properties.employee_id', '=', 'employee.id')
+                    ->join('x_employee', 'properties.employee_id', '=', 'employee.id')
                     ->where('organization_id', Auth::user()->organization_id)
                     ->whereBetween('issue_date', array($from, $to))
                     ->get();
@@ -12851,7 +12851,7 @@ class ReportsController extends Controller
                         });
 
                         $sheet->row(5, array(
-                            '#', 'EMPLOYEE', 'PROPERTY NAME', 'DESCRIPTION', 'SERIAL NO.', 'DIGITAL SNO.', 'VALUE', 'ISSUED BY', 'ISSUE DATE', 'SCHEDULED RETURN DATE', 'STATUS', 'RECEIVED BY'
+                            '#', 'x_employee', 'PROPERTY NAME', 'DESCRIPTION', 'SERIAL NO.', 'DIGITAL SNO.', 'VALUE', 'ISSUED BY', 'ISSUE DATE', 'SCHEDULED RETURN DATE', 'STATUS', 'RECEIVED BY'
                         ));
 
                         $sheet->row(5, function ($r) {
@@ -13046,7 +13046,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                $pdf = app('dompdf.wrapper')->loadView('pdf.individualproperty', compact('from', 'to', 'employee', 'organization', 'properties'))->setPaper('a4');
+                $pdf = app('dompdf.wrapper')->loadView('pdf.individualproperty', compact('from', 'to', 'x_employee', 'organization', 'properties'))->setPaper('a4');
 
                 //dd($organization);
 
@@ -13096,7 +13096,7 @@ class ReportsController extends Controller
         if ($request->type == "Excel") {
             return Excel::download(new P9FormExports($year, $employee, $organization), $ename . '_P9Form_' . $year . ".xls");
         } else {
-            $pdf = app('dompdf.wrapper')->loadview('pdf.p9Pdf', compact('organization', 'employee', 'year'));
+            $pdf = app('dompdf.wrapper')->loadview('pdf.p9Pdf', compact('organization', 'x_employee', 'year'));
             return $pdf->stream($employee->first_name . '_' . $employee->last_name . '_' . $year);
         }
     }
