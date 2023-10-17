@@ -337,6 +337,12 @@ function asMoney($value)
 
 </div>
 
+    
+
+<div class="footer">
+    <p class="page">Page <?php $PAGE_NUM ?></p>
+</div>
+
 
 </body>
 </html>
