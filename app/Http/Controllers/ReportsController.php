@@ -132,9 +132,9 @@ class ReportsController extends Controller
     public function template()
     {
 
-        $members = Member::all();
+        $members = Organization::all();
 
-        $organization = Organization::find(1);
+        $organization = Organization::find(Auth::user()->organization_id);
 
         $pdf = app('dompdf.wrapper')->loadView('pdf.blank', compact('members', 'organization'))->setPaper('a4', 'landscape');
 
