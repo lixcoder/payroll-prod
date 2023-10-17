@@ -7982,7 +7982,6 @@ class ReportsController extends Controller
                 $period = $request->get("period");
 //                dd($request->period);
                 $type = $request->get("earning");
-		    return ($request->get('type'));
                 if ($request->get('type') == 'All') {
 
                     $earnings = DB::table('x_transact_earnings')
@@ -8029,6 +8028,7 @@ class ReportsController extends Controller
                 $month = $m . "_" . $part[1];
 
                 $organization = Organization::find(Auth::user()->organization_id);
+		    return json_decode($earnings);
 
                 $pdf = app('dompdf.wrapper')->loadView('pdf.earningReport', compact('earnings', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
