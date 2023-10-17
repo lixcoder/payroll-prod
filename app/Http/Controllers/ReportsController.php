@@ -8028,6 +8028,7 @@ class ReportsController extends Controller
                 $month = $m . "_" . $part[1];
 
                 $organization = Organization::find(Auth::user()->organization_id);
+		    return json_decode($earnings);
 
                 $pdf = app('dompdf.wrapper')->loadView('pdf.earningReport', compact('earnings', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
