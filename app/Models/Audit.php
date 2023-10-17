@@ -18,7 +18,7 @@ class Audit extends Model
     protected $fillable = [];
 
 
-    public static function logAudit($date, $user, $action, $entity = NULL, $amount = NULL, $organization_id=Auth::user()->organization_id)
+    public static function logAudit($date, $user, $action, $entity = NULL, $amount = NULL)
     {
 //        dd($date);
         $audit = new Audit;
@@ -28,7 +28,7 @@ class Audit extends Model
         $audit->action = $action;
         $audit->entity = $entity;
         $audit->amount = $amount;
-        $audit->organization_id = $organization_id;
+        $audit->organization_id = Auth::user()->organization_id;
         $audit->save();
     }
 
