@@ -4865,7 +4865,7 @@ class ReportsController extends Controller
 
                 $month = $m . "_" . $part[1];
 
-                Audit::logaudit('Payroll Summary', 'view', 'viewed payroll summary for all employees for period ' . $request->get('period'));
+                Audit::logaudit(Carbon::now(),'Payroll Summary', 'view', 'viewed payroll summary for all employees for period ' . $request->get('period'));
                 return Excel::download(new PayrollExport(
                     $total_pay,
                     $total_earning,
