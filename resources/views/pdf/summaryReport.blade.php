@@ -110,6 +110,9 @@ function asMoney($value)
 <body>
 
 <div class="header" style='margin-top:-150px;'>
+    <div class="footer">
+        <p class="page">Page <?php $PAGE_NUM ?></p>
+    </div>
     <table>
         <tr>
 
