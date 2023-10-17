@@ -8028,7 +8028,6 @@ class ReportsController extends Controller
                 $month = $m . "_" . $part[1];
 
                 $organization = Organization::find(Auth::user()->organization_id);
-		    return json_decode($earnings);
 
                 $pdf = app('dompdf.wrapper')->loadView('pdf.earningReport', compact('earnings', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
@@ -9382,7 +9381,7 @@ class ReportsController extends Controller
             $query->whereNull('organization_id')
                 ->orWhere('organization_id', Auth::user()->organization_id);
         })->where('job_group_name', 'Management')
-            ->first();
+            ->get();
         try {
             if (count($jgroup) > 0) {
                 $type = Employee::where('organization_id', Auth::user()->organization_id)->where('job_group_id', $jgroup->id)->where('personal_file_number', Auth::user()->username)->count();
