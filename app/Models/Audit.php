@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth
 
 
 class Audit extends Model
@@ -17,7 +18,7 @@ class Audit extends Model
     protected $fillable = [];
 
 
-    public static function logAudit($date, $user, $action, $entity = NULL, $amount = NULL, $organization_id)
+    public static function logAudit($date, $user, $action, $entity = NULL, $amount = NULL, $organization_id=Auth::user()->organization_id)
     {
 //        dd($date);
         $audit = new Audit;
