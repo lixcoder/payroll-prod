@@ -331,6 +331,9 @@ function asMoney($value)
             <td align="center"><strong>Date</strong></td>
         </tr>
     </table>
+    <div class="footer">
+        <p class="page">Page <?php $PAGE_NUM ?></p>
+    </div>
 
     <br><br>
 
@@ -338,10 +341,6 @@ function asMoney($value)
 </div>
 
     
-
-<div class="footer">
-    <p class="page">Page <?php $PAGE_NUM ?></p>
-</div>
 
 
 </body>
