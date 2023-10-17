@@ -114,14 +114,7 @@ function asMoney($value)
         <tr>
 
 
-            <td style="width:150px">
-                @if($organization->logo != NULL)
-                    <img src="{{public_path().'/uploads/logo/'.$organization->logo}}" alt="logo"
-                         style="height: 40px;">
-                @endif
-
-
-            </td>
+           
 
             <td>
                 <strong>
