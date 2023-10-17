@@ -113,13 +113,20 @@ function asMoney($value)
     <table>
         <tr>
 
+             <td style="width:150px">
+                @if($organization->logo != NULL)
+                    <img src="{{public_path().'/uploads/logo/'.$organization->logo}}" alt="logo"
+                         style="height: 40px;">
+                @endif
 
+
+            </td>
            
 
             <td>
                 <strong>
                     {{ strtoupper($organization->name)}}
-                </strong><br>
+                </strong>
                 {{ $organization->phone}}<br>
                 {{ $organization->email}}<br>
                 {{ $organization->website}}<br>
