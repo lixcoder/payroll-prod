@@ -6584,7 +6584,7 @@ class ReportsController extends Controller
             $query->whereNull('organization_id')
                 ->orWhere('organization_id', Auth::user()->organization_id);
         })->where('job_group_name', 'Management')
-            ->first();
+            ->get();
         //$currency = Currency::whereNull('organization_id')->orWhere('organization_id',Auth::user()->organization_id)->first();
         try {
             if (count($jgroup) > 0) {
