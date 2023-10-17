@@ -2,7 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth
+use Illuminate\Support\Facades\Auth;
 
 
 class Audit extends Model
