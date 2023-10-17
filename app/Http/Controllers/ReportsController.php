@@ -5879,9 +5879,10 @@ class ReportsController extends Controller
                         ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
                         ->where('x_employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
-                        ->orderByRaw('CAST(personal_file_number as SIGNED INTEGER)', 'ASC')
+                        ->orderByRaw('personal_file_number', 'ASC')
                         ->select('personal_file_number', 'first_name', 'middle_name', 'last_name', 'x_transact.basic_pay', 'taxable_income', 'paye', 'nssf_amount', 'nhif_amount', 'earning_amount', 'relief', 'other_deductions', 'total_deductions', 'net', 'x_employee.id', 'income_tax_applicable', 'income_tax_relief_applicable')
                         ->get();
+			// ->orderByRaw('CAST(personal_file_number as SIGNED INTEGER)', 'ASC')
                 } else {
                     $total_pay = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
