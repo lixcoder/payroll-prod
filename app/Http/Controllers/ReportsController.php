@@ -4572,7 +4572,7 @@ class ReportsController extends Controller
 
                     Audit::logaudit(Carbon::now(), 'view', 'viewed payslip for ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $request->get('period'));
 
-                    //return view('pdf.monthlySlip', compact('nontaxables','empall','select','name','employee','transact','allws','deds','earnings','overtimes','pension','rels','period','currency', 'organization','id'));
+                    //return view('pdf.monthlySlip', compact('nontaxables','empall','select','name','employee','x_transact','allws','deds','earnings','overtimes','pension','rels','period','currency', 'organization','id'));
                     $pdf = app('dompdf.wrapper')->loadView('pdf.monthlySlip', compact('nontaxables', 'empall', 'select', 'name', 'employee', 'transacts', 'allws', 'deds', 'earnings', 'overtimes', 'pension', 'rels', 'period', 'currency', 'organization', 'id'))->setPaper('a5');
 
                     return $pdf->stream($employee->personal_file_number . '_' . $employee->first_name . '_' . $employee->last_name . '_' . $month . '.pdf');
@@ -4734,55 +4734,55 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('transact.basic_pay');
 
-                    $total_earning = DB::table('transact')
+                    $total_earning = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('earning_amount');
 
-                    $total_gross = DB::table('transact')
+                    $total_gross = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('taxable_income');
 
-                    $total_paye = DB::table('transact')
+                    $total_paye = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('paye');
 
-                    $total_nssf = DB::table('transact')
+                    $total_nssf = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('nssf_amount');
 
-                    $total_nhif = DB::table('transact')
+                    $total_nhif = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('nhif_amount');
 
-                    $total_others = DB::table('transact')
+                    $total_others = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('process_type', '=', $request->get('type'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('other_deductions');
 
-                    $total_deds = DB::table('transact')
+                    $total_deds = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('process_type', '=', $request->get('type'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('total_deductions');
 
-                    $total_net = DB::table('transact')
+                    $total_net = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('process_type', '=', $request->get('type'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
-                    $data = DB::table('transact')
+                    $data = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
@@ -5013,61 +5013,61 @@ class ReportsController extends Controller
                         ->select(DB::raw('DISTINCT(deduction_name) as deduction_name'))
                         ->get();
                 } else {
-                    $total_pay = DB::table('transact')
+                    $total_pay = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('transact.basic_pay');
 
-                    $total_earning = DB::table('transact')
+                    $total_earning = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('earning_amount');
 
-                    $total_gross = DB::table('transact')
+                    $total_gross = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('taxable_income');
 
-                    $total_paye = DB::table('transact')
+                    $total_paye = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('paye');
 
-                    $total_nssf = DB::table('transact')
+                    $total_nssf = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('nssf_amount');
 
-                    $total_nhif = DB::table('transact')
+                    $total_nhif = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('nhif_amount');
 
-                    $total_others = DB::table('transact')
+                    $total_others = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('other_deductions');
 
-                    $total_deds = DB::table('transact')
+                    $total_deds = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('total_deductions');
 
-                    $total_net = DB::table('transact')
+                    $total_net = DB::table('x_transact')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('net');
 
-                    $data = DB::table('transact')
+                    $data = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('branch_id', '=', $request->get('branch'))
@@ -6052,7 +6052,7 @@ class ReportsController extends Controller
                         ->get();
 
                 } else {
-                    $total_pay = DB::table('transact')
+                    $total_pay = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6060,7 +6060,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('transact.basic_pay');
 
-                    $total_earning = DB::table('transact')
+                    $total_earning = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6068,7 +6068,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('earning_amount');
 
-                    $total_gross = DB::table('transact')
+                    $total_gross = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('branch_id', '=', $request->get('branch'))
@@ -6076,7 +6076,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('taxable_income');
 
-                    $total_paye = DB::table('transact')
+                    $total_paye = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6084,7 +6084,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('paye');
 
-                    $total_nssf = DB::table('transact')
+                    $total_nssf = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6092,7 +6092,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('nssf_amount');
 
-                    $total_nhif = DB::table('transact')
+                    $total_nhif = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('branch_id', '=', $request->get('branch'))
@@ -6100,7 +6100,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('nhif_amount');
 
-                    $total_others = DB::table('transact')
+                    $total_others = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6108,7 +6108,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('other_deductions');
 
-                    $total_deds = DB::table('transact')
+                    $total_deds = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6116,7 +6116,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('total_deductions');
 
-                    $total_net = DB::table('transact')
+                    $total_net = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6129,7 +6129,7 @@ class ReportsController extends Controller
                         ->select('shortname')
                         ->get();
 
-                    $sums = DB::table('transact')
+                    $sums = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->join('branches', 'employee.branch_id', '=', 'branches.id')
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6244,7 +6244,7 @@ class ReportsController extends Controller
                         ->select('personal_file_number', 'first_name', 'middle_name', 'last_name', 'x_transact.basic_pay', 'taxable_income', 'paye', 'nssf_amount', 'nhif_amount', 'earning_amount', 'relief', 'other_deductions', 'total_deductions', 'net', 'x_employee.id', 'income_tax_applicable', 'income_tax_relief_applicable')
                         ->get();
                 } else {
-                    $total_pay = DB::table('transact')
+                    $total_pay = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6252,7 +6252,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('transact.basic_pay');
 
-                    $total_earning = DB::table('transact')
+                    $total_earning = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6260,7 +6260,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('earning_amount');
 
-                    $total_gross = DB::table('transact')
+                    $total_gross = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6268,7 +6268,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('taxable_income');
 
-                    $total_paye = DB::table('transact')
+                    $total_paye = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6276,7 +6276,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('paye');
 
-                    $total_nssf = DB::table('transact')
+                    $total_nssf = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6284,7 +6284,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('nssf_amount');
 
-                    $total_nhif = DB::table('transact')
+                    $total_nhif = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6292,7 +6292,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('nhif_amount');
 
-                    $total_others = DB::table('transact')
+                    $total_others = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6300,7 +6300,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('other_deductions');
 
-                    $total_deds = DB::table('transact')
+                    $total_deds = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6308,7 +6308,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('total_deductions');
 
-                    $total_net = DB::table('transact')
+                    $total_net = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6321,7 +6321,7 @@ class ReportsController extends Controller
                         ->select('shortname')
                         ->get();
 
-                    $sums = DB::table('transact')
+                    $sums = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->join('departments', 'employee.department_id', '=', 'departments.id')
                         ->where('department_id', '=', $request->get('department'))
@@ -6360,7 +6360,7 @@ class ReportsController extends Controller
                 $selDt = DB::table('departments')->find($request->get('department'));
 
                 if ($request->get('type') == 'All') {
-                    $total_pay = DB::table('transact')
+                    $total_pay = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6368,7 +6368,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('transact.basic_pay');
 
-                    $total_earning = DB::table('transact')
+                    $total_earning = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6376,7 +6376,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('earning_amount');
 
-                    $total_gross = DB::table('transact')
+                    $total_gross = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6384,7 +6384,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('taxable_income');
 
-                    $total_paye = DB::table('transact')
+                    $total_paye = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6392,7 +6392,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('paye');
 
-                    $total_nssf = DB::table('transact')
+                    $total_nssf = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6400,7 +6400,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('nssf_amount');
 
-                    $total_nhif = DB::table('transact')
+                    $total_nhif = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6408,7 +6408,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('nhif_amount');
 
-                    $total_others = DB::table('transact')
+                    $total_others = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6416,7 +6416,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('other_deductions');
 
-                    $total_deds = DB::table('transact')
+                    $total_deds = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6424,7 +6424,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('total_deductions');
 
-                    $total_net = DB::table('transact')
+                    $total_net = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6437,7 +6437,7 @@ class ReportsController extends Controller
                         ->select('shortname')
                         ->get();
 
-                    $sums = DB::table('transact')
+                    $sums = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->join('branches', 'employee.branch_id', '=', 'branches.id')
                         ->join('departments', 'employee.department_id', '=', 'departments.id')
@@ -6448,7 +6448,7 @@ class ReportsController extends Controller
                         ->select('personal_file_number', 'first_name', 'middle_name', 'last_name', 'transact.basic_pay', 'taxable_income', 'paye', 'nssf_amount', 'nhif_amount', 'earning_amount', 'relief', 'other_deductions', 'total_deductions', 'net', 'employee.id', 'income_tax_applicable', 'income_tax_relief_applicable')
                         ->get();
                 } else {
-                    $total_pay = DB::table('transact')
+                    $total_pay = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6457,7 +6457,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('transact.basic_pay');
 
-                    $total_earning = DB::table('transact')
+                    $total_earning = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6466,7 +6466,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('earning_amount');
 
-                    $total_gross = DB::table('transact')
+                    $total_gross = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6475,7 +6475,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('taxable_income');
 
-                    $total_paye = DB::table('transact')
+                    $total_paye = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6484,7 +6484,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('paye');
 
-                    $total_nssf = DB::table('transact')
+                    $total_nssf = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6493,7 +6493,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('nssf_amount');
 
-                    $total_nhif = DB::table('transact')
+                    $total_nhif = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6502,7 +6502,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('nhif_amount');
 
-                    $total_others = DB::table('transact')
+                    $total_others = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6511,7 +6511,7 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('other_deductions');
 
-                    $total_deds = DB::table('transact')
+                    $total_deds = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6520,7 +6520,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('total_deductions');
 
-                    $total_net = DB::table('transact')
+                    $total_net = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6534,7 +6534,7 @@ class ReportsController extends Controller
                         ->select('shortname')
                         ->get();
 
-                    $sums = DB::table('transact')
+                    $sums = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->join('branches', 'employee.branch_id', '=', 'branches.id')
                         ->join('departments', 'employee.department_id', '=', 'departments.id')
@@ -6606,27 +6606,27 @@ class ReportsController extends Controller
             if ($request->get('branch') == 'All' && $request->get('department') == 'All') {
 
                 if ($request->get('type') == 'All') {
-                    $total = DB::table('transact')
+                    $total = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
-                    $data = DB::table('transact')
+                    $data = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->get();
                 } else {
 
-                    $total = DB::table('transact')
+                    $total = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('process_type', '=', $request->get('type'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
-                    $data = DB::table('transact')
+                    $data = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('process_type', '=', $request->get('type'))
@@ -6776,14 +6776,14 @@ class ReportsController extends Controller
             } else if ($request->get('department') == 'All') {
 
                 if ($request->get('type') == 'All') {
-                    $total = DB::table('transact')
+                    $total = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
-                    $data = DB::table('transact')
+                    $data = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6791,7 +6791,7 @@ class ReportsController extends Controller
                         ->get();
                 } else {
 
-                    $total = DB::table('transact')
+                    $total = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6799,7 +6799,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
-                    $data = DB::table('transact')
+                    $data = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6944,14 +6944,14 @@ class ReportsController extends Controller
             } else if ($request->get('branch') == 'All') {
 
                 if ($request->get('type') == 'All') {
-                    $total = DB::table('transact')
+                    $total = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
-                    $data = DB::table('transact')
+                    $data = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6959,7 +6959,7 @@ class ReportsController extends Controller
                         ->get();
 
                 } else {
-                    $total = DB::table('transact')
+                    $total = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -6967,7 +6967,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
-                    $data = DB::table('transact')
+                    $data = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -7115,7 +7115,7 @@ class ReportsController extends Controller
             } else if ($request->get('branch') != 'All' && $request->get('department') != 'All') {
 
                 if ($request->get('type') == 'All') {
-                    $total = DB::table('transact')
+                    $total = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('department_id', '=', $request->get('department'))
@@ -7123,7 +7123,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
-                    $data = DB::table('transact')
+                    $data = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('department_id', '=', $request->get('department'))
@@ -7131,7 +7131,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->get();
                 } else {
-                    $total = DB::table('transact')
+                    $total = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('department_id', '=', $request->get('department'))
@@ -7140,7 +7140,7 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
-                    $data = DB::table('transact')
+                    $data = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('department_id', '=', $request->get('department'))
@@ -7437,14 +7437,14 @@ class ReportsController extends Controller
             } else if ($request->get('branch') == 'All') {
 
                 if ($request->get('type') == 'All') {
-                    $total = DB::table('transact')
+                    $total = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
-                    $rems = DB::table('transact')
+                    $rems = DB::table('x_transact')
                         ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                         ->where('department_id', '=', $request->get('department'))
                         ->where('employee.organization_id', Auth::user()->organization_id)
@@ -12126,7 +12126,7 @@ class ReportsController extends Controller
         if (request()->get('format') == "excel") {
             if (request()->get('type') == "month") {
 
-                $data = DB::table('transact')
+                $data = DB::table('x_transact')
                     ->join('employee', 'transact.employee_id', '=', 'employee.personal_file_number')
                     ->where('employee.organization_id', Auth::user()->organization_id)
                     ->where('social_security_applicable', '=', 1)
