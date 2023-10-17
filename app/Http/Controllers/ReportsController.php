@@ -7982,7 +7982,7 @@ class ReportsController extends Controller
                 $period = $request->get("period");
 //                dd($request->period);
                 $type = $request->get("earning");
-		    return ($request->get('type')."senor";
+		    return ($request->get('type');
                 if ($request->get('type') == 'All') {
 
                     $earnings = DB::table('x_transact_earnings')
