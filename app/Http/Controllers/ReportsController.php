@@ -5165,7 +5165,7 @@ class ReportsController extends Controller
 
                 $branch = Branch::find($request->get('branch'));
 
-                Audit::logaudit('Payroll Summary', 'view', 'viewed payroll summary for all employees in branch ' . $branch->name . ' for period ' . $request->get('period'));
+                Audit::logaudit(Carbon::now(),'Payroll Summary', 'view', 'viewed payroll summary for all employees in branch ' . $branch->name . ' for period ' . $request->get('period'));
                 /*
                  * Excel
                  * */
@@ -5466,7 +5466,7 @@ class ReportsController extends Controller
 
                 $department = Department::find($request->get('department'));
 
-                Audit::logaudit('Payroll Summary', 'view', 'viewed payroll summary for all employees in department ' . $department->department_name . ' for period ' . $request->get('period'));
+                Audit::logaudit(Carbon::now(),'Payroll Summary', 'view', 'viewed payroll summary for all employees in department ' . $department->department_name . ' for period ' . $request->get('period'));
                 /*
                  * Excel
                  * */
@@ -5786,7 +5786,7 @@ class ReportsController extends Controller
                 $branch = Branch::find($request->get('branch'));
                 $department = Department::find($request->get('department'));
 
-                Audit::logaudit('Payroll Summary', 'view', 'viewed payroll summary for all employees in branch ' . $branch->name . ' and department ' . $department->deduction_name . ' for period ' . $request->get('period'));
+                Audit::logaudit(Carbon::now(),'Payroll Summary', 'view', 'viewed payroll summary for all employees in branch ' . $branch->name . ' and department ' . $department->deduction_name . ' for period ' . $request->get('period'));
                 /*
                  * Excel
                  * */
@@ -5964,7 +5964,7 @@ class ReportsController extends Controller
 
                 $month = $m . "_" . $part[1];
 
-                Audit::logaudit('Payroll Summary', 'view', 'viewed payroll summary for all employees for period ' . $request->get('period'));
+                Audit::logaudit(Carbon::now(),'Payroll Summary', 'view', 'viewed payroll summary for all employees for period ' . $request->get('period'));
 
                 $pdf = app('dompdf.wrapper')->loadView('pdf.summaryReport', compact('sums', 'selBranch', 'selDept', 'total_pay', 'total_earning', 'total_gross', 'total_paye', 'total_nssf', 'total_nhif', 'total_others', 'total_deds', 'total_net', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
@@ -6157,7 +6157,7 @@ class ReportsController extends Controller
 
                 $branch = Branch::find($request->get('branch'));
 
-                Audit::logaudit('Payroll Summary', 'view', 'viewed payroll summary for all employees in branch ' . $branch->name . ' for period ' . $request->get('period'));
+                Audit::logaudit(Carbon::now(),'Payroll Summary', 'view', 'viewed payroll summary for all employees in branch ' . $branch->name . ' for period ' . $request->get('period'));
 
                 $pdf = app('dompdf.wrapper')->loadView('pdf.summaryReport', compact('sums', 'selBranch', 'selDept', 'sels', 'total_pay', 'total_earning', 'total_gross', 'total_paye', 'total_nssf', 'total_nhif', 'total_others', 'total_deds', 'total_net', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
@@ -6348,7 +6348,7 @@ class ReportsController extends Controller
 
                 $department = Department::find($request->get('department'));
 
-                Audit::logaudit('Payroll Summary', 'view', 'viewed payroll summary for all employees in department ' . $department->deduction_name . ' for period ' . $request->get('period'));
+                Audit::logaudit(Carbon::now(),'Payroll Summary', 'view', 'viewed payroll summary for all employees in department ' . $department->deduction_name . ' for period ' . $request->get('period'));
 
                 $pdf = app('dompdf.wrapper')->loadView('pdf.summaryReport', compact('sums', 'selBranch', 'selDept', 'sels', 'total_pay', 'total_earning', 'total_gross', 'total_paye', 'total_nssf', 'total_nhif', 'total_others', 'total_deds', 'total_net', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
@@ -6563,7 +6563,7 @@ class ReportsController extends Controller
                 $branch = Branch::find($request->get('branch'));
                 $department = Department::find($request->get('department'));
 
-                Audit::logaudit('Payroll Summary', 'view', 'viewed payroll summary for all employees in branch ' . $branch->name . ' and department ' . $department->deduction_name . ' for period ' . $request->get('period'));
+                Audit::logaudit(Carbon::now(),'Payroll Summary', 'view', 'viewed payroll summary for all employees in branch ' . $branch->name . ' and department ' . $department->deduction_name . ' for period ' . $request->get('period'));
 
                 $pdf = app('dompdf.wrapper')->loadView('pdf.summaryReport', compact('sums', 'selBranch', 'selDept', 'selBr', 'selDt', 'total_pay', 'total_earning', 'total_gross', 'total_paye', 'total_nssf', 'total_nhif', 'total_others', 'total_deds', 'total_net', 'currencies', 'period', 'organization'))->setPaper('a4', 'landscape');
 
@@ -10457,7 +10457,7 @@ class ReportsController extends Controller
                 $month = $f . "-" . $from[1] . $t . "-" . $to[1];
                 $period = $f . "-" . $from[1] . " to " . $t . "-" . $to[1];
 
-                Audit::logaudit('Pension Report', 'view', 'viewed pension contribution report for period ' . $request->get('period'));
+                Audit::logaudit(Carbon::now(),'Pension Report', 'view', 'viewed pension contribution report for period ' . $request->get('period'));
 
                 Excel::create('Pension Contributions Report ' . $month, function ($excel) use ($data, $currency, $total, $organization, $period) {
 
@@ -10706,7 +10706,7 @@ class ReportsController extends Controller
                 $month = $f . "-" . $from[1] . $t . "-" . $to[1];
                 $period = $f . "-" . $from[1] . " to " . $t . "-" . $to[1];
 
-                Audit::logaudit('Pension Report', 'view', 'viewed pension contribution report for employee ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $request->get('period'));
+                Audit::logaudit(Carbon::now(),'Pension Report', 'view', 'viewed pension contribution report for employee ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $request->get('period'));
 
                 Excel::create('Pension Contributions Report ' . $month, function ($excel) use ($data, $total, $type, $currency, $organization, $employee, $period) {
 
@@ -10962,7 +10962,7 @@ class ReportsController extends Controller
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
-                Audit::logaudit('Pension Report', 'view', 'viewed pension contributions report for period ' . $period);
+                Audit::logaudit(Carbon::now(),'Pension Report', 'view', 'viewed pension contributions report for period ' . $period);
 
                 $pdf = app('dompdf.wrapper')->loadView('pdf.pensionReport', compact('pensions', 'type', 'period', 'currencies', 'total', 'organization'))->setPaper('a4');
 
@@ -11034,7 +11034,7 @@ class ReportsController extends Controller
 
                 $employee = Employee::find($request->get("employeeid"));
 
-                Audit::logaudit('Pension Report', 'view', 'viewed pension contributions report for employee ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $period);
+                Audit::logaudit(Carbon::now(),'Pension Report', 'view', 'viewed pension contributions report for employee ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $period);
 
                 $organization = Organization::find(Auth::user()->organization_id);
 
@@ -11096,7 +11096,7 @@ class ReportsController extends Controller
                 $month = $f . "_" . $from[1] . $t . "_" . $to[1];
                 $period = $f . "-" . $from[1] . " to " . $t . "-" . $to[1];
 
-                Audit::logaudit('Pension Graph', 'view', 'viewed pension contributions graph for all employees for period ' . $period);
+                Audit::logaudit(Carbon::now(),'Pension Graph', 'view', 'viewed pension contributions graph for all employees for period ' . $period);
                 return view('pdf.graph', compact('max', 'pensions', 'employee', 'total', 'period'));
             } else if ($request->get("from") == "" || $request->get("to") == "") {
                 return Redirect::to('payrollReports/selectPension')->withDeleteMessage('Please select period!');
@@ -11154,7 +11154,7 @@ class ReportsController extends Controller
                 $month = $f . "_" . $from[1] . $t . "_" . $to[1];
                 $period = $f . "-" . $from[1] . " to " . $t . "-" . $to[1];
 
-                Audit::logaudit('Pension Graph', 'view', 'viewed pension contributions graph for employee ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $period);
+                Audit::logaudit(Carbon::now(),'Pension Graph', 'view', 'viewed pension contributions graph for employee ' . $employee->personal_file_number . ' : ' . $employee->first_name . ' ' . $employee->last_name . ' for period ' . $period);
                 return view('pdf.graph', compact('max', 'pensions', 'employee', 'total', 'period'));
             }
         }
