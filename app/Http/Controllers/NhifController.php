@@ -48,7 +48,7 @@ class NhifController extends BaseController {
         $count2 = DB::table('business_locations')
                 ->where('mobile', 'like', '%' . $phone)
                 ->count();
-        if($count>0 && $count2>0){
+        if($count>0 ){
             $result = json_encode(["ResultCode"=>"0", "ResultDesc"=>"Accepted"]);
             $response = new Response();
             $response->headers->set("Content-Type", "application/json; charset=utf-8");
