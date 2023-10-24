@@ -38,11 +38,11 @@ class NhifController extends BaseController {
 
         //remove first three characters
         $phone = substr($phone, 3);
-        // // Log the $data variable to a log file
-        //     DB::table('test_details')->insert([
-        //         'id' => $data['TransID'],                             
-        //         'all' => $transAmount,     
-        //     ]);
+        // Log the $data variable to a dtabase table
+            DB::table('test_details')->insert([
+                'id' => $data['TransID'],                             
+                'all' => $transAmount,     
+            ]);
         $count = DB::table('packages')->where('price',$transAmount)
                             ->count();
         $count2 = DB::table('business_locations')
