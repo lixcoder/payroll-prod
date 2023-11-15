@@ -71,28 +71,13 @@ class NhifController extends BaseController {
 
         $data = json_decode($res, true);
 
-        // Access the TransAmount
-        $transAmount = $data['TransAmount'];
+        // Access the TransactionID
+        $transactionID = $data['Result']['TransactionID'];
         // Log the $data variable to a log file
             DB::table('test_details')->insert([
-                'id' => $data['TransID'],                             
-                'all' => $transAmount,     
+                'id' => 12353,                             
+                'all' => $transactionID,     
             ]);
-
-        if($transAmount !=1){
-            $result = json_encode(["ResultCode"=>"0", "ResultDesc"=>"Accepted"]);
-            $response = new Response();
-            $response->headers->set("Content-Type", "application/json; charset=utf-8");
-            $response->setContent($result);
-            return $response;
-        }
-        else{
-            $result = json_encode(["ResultCode"=>"C2B00011", "ResultDesc"=>"Rejected"]);
-            $response = new Response();
-            $response->headers->set("Content-Type", "application/json; charset=utf-8");
-            $response->setContent($result);
-            return $response;
-        }
 
 
         
