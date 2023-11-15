@@ -106,6 +106,16 @@ class UserController extends Controller
         return  redirect()->route('users.index')->with('success','User Updated');
     }
 
+    // public function profileUpdate(Request $request, $id)
+    // {
+    //     //
+    //     $user = User::where('id',$id)->findOrFail($id);
+    //     $user->name = $request->name;
+    //     $user->email = $request->email;
+    //     $user->push();
+    //     return  redirect()->route('users.index')->with('success','User Profile Updated');
+    // }
+
     /**
      * Remove the specified resource from storage.
      *
