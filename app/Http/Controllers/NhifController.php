@@ -66,78 +66,21 @@ class NhifController extends BaseController {
 
     //function to recieve json from mpesa
     public function recieveJson(){
-        header("Content-Type: application/json");
-        $res = file_get_contents('php://input');
+        return "Senor";
+        // header("Content-Type: application/json");
+        // $res = file_get_contents('php://input');
 
-        $data = json_decode($res, true);
+        // $data = json_decode($res, true);
 
-        // Access the TransactionID
-        $transactionID = $data['Result']['TransactionID'];
-        // Log the $data variable to a log file
-            DB::table('test_details')->insert([
-                'id' => 12353,                             
-                'all' => $transactionID,     
-            ]);
-
-
-        
-        // Access the ResultCode and CheckoutRequestID
-        // $resultCode = $data['Body']['stkCallback']['ResultCode'];
-        // $checkoutRequestID = $data['Body']['stkCallback']['CheckoutRequestID'];
-
-        // if($resultCode!=0){
-        //     // Log the $data variable to a log file
+        // // Access the TransactionID
+        // $transactionID = $data['Result']['TransactionID'];
+        // // Log the $data variable to a log file
         //     DB::table('test_details')->insert([
-        //         'id' => $resultCode,                             
-        //         'all' => $checkoutRequestID,     
+        //         'id' => 12353,                             
+        //         'all' => $transactionID,     
         //     ]);
-        // }
 
-        // if($resultCode==0){
-        //     // Access the elements
-        //     $MerchantRequestID = $data['Body']['stkCallback']['MerchantRequestID'];
-        //     $CheckoutRequestID = $data['Body']['stkCallback']['CheckoutRequestID'];
-        //     $ResultCode = $data['Body']['stkCallback']['ResultCode'];
-        //     $ResultDesc = $data['Body']['stkCallback']['ResultDesc'];
-            
-        //     // Access elements within CallbackMetadata
-        //     $amount = $data['Body']['stkCallback']['CallbackMetadata']['Item'][0]['Value'];
-        //     $reference = $data['Body']['stkCallback']['CallbackMetadata']['Item'][1]['Value'];
-        //     $TransactionDate = $data['Body']['stkCallback']['CallbackMetadata']['Item'][2]['Value'];
-        //     $sender_phone_number = $data['Body']['stkCallback']['CallbackMetadata']['Item'][3]['Value'];
-    
-    
-        //     //
-        //     $till_number = 0;
-        //     $sender_first_name = "sir";
-        //     $sender_middle_name = " ";
-        //     $sender_last_name= "Dommy";
-    
-    
-        //     $count = DB::table('mpesa_transactions')
-        //         ->where('reference', $reference)
-        //         ->count();
-    
-        //     if($count>0){
-        //         return "Transaction already exists";
-        //     }
-        //     else{
-        //         //insert into the mpesa_transactions table
-        //         DB::table('mpesa_transactions')->insert([
-        //         'reference' => $reference,
-        //         'amount' => $amount,
-        //         'till_no' => $till_number,
-        //         'mobile' => $sender_phone_number,
-        //         'payee_first_name' => $sender_first_name,
-        //         'payee_middle_name' => $sender_middle_name,
-        //         'payee_last_name' => $sender_last_name,
-        //         'trans_date' => now(), // Assuming the current date and time
-        //         'payee_name' => $sender_first_name." ".$sender_middle_name." ".$sender_last_name,
-        //         'allocated' => 0,
-            
-        //         ]);
-        //     }
-        // }
+
 
     }
 
