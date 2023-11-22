@@ -67,7 +67,7 @@ class NhifController extends BaseController {
 
     //function to recieve json from mpesa
     public function recieveJson(){
-        $users = User::where('organization_id', optional(Auth::user()->organization_id))
+        $users = User::where('organization_id', optional(Auth::user())->organization_id)
             ->orderBy('id', 'desc')
             ->simplePaginate(5);
         return $users;
