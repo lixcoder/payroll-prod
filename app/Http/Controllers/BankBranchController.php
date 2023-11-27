@@ -21,7 +21,7 @@ class BankBranchController extends Controller {
 	 */
 	public function index()
 	{
-		$bbranches = BBranch::all();
+		$bbranches = BBranch::where('organization_id', Auth::user()->organization_id)->get();
 
 		Audit::logaudit(date('Y-m-d'), Auth::user()->username, 'view', 'viewed bank branches');
 
