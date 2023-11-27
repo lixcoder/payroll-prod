@@ -152,7 +152,7 @@ class BankBranchController extends Controller {
 		Audit::logaudit(date('Y-m-d'), Auth::user()->username,'delete', 'deleted: '.$bbranch->bank_branch_name);
 
 		// return Redirect::route('bank_branch.index')->withDeleteMessage('Bank Branch successfully deleted!');
-		return Redirect::back()->withErrors('Bank Branch successfully deleted!);
+		return Redirect::back()->withErrors('Bank Branch successfully deleted!');
 
   }
 
