@@ -336,6 +336,11 @@
                                         <span class="pcoded-mtext">Statutory Reports</span>
                                     </a>
                                 </li>
+                                 <li class="">
+                                    <a href="{{ url('sms')}}" class="waves-effect waves-dark">
+                                        <span class="pcoded-mtext">SMS</span>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                         <li class="pcoded-hasmenu">

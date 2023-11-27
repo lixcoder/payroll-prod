@@ -652,6 +652,11 @@ Route::get('statutoryReports', function () {
     return view('employees.statutoryreports',compact('employees'));
 });
 
+Route::get('sms', function () {
+    $employees = Employee::where('organization_id', Auth::user()->organization_id)->get();
+    return view('employees.sms',compact('employees'));
+});
+
 Route::resource('accounts', AccountsController::class);
 Route::post('accounts/update/{id}', [AccountsController::class, 'update']);
 Route::get('accounts/delete/{id}', [AccountsController::class, 'destroy']);
