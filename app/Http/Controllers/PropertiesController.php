@@ -87,7 +87,7 @@ class PropertiesController extends Controller {
             $property->state = 0;
             $property->received_by = 0;
             $property->return_date = null;
-            return "sir";
+            return redirect::back()->withErrors('Return Date Cannot be Null');
         }
         $property->save();
 
