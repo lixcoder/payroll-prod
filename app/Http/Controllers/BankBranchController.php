@@ -40,7 +40,7 @@ class BankBranchController extends Controller {
 	 */
 	public function create()
 	{
-		$banks = Bank::all();
+		$banks = Bank::where('organization_id', Auth::user()->organization_id)->get();
 		return View::make('bank_branch.create',compact('banks'));
 	}
 
@@ -58,10 +58,10 @@ class BankBranchController extends Controller {
 			return Redirect::back()->withErrors($validator)->withInput();
 		}
 		$bbranches = BBranch::where('organization_id', Auth::user()->organization_id)
-			->where('bank_branch_name', $request->get('name'))
+			->where('branch_code', $request->get('code'))
 			->get();
 		if(count($bbranches)>0){
-			return Redirect::back()->withErrors('Bank Branch with similar name exists');
+			return Redirect::back()->withErrors('Bank Branch with similar Branch Code exists');
 		}
 
 		$bbranch = new BBranch;
@@ -105,7 +105,7 @@ class BankBranchController extends Controller {
 	{
 		$bbranch = BBranch::find($id);
 
-		$banks = Bank::all();
+		$banks = Bank::where('organization_id', Auth::user()->organization_id)->get();
 
 		return View::make('bank_branch.edit', compact('bbranch','banks'));
 	}
