@@ -692,7 +692,7 @@ class EmployeesController extends Controller
         if ($request->get('education') == '') {
             $employee->education_type_id = null;
         } else {
-            $education_id = DB::table('education')->where('organization_id',Auth('user')->organization_id)
+            $education_id = DB::table('education')->where('organization_id',Auth::user()->organization_id)
                 ->where('education_name',$request->get('education'))
                 ->get('id');
             // Setting employee education id as null to avoid an error, this should be corrected after testing
