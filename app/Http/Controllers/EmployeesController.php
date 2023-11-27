@@ -810,17 +810,20 @@ class EmployeesController extends Controller
         Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'update', 'updated: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name);
 
         Nextofkin::where('employee_id', $id)->delete();
-        for ($i = 0; $i < count($request->get('kin_first_name')); $i++) {
-            if (($request->get('kin_first_name')[$i] != '' || $request->get('kin_first_name')[$i] != null) && ($request->get('kin_last_name')[$i] != '' || $request->get('kin_last_name')[$i] != null)) {
-                $kin = new Nextofkin;
-                $kin->employee_id = $id;
-                $kin->kin_name = $request->get('kin_first_name')[$i] . ' ' . $request->get('kin_last_name')[$i] . ' ' . $request->get('kin_middle_name')[$i];
-                $kin->relation = $request->get('relationship')[$i];
-                $kin->contact = $request->get('contact')[$i];
-                $kin->id_number = $request->get('id_number')[$i];
-                $kin->save();
+        if (isset($request->get('kin_first_name')[0])) {
+            for ($i = 0; $i < count($request->get('kin_first_name')); $i++) {
+                if (($request->get('kin_first_name')[$i] != '' || $request->get('kin_first_name')[$i] != null) && ($request->get('kin_last_name')[$i] != '' || $request->get('kin_last_name')[$i] != null)) {
+                    $kin = new Nextofkin;
+                    $kin->employee_id = $insertedId;
+                    $kin->kin_name = $request->get('kin_first_name')[$i] . ' ' . $request->get('kin_last_name')[$i] . ' ' . $request->get('kin_middle_name')[$i];
+                    $kin->relation = $request->get('relationship')[$i];
+                    $kin->contact = $request->get('contact')[$i];
+                    $kin->id_number = $request->get('id_number')[$i];
 
-                Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'create', 'created: ' . $request->get('kin_first_name')[$i] . ' for ' . Employee::getEmployeeName($id));
+                    $kin->save();
+
+                    Audit::logaudit('NextofKins', 'create', 'created: ' . $request->get('kin_first_name')[$i] . ' for ' . Employee::getEmployeeName($insertedId));
+                }
             }
         }
 
