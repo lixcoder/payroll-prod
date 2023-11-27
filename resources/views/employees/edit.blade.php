@@ -682,7 +682,7 @@
                                                                            @else value="{{$employee->basic_pay}}" @endif>
                                                                 </div>
                                                             </div>
-                                                        @elsecan
+                                                        
                                                             @if($employee->job_group_id != 4)
                                                                 <div class="form-group">
 
