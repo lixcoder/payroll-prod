@@ -905,7 +905,7 @@ class EmployeesController extends Controller
 
         DB::table('x_employee')->where('id', $id)->update(array('in_employment' => 'N', 'termination_date' => date('Y-m-d')));
 
-        Audit::logaudit('Employee', 'deactivate', 'deactivated: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name . ' on ' . date('Y-m-d'));
+        Audit::logaudit(date('Y-m-d'), 'deactivate', 'deactivated: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name . ' on ' . date('Y-m-d'));
 
 
         return Redirect::route('employees.index')->withDeleteMessage('Employee successfully deactivated!');
@@ -918,7 +918,7 @@ class EmployeesController extends Controller
 
         DB::table('x_employee')->where('id', $id)->update(array('in_employment' => 'Y', 'termination_date' => null));
 
-        Audit::logaudit('Employee', 'activate', 'activated: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name . ' on ' . date('Y-m-d'));
+        Audit::logaudit(date('Y-m-d'), 'activate', 'activated: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name . ' on ' . date('Y-m-d'));
 
 
         return Redirect::to('deactives')->withFlashMessage($employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name . ' successfully activated!');
