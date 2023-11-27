@@ -66,7 +66,7 @@ class BankBranchController extends Controller {
 
 		$bbranch->bank_id = $request->get('bank');
 
-        $bbranch->organization_id = '1';
+        	$bbranch->organization_id = Auth::user()->organization_id;
 
 		$bbranch->save();
 
