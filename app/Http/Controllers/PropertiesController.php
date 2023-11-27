@@ -82,6 +82,7 @@ class PropertiesController extends Controller {
             $property->state = 1;
             $property->received_by = Auth::user()->id;
             $property->return_date = $request->get('idate');
+            return "sir";
         }else{
             $property->state = 0;
             $property->received_by = 0;
