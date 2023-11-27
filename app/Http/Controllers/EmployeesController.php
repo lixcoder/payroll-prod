@@ -692,10 +692,12 @@ class EmployeesController extends Controller
         if ($request->get('education') == '') {
             $employee->education_type_id = null;
         } else {
-            
+            $education_id = DB::table('education')->where('organization_id',Auth('user')->organization_id)
+                ->where('education_name',$request->get('education'))
+                ->get('id');
             // Setting employee education id as null to avoid an error, this should be corrected after testing
             $employee->education_type_id = $request->get('education_id');
-            return $request->get('education_id');
+            return $education_id;
             // $employee->education_type_id = null;
         }
         $a = str_replace(',', '', $request->get('pay'));
