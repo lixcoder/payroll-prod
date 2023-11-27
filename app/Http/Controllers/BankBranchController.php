@@ -57,6 +57,12 @@ class BankBranchController extends Controller {
 		{
 			return Redirect::back()->withErrors($validator)->withInput();
 		}
+		$bbranches = BBranch::where('organization_id', Auth::user()->organization_id)
+			->where('bank_branch_name', $request->get('name'))
+			->get();
+		if(count($bbranches)>0){
+			return Redirect::back()->withErrors('Bank Branch with similar name exists');
+		}
 
 		$bbranch = new BBranch;
 
@@ -145,7 +151,8 @@ class BankBranchController extends Controller {
 
 		Audit::logaudit(date('Y-m-d'), Auth::user()->username,'delete', 'deleted: '.$bbranch->bank_branch_name);
 
-		return Redirect::route('bank_branch.index')->withDeleteMessage('Bank Branch successfully deleted!');
+		// return Redirect::route('bank_branch.index')->withDeleteMessage('Bank Branch successfully deleted!');
+		return Redirect::back()->withErrors('Bank Branch successfully deleted!);
 
   }
 
