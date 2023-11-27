@@ -21,7 +21,7 @@ class OrganizationsController extends Controller {
      */
     public function index()
     {
-        $organization = DB::table('x_organizations')->where('id', '=', Auth::user()->organization_id)->first();
+        $organization = Organization::where('id', '=', Auth::user()->organization_id)->first();
         return View::make('organizations.index', compact('organization'));
     }
 
