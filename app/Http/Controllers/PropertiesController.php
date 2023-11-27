@@ -74,6 +74,7 @@ class PropertiesController extends Controller {
         $property->serial = $request->get('serial');
         $property->digitalserial = $request->get('dserial');
         $a = str_replace( ',', '', $request->get('amount') );
+        return $a;
         $property->monetary = $a;
         $property->issued_by = Auth::user()->id;
         $property->issue_date = $request->get('idate');
