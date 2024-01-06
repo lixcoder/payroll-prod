@@ -154,8 +154,9 @@ class Payroll extends Model
      $pay = $employee->basic_pay;
     }*/
         $pay = $employee->basic_pay;
-        //Wdd($pay);
-        return round($pay, 2);
+         $numericvaluepay = floatval($pay);
+         
+        return round($numericvaluepay, 2);
 
     }
 

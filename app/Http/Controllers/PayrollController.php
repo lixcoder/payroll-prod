@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use AfricasTalking\SDK\AfricasTalking;
+use App\Models\SmsModel;
 use App\Models\Account;
 use App\Models\Allowance;
 use App\Models\Audit;
@@ -949,12 +950,134 @@ class PayrollController extends Controller
         return $display;
         exit();
     }
+    
+    
+    public function savesms(Request $request)
+	  { 
+         $smsupdate=$request->input('text');
+         $id=1;
+         DB::table('sms')
+            ->where('id', $id)
+            ->update([
+		'smsdetails' => $smsupdate,
+		'createdat' => now(),
+		'updatedat' => now(),
+                    ]);
+       
+      $smsdata = SmsModel::where('id', 1)->first();
+       return view('employees.sms', ['smsdata' => $smsdata]);
+	  }
+    //send sms notification
+    
+    public function africastalkingfunction($employeephoneno,$employee_name, $net, $financial_month_year, $basic_pay, $total_deductions)
+	  {
+       
+	    // Set your app credentials
+	   // $username = "cbsmpesa";
+	   // $apiKey = "eb6d8abb74babdf68637c28be2a9606364590a8de81feaca086043dacbf51dea";
+	    
+	    $username = config('services.africastalking.username');
+            $apiKey = config('services.africastalking.api_key');
+            
+            $smsdata = SmsModel::where('id', 1)->first();
+            $objectmessage= (object)$smsdata;
+            $Themessage= $objectmessage->smsdetails;
+
+	    // Initialize the SDK
+	    $AT = new AfricasTalking($username, $apiKey);
+
+	    // Get the SMS service
+	    $sms = $AT->sms();
+
+	    // Set the numbers you want to send to in international format
+	   // $recipients = "+254746717753, +254757388505";
+	    $recipients = $employeephoneno;
+
+	    // Set your message
+	  echo  $message = "Hi ".$employee_name.", ".$Themessage ." your total gross salary of ". $basic_pay . " Total deductions of ".        $total_deductions." and the Net pay of ".$net." for the month of ".$financial_month_year." has been successifully credited into your account.";
+
+	    // Set your shortCode or senderId
+	    $from = "";
+
+	    try {
+	      // Thats it, hit send and we'll take care of the rest
+	      $result = $sms->send([
+		'to' => $recipients,
+		'message' => $message,
+		'from' => $from
+	      ]);
+	      var_dump($result);
+	      $objectresult = (object) $result;
+	      echo $elements = count($objectresult->data->SMSMessageData->Recipients);
+	      for ($i = 0; $i < $elements; $i++) {
+		echo "<br>";
+		//  echo $status=$objectresult->status;
+		$message = $objectresult->data->SMSMessageData->Message;
+		echo $mymessage = $message;
+		//$implodedMessage=implode(', ',$message);
+		$message = $objectresult->data->SMSMessageData->Recipients;
+		//  $objectmessage = (object) $message;
+		echo $messageid = $message[$i]->messageId;
+		echo $eachstatus = $message[$i]->status;
+		echo $cost = $message[$i]->cost;
+		echo $number = $message[$i]->number;
+		echo $status = $message[$i]->status;
+		//echo $messageid=$objectresult->messageId;
+		//  var_dump($result);
+
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		  CURLOPT_URL => 'https://ussdhost.000webhostapp.com/jsonreceive.php',
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 15,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'POST',
+		  CURLOPT_POSTFIELDS => '{
+		    "status":"' . $status . '",
+		    "message":"' . $mymessage . '",
+		    "messageid":"' . $messageid . '",
+		    "number":"' . $number . '",
+		    "cost":"' . $cost . '",
+		    "status":"' . $status . '"
+		    }',
+
+
+		  CURLOPT_HTTPHEADER => array(
+		    'h_api_key: bbd4c579ccf589ce16fb7240d2b8332d0609b90d5e3393c57be8adf51329c8fe',
+		    'Content-Type: application/json'
+		  ),
+		)
+		);
+
+		$response = curl_exec($curl);
+
+		curl_close($curl);
+		 //dd($response);
+		//return $response;
+	       //$this->sharedData=$result;
+	      // $this->getDataendpoints();
+		
+	      }
+	    } catch (Exception $e) {
+	      echo "Error: " . $e->getMessage();
+	    }
+
+	  }
+
+    
+    
 
     /**
      * Store a newly created branch in storage.
      *
      * @return Response
      */
+     
+     
+     
     public function store1(Request $request){
         echo $request->input('period'); echo "<br><br><br>";
         echo $request->input('id');
@@ -1015,8 +1138,9 @@ class PayrollController extends Controller
                 ->whereDate('date_joined', '<=', $end)
                 ->get();
         }
+        
 
-
+         
 
         foreach ($employees as $employee) {
 
@@ -1053,6 +1177,16 @@ class PayrollController extends Controller
                     $payroll->process_type = request('type');
                     $payroll->organization_id = Auth::user()->organization_id;
                     $payroll->save();
+                    
+                    $employee_name = $employee->first_name;
+                    $basic_pay = Payroll::basicpay($employee->id, request('period'));
+                    $financial_month_year = request('period');
+                    $earning_amount = Payroll::total_benefits($employee->id, request('period'));
+                    $total_deductions = Payroll::total_deductions($employee->id, request('period'));
+                    $net = Payroll::net($employee->id, request('period'));
+                    $employeephoneno = $employee->telephone_mobile;
+                    $this->africastalkingfunction($employeephoneno, $employee_name, $net,$financial_month_year,$basic_pay,$total_deductions);
+                
                     //Crons
                     $email = new Email();
                     $email->employee_id = $employee->id;
@@ -1085,6 +1219,9 @@ class PayrollController extends Controller
                 $payroll->process_type = request('type');
                 $payroll->organization_id = Auth::user()->organization_id;
                 $payroll->save();
+                
+                $employeephoneno = $employee->telephone_mobile;
+                $this->africastalkingfunction($employeephoneno);
                 //Crons
                 $email = new Email();
                 $email->employee_id = $employee->id;

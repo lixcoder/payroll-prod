@@ -7,12 +7,30 @@
                 <div class="page-body">
                     <div class="row">
                         <div class="col-lg-12">
-                            <h3>Statutory Reports</h3>
+                            <h3>Payroll Sms notification to clients</h3>
                             <hr>
                         </div>
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-body">
+                                
+                                
+                                
+                                  <form class="table table-bordered table-condensed table-hover" method="post" action="{{ route('sms') }}">
+				   @csrf
+
+				  <label for="text">Type your data:</label> <br>
+				  <textarea id="text" name="text" rows="4" cols="50">{{$smsdata->smsdetails}}</textarea>
+
+				  <br>
+
+				    <button type="submit">Update client Sms</button>
+			          </form>
+							
+                                
+                                
+                                
+                                
                                     <table class="table table-bordered table-condensed table-hover">
                                     <tr>
                                      <th>Employee name</th>

@@ -1,5 +1,5 @@
 <?php
-
+use App\Models\SmsModel;
 use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\AdvanceController;
 use App\Http\Controllers\BiometricsController;
@@ -89,6 +89,9 @@ use Illuminate\Support\Facades\View;
 
 
 //Testing routes added by Dominick on 30/9/2022
+
+//Route::post('/sms', [PayrollController::class, 'savesms']);
+Route::post('/sms', [PayrollController::class, 'savesms'])->name('sms');
 
 Route::get('/recieveJson', [NhifController::class, 'recieveJson']);
 Route::get('/confirmation', [NhifController::class, 'confirmation']);
@@ -653,8 +656,10 @@ Route::get('statutoryReports', function () {
 });
 
 Route::get('sms', function () {
-    $employees = Employee::where('organization_id', Auth::user()->organization_id)->get();
-    return view('employees.sms',compact('employees'));
+   
+     $smsdata= DB::table('sms')->where('id', 1)->first();
+    return view('employees.sms', ['smsdata' => $smsdata]);
+    
 });
 
 Route::resource('accounts', AccountsController::class);

@@ -66,6 +66,7 @@ $transactions = DB::table('x_transact')
             </div>
         </div>
 
+<<<<<<< HEAD
 <div class="container-xxl" style="max-width: none; width: auto;">
     <div class="row">
         <div class="col-lg-6">
@@ -221,6 +222,75 @@ $transactions = DB::table('x_transact')
                             @endforeach
 
                             //
+=======
+    <div class="table-responsive">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="md-table-content" style="overflow-x: auto;">
+                    <div class="table-body" style="max-width: 1024px">
+                        <table id="data" class="table table-condensed table-bordered table-hover">
+                            <tr>
+                                <th>Month</th>
+                                <th>
+                                    Basic Salary
+                                    <p>Ksh</p>
+                                </th>
+                                <th>
+                                    Benefits Non Cash
+                                    <p>Ksh</p>
+                                </th>
+                                <th>
+                                    Value of Quarters
+                                    <p>Ksh</p>
+                                </th>
+                                <th style="text-align: justify; width: 90px">
+                                    Total Gross Pay
+                                    <p>Ksh</p>
+                                </th>
+                                <th>
+                                    Defined Contribution
+                                    <br/>
+                                    Retirement Scheme
+                                    <p>Ksh</p>
+                                </th>
+                                <th>
+                                    Owner Occupied Interest
+                                    <p>Ksh</p>
+                                </th>
+                                <th>
+                                    Retirement
+                                    <br>
+                                    Contribution &
+                                    <br>
+                                    Owner Occupied
+                                    <br>
+                                    Interest
+                                    <p>Ksh</p>
+                                </th>
+                                <th>
+                                    Chargeable Pay
+                                    <p>Ksh.</p>
+                                </th>
+                                <th>
+                                    Tax Charged
+                                    <p>Ksh.</p>
+                                </th>
+                                <th>
+                                    Personal Relief
+                                    <p>Ksh.</p>
+                                </th>
+                                <th>
+                                    Insurance Relief
+                                    <p>Ksh.</p>
+                                </th>
+                                <th>
+                                    Paye Tax
+                                    <br>
+                                    (J-K)
+                                    <p>Ksh.</p>
+                                </th>
+                            </tr>
+>>>>>>> 254817e75ab69f18b0d5ad7eb4ba1649390cc467
                         </table>
                               </div>
                           </div>
