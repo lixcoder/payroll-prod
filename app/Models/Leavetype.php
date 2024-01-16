@@ -19,7 +19,8 @@ class Leavetype extends Model
     public function organization()
     {
 
-        return $this->belongsTo('Organization');
+        return $this->belongsTo(Organization::class, 'organization_id');
+        //return $this->belongsTo('Organization');
     }
 
     public function leaveapplications()
