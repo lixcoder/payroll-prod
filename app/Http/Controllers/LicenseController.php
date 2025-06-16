@@ -35,7 +35,7 @@ class LicenseController extends Controller
     public function stkPush(Request $request)
     {
         $data = new \GuzzleHttp\Client();
-        $post = $data->post('http://127.0.0.1/licensemanager/public/api/v1/stk/push', [
+        $post = $data->post('http://127.0.0.1:8000/licensemanager/public/api/v1/stk/push', [
             'form_params' => [
                 'phone' => $request->phone,
                 'amount' => $request->amount
@@ -47,7 +47,7 @@ class LicenseController extends Controller
 
     public function createOrganization(Request $request)
     {
-        $data = Http::post('http://127.0.0.1/licensemanager/public/api/v1/create/organization', [
+        $data = Http::post('http://127.0.0.1:8000/licensemanager/public/api/v1/create/organization', [
             'cname' => $request->cname,
             'fname' => $request->fname,
             'lname' => $request->lname,

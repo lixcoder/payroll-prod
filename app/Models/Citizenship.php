@@ -3,19 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use \Traits\Encryptable;
 
 class Citizenship extends Model
 {
     protected $table = 'citizenships';
-    /*
-        use \Traits\Encryptable;
 
 
-        protected $encryptable = [
+        /*protected $encryptable = [
 
             'allowance_name',
-        ];
-        */
+        ];*/
 
     public static $rules = [
         'name' => 'required'
@@ -26,13 +24,13 @@ class Citizenship extends Model
     );
 
     // Don't forget to fill this array
-    protected $fillable = [];
+    protected $fillable = ['name', 'organization_id'];
 
 
     public function employees()
     {
 
-        return $this->hasMany('Employee');
+        return $this->hasMany(\App\Models\Employee::class);
     }
 
 }

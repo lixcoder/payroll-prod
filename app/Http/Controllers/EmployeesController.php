@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class EmployeesController extends Controller
 {
@@ -122,7 +123,7 @@ class EmployeesController extends Controller
     {
         $postbank = $request->all();
         $data = array('bank_name' => $postbank['name'],
-            //'bank_code' => $postbank['code'],
+            'bank_code' => $postbank['code'],
             'organization_id' => Auth::user()->organization_id,
             'created_at' => DB::raw('NOW()'),
             'updated_at' => DB::raw('NOW()'));
@@ -141,7 +142,7 @@ class EmployeesController extends Controller
     public function createbankbranch(Request $request)
     {
         $postbankbranch = $request->all();
-//        dd($postbankbranch);
+        dd($postbankbranch);
         $data = array('bank_branch_name' => $postbankbranch['name'],
             'branch_code' => $postbankbranch['code'],
             'bank_id' => $postbankbranch['bid'],
@@ -256,7 +257,16 @@ class EmployeesController extends Controller
         $employees = count(Employee::where('organization_id', Auth::user()->organization_id)->get());
 //        dd($employees);
         #echo "<pre>"; print_r($organization->licensed); echo "</pre>"; die;
-        if(!(License::checkSubscription(Auth::user()->organization_id))){
+
+        // Reduct and make changes when deploying // (Ian_Ray)
+
+        // if(!(License::checkSubscription(Auth::user()->organization_id))){
+        //     return View::make('employees.employeelimit');
+        // }
+
+        //  
+        
+        if (app()->environment('production') && !(License::checkSubscription(Auth::user()->organization_id))) {
             return View::make('employees.employeelimit');
         }
          else {
@@ -296,7 +306,7 @@ class EmployeesController extends Controller
     public function store(Request $request)
     {
         //
-//         dd($request->all());
+         dd($request->all());
         $validator = Validator::make($request->all(), [
             'fname' => 'required',
             'education' => 'required',
@@ -499,7 +509,7 @@ class EmployeesController extends Controller
             Audit::logaudit(Carbon::now(), 'create', 'created: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name);
 
             $insertedId = $employee->id;
-            // if (($request->get('kin_first_name')[0]) !== null) {
+            //if (($request->get('kin_first_name')[0]) !== null) {
             if (isset($request->get('kin_first_name')[0])) {
                 for ($i = 0; $i < count($request->get('kin_first_name')); $i++) {
                     if (($request->get('kin_first_name')[$i] != '' || $request->get('kin_first_name')[$i] != null) && ($request->get('kin_last_name')[$i] != '' || $request->get('kin_last_name')[$i] != null)) {
@@ -543,7 +553,7 @@ class EmployeesController extends Controller
 
             return Redirect::route('employees.index')->withFlashMessage('Employee successfully created!');
         } catch (\Exception $e) {
-//            return Redirect::back()->withInput()->withErrors($e);
+            return Redirect::back()->withInput()->withErrors($e);
             return $e;
         }
     }
@@ -799,16 +809,17 @@ class EmployeesController extends Controller
         } else {
             $employee->in_employment = 'N';
         }
-        /*if ($request->get('confirmed') != null) {
+        if ($request->get('confirmed') != null) {
             $employee->confirmed = 'Y';
         } else {
             $employee->confirmed = 'N';
-        }*/
+        }
 
         $employee->update();
 
         Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'update', 'updated: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name);
 
+        $insertedId = $employee->id;
         Nextofkin::where('employee_id', $id)->delete();
         if (isset($request->get('kin_first_name')[0])) {
             for ($i = 0; $i < count($request->get('kin_first_name')); $i++) {
@@ -840,7 +851,7 @@ class EmployeesController extends Controller
                     if ($file) {
 
                         $name = time() . '-' . $file->getClientOriginalName();
-                        //dd($name);
+                        dd($name);
                         $file = $file->store('uploads/employees/documents', 'public', $name);
                         $input['file'] = '/public/uploads/employees/documents/' . $name;
                         $extension = pathinfo($name, PATHINFO_EXTENSION);
@@ -948,6 +959,7 @@ class EmployeesController extends Controller
         $count = Employeebenefit::where('jobgroup_id', $employee->job_group_id)->count();
 
         $organization = Organization::find(Auth::user()->organization_id);
+
         return View::make('employees.view', compact('employee', 'appraisals', 'kins', 'documents', 'occurences', 'properties', 'count', 'benefits'));
 
     }
@@ -983,7 +995,7 @@ class EmployeesController extends Controller
         $employee = Employee::find($id);
 
 
-        $password = strtoupper(str_random(8));
+        $password = strtoupper(Str::random(8));
 
 
         $email = $employee->email_office;

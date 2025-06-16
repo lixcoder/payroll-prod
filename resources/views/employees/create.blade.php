@@ -1,6 +1,7 @@
 @extends('layouts.main_hr')
 @section('xara_cbs')
     <?php
+    use Illuminate\Support\Facades\Auth;
     $organization = App\models\Organization::find(Auth::user()->organization_id);
     $string = $organization->name;
 
@@ -1182,7 +1183,7 @@
                 function Incrementer() {
                     x = x + 1;
                     if (x <= ((100 / 7) * 6)) {
-                        //document.getElementById('progressBtn').innerHTML=x+"%";
+                        document.getElementById('progressBtn').innerHTML=x+"%";
                         document.getElementById('progressBtn').style.background = "#6dd144"
                         document.getElementById("progressBtn").innerHTML = '<i class="text-white fa fa-check fa-2x"></i>';
                     }
@@ -1424,18 +1425,18 @@
                     }
                 })
             })
-            {{--$('#bank_id').change(function () {--}}
-            {{--    $.get("{{ url('api/dropdown')}}",--}}
-            {{--        {name: $(this).val()},--}}
-            {{--        function (data) {--}}
-            {{--            $('#bbranch_id').empty();--}}
-            {{--            $('#bbranch_id').append("<option>----------------select Bank Branch--------------------</option>");--}}
-            {{--            $('#bbranch_id').append("<option value='cnew'>Create New</option>");--}}
-            {{--            for (var x = 0; x < data.branches.length; x++) {--}}
-            {{--                $('#bbranch_id').append("<option value='" + data.branches[x]['id'] + "'>" + data.branches[x]['bank_branch_name'] + "</option>");--}}
-            {{--            }--}}
-            {{--        });--}}
-            {{--});--}}
+            $('#bank_id').change(function () {
+                $.get("{{ url('api/dropdown')}}",
+                    {name: $(this).val()},
+                    function (data) {
+                        $('#bbranch_id').empty();
+                        $('#bbranch_id').append("<option>----------------select Bank Branch--------------------</option>");
+                        $('#bbranch_id').append("<option value='cnew'>Create New</option>");
+                        for (var x = 0; x < data.branches.length; x++) {
+                            $('#bbranch_id').append("<option value='" + data.branches[x]['id'] + "'>" + data.branches[x]['bank_branch_name'] + "</option>");
+                        }
+                    });
+            });
         });
     </script>
     <script>
@@ -1555,17 +1556,17 @@
             $('#empdetails').click(function (e) {
                 e.preventDefault();
 
-                /*var kdata = $('.kindata').map(function(){
+                var kdata = $('.kindata').map(function(){
                   return this.value;
-                }).get();*/
+                }).get();
 
                 var kind = $('.kindata').serialize();
 
                 var docdata = new FormData($("#form3"));
 
-                //var docdata= $('.docdata').serialize();
+                var docdata= $('.docdata').serialize();
 
-                /*var kfn = $('input[name^="kin_first_name"]').map(function(){
+                var kfn = $('input[name^="kin_first_name"]').map(function(){
                   return this.value;
                 }).get();
 
@@ -1587,9 +1588,9 @@
 
                 var kcon = $('input[name^="contact"]').map(function(){
                   return this.value;
-                }).get();*/
+                }).get();
 
-                /*var path = $('input[name^="path"]').map(function(){
+                var path = $('input[name^="path"]').map(function(){
                   return this.value;
                 }).get();
 
@@ -1609,7 +1610,7 @@
                   return this.value;
                 }).get();
 
-                var __data = $('input[name^="kin_first_name"]').serialize();*/
+                var __data = $('input[name^="kin_first_name"]').serialize();
 
 
                 var fname = $("#fname"),
@@ -1658,7 +1659,7 @@
                 var valid = true;
                 allFields.removeClass("ui-state-error");
 
-                /*valid = valid && checkLength( lname, "Please insert last name!" );
+                valid = valid && checkLength( lname, "Please insert last name!" );
 
                 valid = valid && checkLength( fname, "Please insert first name!" );
 
@@ -1683,7 +1684,7 @@
                 valid = valid && checkRegexp( email_office, /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/, "Please insert a valid office email address!" );
 
                 valid = valid && checkRegexp( email_personal, /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/, "Please insert a valid personal email address!" );
-          */
+          
 
 
                 //get form id
@@ -1797,7 +1798,7 @@
 
                 if (valid) {
 
-                    /* displaydata();
+                     displaydata();
 
                     function displaydata(){
                      $.ajax({
@@ -1807,10 +1808,10 @@
                       data    : { },
                       success : function(s){
                         var data = JSON.parse(s)
-                        //alert(data.id);
+                        alert(data.id);
                       }
        });
-       }*/
+       }
                     const citizenData = {
                         'name': document.getElementById('cname').value,
                         "_token": "{{csrf_token()}}",
@@ -1845,10 +1846,10 @@
                         dialog.dialog("close");
                     }
                 },
-                // close: function () {
-                //     form[0].reset();
-                //     allFields.removeClass("ui-state-error");
-                // }
+                 close: function () {
+                     form[0].reset();
+                     allFields.removeClass("ui-state-error");
+                 }
             });
             form = dialog.find("form").on("submit", function (event) {
                 event.preventDefault();
@@ -1908,9 +1909,9 @@
 
                 if (valid) {
 
-                    //displaydata();
+                    displaydata();
 
-                    /*function displaydata() {
+                    function displaydata() {
                         $.ajax({
                             url: "{{url('reloaddata')}}",
                             type: "POST",
@@ -1921,7 +1922,7 @@
                                 alert(data.id);
                             }
                         });
-                    }*/
+                    }
 
                     const Formdata = {
                         'name': document.getElementById('ename').value,
@@ -2025,7 +2026,7 @@
 
                 if (valid) {
 
-                    /* displaydata();
+                     displaydata();
 
                     function displaydata(){
                      $.ajax({
@@ -2035,10 +2036,10 @@
                       data    : { },
                       success : function(s){
                         var data = JSON.parse(s)
-                        //alert(data.id);
+                        alert(data.id);
                       }
        });
-       }*/
+       }
                     const bankData = {
                         'name': document.getElementById('bname').value,
                         'code': document.getElementById('bcode').value,
@@ -2146,13 +2147,13 @@
 
                 valid = valid && checkLength(bname, "Please insert bank branch name!");
 
-                //valid = valid && checkLength( bid, "Please select bank for this branch!" );
+                valid = valid && checkLength( bid, "Please select bank for this branch!" );
 
                 valid = valid && checkRegexp(bname, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for bank branch name.");
 
                 if (valid) {
 
-                    /* displaydata();
+                     displaydata();
 
                     function displaydata(){
                      $.ajax({
@@ -2162,10 +2163,10 @@
                       data    : { },
                       success : function(s){
                         var data = JSON.parse(s)
-                        //alert(data.id);
+                        alert(data.id);
                       }
        });
-       }*/
+       }
                     const bankBranchName = {
                         'bid': document.getElementById('bid').value,
                         'name': document.getElementById('brname').value,
@@ -2268,13 +2269,13 @@
 
                 valid = valid && checkLength(bname, "Please insert branch name!");
 
-                //valid = valid && checkLength( bid, "Please select bank for this branch!" );
+                valid = valid && checkLength( bid, "Please select bank for this branch!" );
 
                 valid = valid && checkRegexp(bname, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for branch name.");
 
                 if (valid) {
 
-                    /* displaydata();
+                     displaydata();
 
                     function displaydata(){
                      $.ajax({
@@ -2284,10 +2285,10 @@
                       data    : { },
                       success : function(s){
                         var data = JSON.parse(s)
-                        //alert(data.id);
+                        alert(data.id);
                       }
        });
-       }*/
+       }
                     const EmployeeBranch = {
                         'name': document.getElementById('ebname').value,
                         "_token": "{{csrf_token()}}"
@@ -2388,26 +2389,26 @@
 
                 valid = valid && checkLength(dname, "Please insert department name!");
 
-                //valid = valid && checkLength( bid, "Please select bank for this branch!" );
+                valid = valid && checkLength( bid, "Please select bank for this branch!" );
 
                 valid = valid && checkRegexp(dname, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for department name.");
 
                 if (valid) {
 
-                    {{--displaydata();--}}
+                    displaydata();
 
-                    {{--function displaydata(){--}}
-                    {{--    $.ajax({--}}
-                    {{--        url     : "{{url('reloaddata')}}",--}}
-                    {{--        type    : "POST",--}}
-                    {{--        async   : false,--}}
-                    {{--        data    : { },--}}
-                    {{--        success : function(s){--}}
-                    {{--            var data = JSON.parse(s)--}}
-                    {{--            //alert(data.id);--}}
-                    {{--        }--}}
-                    {{--    });--}}
-                    {{--}--}}
+                    function displaydata(){
+                        $.ajax({
+                            url     : "{{url('reloaddata')}}",
+                            type    : "POST",
+                            async   : false,
+                            data    : { },
+                            success : function(s){
+                                var data = JSON.parse(s)
+                                alert(data.id);
+                            }
+                        });
+                    }
                     const departmentData = {
                         'name': document.getElementById('dname').value,
                         'code': document.getElementById('dcode').value,
@@ -2467,7 +2468,7 @@
         $(function () {
             var dialog, form,
 
-                // From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
+                //From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
                 jname = $("#jname"),
                 allFields = $([]).add(jname),
                 tips = $(".validateTips7");
@@ -2501,19 +2502,20 @@
                 }
             }
 
+            // For Branch identification
             function addUser() {
                 var valid = true;
                 allFields.removeClass("ui-state-error");
 
                 valid = valid && checkLength(jname, "Please insert job group!");
 
-                //valid = valid && checkLength( bid, "Please select bank for this branch!" );
+                valid = valid && checkLength( bid, "Please select bank for this branch!" );
 
                 valid = valid && checkRegexp(jname, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for job group.");
 
                 if (valid) {
 
-                    /* displaydata();
+                     displaydata();
 
                     function displaydata(){
                      $.ajax({
@@ -2523,10 +2525,10 @@
                       data    : { },
                       success : function(s){
                         var data = JSON.parse(s)
-                        //alert(data.id);
+                        alert(data.id);
                       }
        });
-       }*/
+       }
                     const jobGroup = {
                         "name": document.getElementById('jname').value,
                         "_token": "{{csrf_token()}}"
@@ -2625,13 +2627,13 @@
 
                 valid = valid && checkLength(tname, "Please insert employee type name!");
 
-                //valid = valid && checkLength( bid, "Please select bank for this branch!" );
+                valid = valid && checkLength( bid, "Please select bank for this branch!" );
 
                 valid = valid && checkRegexp(tname, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for employee type name.");
 
                 if (valid) {
 
-                    /* displaydata();
+                     displaydata();
 
                     function displaydata(){
                      $.ajax({
@@ -2641,10 +2643,10 @@
                       data    : { },
                       success : function(s){
                         var data = JSON.parse(s)
-                        //alert(data.id);
+                        alert(data.id);
                       }
        });
-       }*/
+       }
                     const empType = {
                         "name": document.getElementById('tname').value,
                         "_token": "{{csrf_token()}}"
@@ -2748,7 +2750,7 @@
 
                 if (valid) {
 
-                    /* displaydata();
+                     displaydata();
 
                     function displaydata(){
                      $.ajax({
@@ -2758,10 +2760,10 @@
                       data    : { },
                       success : function(s){
                         var data = JSON.parse(s)
-                        //alert(data.id);
+                        alert(data.id);
                       }
        });
-       }*/
+       }
                     const jobTitle = {
                         'name': document.getElementById('jtitle').value,
                         "_token": "{{csrf_token()}}"
