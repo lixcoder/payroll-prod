@@ -42,6 +42,10 @@ final class Groups
         return $this->include;
     }
 
+    public static $rules = [
+        'name' => 'required'
+        // 'name' => 'required'
+    ];
     public function hasExclude(): bool
     {
         return !$this->exclude->isEmpty();

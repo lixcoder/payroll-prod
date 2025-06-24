@@ -40,11 +40,11 @@
                                                         </button>
 
                                                         <ul class="dropdown-menu" role="menu">
-                                                            <li><a href="{{URL::to('job_group/edit/'.$jgroup->id)}}">Update</a>
-                                                            </li>
-
-                                                            <li><a href="{{URL::to('job_group/delete/'.$jgroup->id)}}">Delete</a>
-                                                            </li>
+                                                            <form action="{{ URL::to('job_group/' . $jgroup->id) }}" method="POST" style="display:inline;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="dropdown-item" onclick="return confirm('Are you sure you want to delete this job group?')">Delete</button>
+                                                            </form>
                                                         </ul>
                                                     </div>
                                                 </td>

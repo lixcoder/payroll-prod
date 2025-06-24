@@ -9,16 +9,18 @@ class Group extends Model
     protected $table = 'x_groups';
     // Add your validation rules here
     public static $rules = [
-        'name' => 'required'
+        'name' => 'required|string|max:255',
     ];
 
     // Don't forget to fill this array
-    protected $fillable = [];
+    protected $fillable = [
+        'name', 'description', 'organization_id',
+    ];
 
-    public function members()
-    {
+    // public function members()
+    // {
 
-        return $this->hasMany('Member');
-    }
+    //     return $this->hasMany('Member');
+    // }
 
 }

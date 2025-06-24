@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\JGroup;
+use App\Models\Jobgroup;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 
 class JobGroupController extends BaseController {
@@ -16,7 +18,7 @@ class JobGroupController extends BaseController {
      */
     public function index()
     {
-        $jgroups = JGroup::all();
+        $jgroups = Jobgroup::all();
 
         return View::make('job_group.index', compact('jgroups'));
     }
@@ -38,14 +40,14 @@ class JobGroupController extends BaseController {
      */
     public function store()
     {
-        $validator = Validator::make($data = request()->all(), JGroup::$rules,JGroup::$messages);
+        $validator = Validator::make($data = request()->all(), Jobgroup::$rules,Jobgroup::$messages);
 
         if ($validator->fails())
         {
             return Redirect::back()->withErrors($validator)->withInput();
         }
 
-        $jgroup = new JGroup;
+        $jgroup = new Jobgroup;
 
         $jgroup->job_group_name = request('name');
 
@@ -64,7 +66,7 @@ class JobGroupController extends BaseController {
      */
     public function show($id)
     {
-        $jgroup = JGroup::findOrFail($id);
+        $jgroup = Jobgroup::findOrFail($id);
 
         return View::make('job_group.show', compact('jgroup'));
     }
@@ -77,7 +79,7 @@ class JobGroupController extends BaseController {
      */
     public function edit($id)
     {
-        $jgroup = JGroup::find($id);
+        $jgroup = Jobgroup::find($id);
 
         return View::make('job_group.edit', compact('jgroup'));
     }
@@ -90,9 +92,9 @@ class JobGroupController extends BaseController {
      */
     public function update($id)
     {
-        $jgroup = JGroup::findOrFail($id);
+        $jgroup = Jobgroup::findOrFail($id);
 
-        $validator = Validator::make($data = request()->all(), JGroup::$rules,JGroup::$messages);
+        $validator = Validator::make($data = request()->all(), Jobgroup::$rules,Jobgroup::$messages);
 
         if ($validator->fails())
         {
@@ -112,10 +114,16 @@ class JobGroupController extends BaseController {
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($id)
-    {
-        JGroup::destroy($id);
-
-        return Redirect::route('job_group.index');
+{
+    try {
+        $jobgroup = Jobgroup::findOrFail($id);
+        $jobgroup->delete();
+        Log::info('Job group deleted: ID ' . $id);
+        return Redirect::route('job_group.index')->with('success', 'Job group deleted successfully!');
+    } catch (\Exception $e) {
+        Log::error('Job group deletion failed: ' . $e->getMessage());
+        return Redirect::back()->with('error', 'Failed to delete job group: ' . $e->getMessage());
     }
+}
 
 }

@@ -17,6 +17,17 @@
                                 {{ Session::get('delete_message') }}
                             </div>
                         @endif
+
+                        @if (Session::has('import_errors'))
+                            <div class="alert alert-danger">
+                                <strong>Import failed!</strong> Please fix the following errors and try again:
+                                <ul>
+                                    @foreach (Session::get('import_errors') as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <div class="card-header">
                             <h4>Active Employees</h4>
                             <div class="card-header-right">
@@ -33,13 +44,13 @@
                                 <div class="modal fade" id="importEmployees">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
-                                            <form action="{{url('employee/import')}}" method="post"
+                                            <form action="{{route('employees.import')}}" method="post"
                                                   enctype="multipart/form-data">
                                                 @csrf
                                                 <div class="modal-body">
                                                     <div class="form-group">
                                                         <label class="col-form-label">Import Employees</label>
-                                                        <input type="file" class="form-control" name="file">
+                                                        <input type="file" class="form-control" name="file" required>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer justify-content-center">
@@ -92,7 +103,11 @@
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <?php $i = 1; ?>
+                                                    <?php
+
+use Illuminate\Support\Facades\DB;
+
+ $i = 1; ?>
                                                     @forelse($employees as $employee)
                                                         <tr>
 
@@ -166,8 +181,7 @@
                                                             <td colspan="11">
                                                                 <center>
                                                                     <div
-                                                                        class="flex flex-col items-center justify-center mt-16"
-                                                                        style="">
+                                                                        class="flex flex-col items-center justify-center mt-16">
                                                                         <div
                                                                             class="flex flex-col items-center justify-center">
                                                                             <svg width="125" height="110"
@@ -362,10 +376,10 @@
                                                                         <li>
                                                                             <a href="{{url('employees/edit/'.$employee->id)}}">Update</a>
                                                                         </li>
-{{--                                                                        <li>--}}
-{{--                                                                            <a href="{{url('employees/deactivate/'.$employee->id)}}"--}}
-{{--                                                                               onclick="return (confirm('Are you sure you want to deactivate this employee?'))">Deactivate</a>--}}
-{{--                                                                        </li>--}}
+                                                                        <li>
+                                                                            <a href="{{url('employees/deactivate/'.$employee->id)}}"
+                                                                               onclick="return (confirm('Are you sure you want to deactivate this employee?'))">Deactivate</a>
+                                                                        </li>
                                                                         <li>
                                                                             <a data-toggle="modal"
                                                                                data-target="#confirmEmployee{{$employee->id}}">
@@ -409,8 +423,7 @@
                                                             <td colspan="11">
                                                                 <center>
                                                                     <div
-                                                                        class="flex flex-col items-center justify-center mt-16"
-                                                                        style="">
+                                                                        class="flex flex-col items-center justify-center mt-16">
                                                                         <div
                                                                             class="flex flex-col items-center justify-center">
                                                                             <svg width="125" height="110"

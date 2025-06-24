@@ -19,6 +19,7 @@ use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use LogicException;
 use PDO;
 use PDOStatement;
@@ -994,7 +995,7 @@ class Connection implements ConnectionInterface
         $connection = $this->getDoctrineConnection();
 
         // Doctrine v2 expects one parameter while v3 expects two. 2nd will be ignored on v2...
-        return $this->getDoctrineDriver()->getSchemaManager(
+        return $this->getDoctrineSchemaManager()->getSchemaManager(
             $connection,
             $connection->getDatabasePlatform()
         );
@@ -1008,7 +1009,7 @@ class Connection implements ConnectionInterface
     public function getDoctrineConnection()
     {
         if (is_null($this->doctrineConnection)) {
-            $driver = $this->getDoctrineDriver();
+            $driver = $this->getDoctrineSchemaManager();
 
             $this->doctrineConnection = new DoctrineConnection(array_filter([
                 'pdo' => $this->getPdo(),

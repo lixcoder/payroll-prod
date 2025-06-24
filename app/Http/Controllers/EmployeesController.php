@@ -39,6 +39,10 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Validators\ValidationException;
+
+use function PHPSTORM_META\type;
 
 class EmployeesController extends Controller
 {
@@ -142,7 +146,7 @@ class EmployeesController extends Controller
     public function createbankbranch(Request $request)
     {
         $postbankbranch = $request->all();
-        dd($postbankbranch);
+        //dd($postbankbranch);
         $data = array('bank_branch_name' => $postbankbranch['name'],
             'branch_code' => $postbankbranch['code'],
             'bank_id' => $postbankbranch['bid'],
@@ -227,11 +231,11 @@ class EmployeesController extends Controller
     public function creategroup(Request $request)
     {
         $postgroup = $request->all();
-        $data = array('job_group_name' => $postgroup['name'],
+        $data = array('name' => $postgroup['name'],
             'organization_id' => Auth::user()->organization_id,
             'created_at' => DB::raw('NOW()'),
             'updated_at' => DB::raw('NOW()'));
-        $check = DB::table('x_job_group')->insertGetId($data);
+        $check = DB::table('x_groups')->insertGetId($data);
 
         if ($check > 0) {
             $date = now();
@@ -272,7 +276,7 @@ class EmployeesController extends Controller
          else {
             try {
                 $currency = Currency::where('organization_id', Auth::user()->organization_id)->first();
-//            $currency = Currency::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->first();
+                // $currency = Currency::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->first();
 //            dd($currency);
                 $branches = Branch::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
                 $departments = Department::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
@@ -306,7 +310,7 @@ class EmployeesController extends Controller
     public function store(Request $request)
     {
         //
-         dd($request->all());
+        //  dd($request->all());
         $validator = Validator::make($request->all(), [
             'fname' => 'required',
             'education' => 'required',
@@ -387,8 +391,8 @@ class EmployeesController extends Controller
             if ($request->get('citizenship') == '') {
                 $employee->citizenship_id = null;
             } else {
-                //$employee->citizenship_id = $request->get('citizenship');
-                $employee->citizenship_id = 0;
+                $employee->citizenship_id = $request->get('citizenship') ?? null;
+                // $employee->citizenship_id = 0;
             }
             $employee->mode_of_payment = $request->get('modep');
             if ($request->get('bank_account_number') != null) {
@@ -452,8 +456,8 @@ class EmployeesController extends Controller
             if ($request->get('type_id') == '') {
                 $employee->type_id = null;
             } else {
-                // $employee->type_id = $request->get('type_id');
-                $employee->type_id = 0;
+                $employee->type_id = $request->get('type_id');
+                // $employee->type_id = 0;
             }
             if ($request->get('i_tax') != null) {
                 $employee->income_tax_applicable = '1';
@@ -477,8 +481,8 @@ class EmployeesController extends Controller
             }
             $employee->custom_field1 = $request->get('omode');
             $employee->organization_id = Auth::user()->organization_id;
-            // $employee->start_date = $request->get('startdate');
-            // $employee->end_date = $request->get('enddate');
+            $employee->start_date = $request->get('startdate');
+            $employee->end_date = $request->get('enddate');
             $employee->start_date = Carbon::now();
             $employee->end_date = null;
             if ($request->get('active') != null) {
@@ -509,7 +513,7 @@ class EmployeesController extends Controller
             Audit::logaudit(Carbon::now(), 'create', 'created: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name);
 
             $insertedId = $employee->id;
-            //if (($request->get('kin_first_name')[0]) !== null) {
+            // if (($request->get('kin_first_name')[0]) !== null) {
             if (isset($request->get('kin_first_name')[0])) {
                 for ($i = 0; $i < count($request->get('kin_first_name')); $i++) {
                     if (($request->get('kin_first_name')[$i] != '' || $request->get('kin_first_name')[$i] != null) && ($request->get('kin_last_name')[$i] != '' || $request->get('kin_last_name')[$i] != null)) {
@@ -571,15 +575,37 @@ class EmployeesController extends Controller
     /*
      * Import Employees
      * */
-    public function importEmployees()
+public function importEmployees(Request $request)
     {
-        $import = Excel::import(new EmployeeImport, request()->file('file'));
-        if ($import) {
-            return redirect()->back()->withFlashMessage('Employee successfully Uploaded!');
-        } else {
-            return redirect()->back()->withFlashMessage('Employee successfully Uploaded!');
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|mimes:csv,xlsx,xls|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        $import = new EmployeeImport();
+        try {
+            Excel::import($import, $request->file('file'));
+            Audit::logaudit(now(), Auth::user()->username, 'import', 'Imported employees via file upload');
+
+            if (!empty($import->errors)) {
+                return redirect()->back()->with('import_errors', $import->errors);
+            }
+
+            return redirect()->back()->with('flash_message', 'Employees successfully uploaded!');
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            $errors = [];
+            foreach ($failures as $failure) {
+                $errors[] = 'Row ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+            }
+            return redirect()->back()->with('import_errors', $errors);
+        } catch (\Exception $e) {
+            Log::error('Employee import failed: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
+            return redirect()->back()->with('error', 'Failed to import employees: ' . $e->getMessage());
+        }
     }
 
     public function serializeDoc(Request $request)
@@ -851,7 +877,7 @@ class EmployeesController extends Controller
                     if ($file) {
 
                         $name = time() . '-' . $file->getClientOriginalName();
-                        dd($name);
+                        //dd($name);
                         $file = $file->store('uploads/employees/documents', 'public', $name);
                         $input['file'] = '/public/uploads/employees/documents/' . $name;
                         $extension = pathinfo($name, PATHINFO_EXTENSION);
@@ -866,11 +892,11 @@ class EmployeesController extends Controller
 
                     }
 
-                    //$document->description = $request->get('description')[$j];
+                    $document->description = $request->get('description')[$j];
 
-                    //$document->from_date = $request->get('fdate')[$j];
+                    $document->from_date = $request->get('fdate')[$j];
 
-                    //$document->expiry_date = $request->get('edate')[$j];
+                    $document->expiry_date = $request->get('edate')[$j];
 
                     $document->save();
 

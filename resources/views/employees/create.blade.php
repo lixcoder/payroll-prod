@@ -643,8 +643,8 @@
                                                                 style="color:red">*</span></label>
                                                         <div class="right-inner-addon ">
                                                             <i class="glyphicon glyphicon-calendar"></i>
-                                                            <input class="form-control datepicker" readonly="readonly"
-                                                                   placeholder="" type="text" name="djoined"
+                                                            <input class="form-control date fill"
+                                                                   placeholder="" type="date" name="djoined" data-mask="99/99/9999"
                                                                    id="djoined" value="{{{ old('djoined') }}}">
                                                         </div>
                                                     </div>
@@ -1556,17 +1556,17 @@
             $('#empdetails').click(function (e) {
                 e.preventDefault();
 
-                var kdata = $('.kindata').map(function(){
+                /*var kdata = $('.kindata').map(function(){
                   return this.value;
-                }).get();
+                }).get();*/
 
                 var kind = $('.kindata').serialize();
 
                 var docdata = new FormData($("#form3"));
 
-                var docdata= $('.docdata').serialize();
+                //var docdata= $('.docdata').serialize();
 
-                var kfn = $('input[name^="kin_first_name"]').map(function(){
+                /*var kfn = $('input[name^="kin_first_name"]').map(function(){
                   return this.value;
                 }).get();
 
@@ -1588,9 +1588,9 @@
 
                 var kcon = $('input[name^="contact"]').map(function(){
                   return this.value;
-                }).get();
+                }).get();*/
 
-                var path = $('input[name^="path"]').map(function(){
+                /*var path = $('input[name^="path"]').map(function(){
                   return this.value;
                 }).get();
 
@@ -1610,7 +1610,7 @@
                   return this.value;
                 }).get();
 
-                var __data = $('input[name^="kin_first_name"]').serialize();
+                var __data = $('input[name^="kin_first_name"]').serialize();*/
 
 
                 var fname = $("#fname"),
@@ -1659,7 +1659,7 @@
                 var valid = true;
                 allFields.removeClass("ui-state-error");
 
-                valid = valid && checkLength( lname, "Please insert last name!" );
+                /*valid = valid && checkLength( lname, "Please insert last name!" );
 
                 valid = valid && checkLength( fname, "Please insert first name!" );
 
@@ -1684,7 +1684,7 @@
                 valid = valid && checkRegexp( email_office, /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/, "Please insert a valid office email address!" );
 
                 valid = valid && checkRegexp( email_personal, /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/, "Please insert a valid personal email address!" );
-          
+          */
 
 
                 //get form id
@@ -1802,7 +1802,7 @@
 
                     function displaydata(){
                      $.ajax({
-                                    url     : "{{url('reloaddata')}}",
+                      url     : "{{url('reloaddata')}}",
                       type    : "POST",
                       async   : false,
                       data    : { },
@@ -1814,7 +1814,7 @@
        }
                     const citizenData = {
                         'name': document.getElementById('cname').value,
-                        "_token": "{{csrf_token()}}",
+                        _token: "{{csrf_token()}}",
                     }
                     $.ajax({
                         url: "{{url('createCitizenship')}}",

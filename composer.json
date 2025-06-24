@@ -8,6 +8,7 @@
         "php": "^7.3|^8.0",
         "africastalking/africastalking": "^3.0",
         "barryvdh/laravel-dompdf": "^1.0",
+        "doctrine/dbal": "^4.2",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.4",
         "laravel/framework": "^8.75",

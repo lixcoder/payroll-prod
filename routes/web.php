@@ -129,7 +129,8 @@ Route::resource('roles', RoleController::class);
  * */
 Route::resource('employees', EmployeesController::class);
 Route::get('employee/template', [EmployeesController::class, 'exportTemplate']);
-Route::post('employee/import', [EmployeesController::class, 'importEmployees']);
+// Route::post('employee/import', [EmployeesController::class, 'importEmployees']);
+Route::post('/employee/import', [EmployeesController::class, 'importEmployees'])->name('employees.import');
 Route::get('employees/show/{id}', [EmployeesController::class, 'show']);
 Route::get('v1/employees', [EmployeesController::class, 'getEmployees']);
 Route::get('employees/create', [EmployeesController::class, 'create']);
@@ -394,6 +395,7 @@ Route::get('branches/edit/{id}', [BranchesController::class, 'edit']);
 
 //=================GROUP ROUTES ===============================//
 Route::resource('groups', GroupsController::class);
+Route::post('/groups', [GroupsController::class, 'store'])->name('groups.store'); //Just added
 Route::post('groups/update/{id}', [GroupsController::class, 'update']);
 Route::get('groups/delete/{id}', [GroupsController::class, 'destroy']);
 Route::get('groups/edit/{id}', [GroupsController::class, 'edit']);
@@ -527,6 +529,7 @@ Route::get('overtimes/view/{id}', [OvertimesController::class, 'view']);
 */
 
 Route::resource('job_group', JobGroupController::class);
+Route::post('/job_group', [JobGroupController::class, 'store'])->name('job_group.store');
 Route::post('job_group/update/{id}', [JobGroupController::class, 'update']);
 Route::get('job_group/delete/{id}', [JobGroupController::class, 'destroy']);
 Route::get('job_group/edit/{id}', [JobGroupController::class, 'edit']);
@@ -790,7 +793,7 @@ Route::get('api/branchemployee', function () {
         ->first();
     //dd('bid=>'.$bid.' did=>'.$did);
     if (($bid == 'All' || $bid == '' || $bid == 0) && ($did == 'All' || $did == '' || $did == 0)) {
-        if (Auth::user()->can('manager_payroll')) {
+        if (Gate::allows('manager_payroll')) {
             $employee = Employee::select('id', DB::raw('CONCAT(personal_file_number, " : ", first_name," ",last_name) AS full_name'))
                 ->where('organization_id', Auth::user()->organization_id)
                 ->pluck('full_name', 'id');
