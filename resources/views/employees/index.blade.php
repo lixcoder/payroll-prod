@@ -283,7 +283,7 @@ use Illuminate\Support\Facades\DB;
                                                         </tr>
                                                     @endforelse
                                                     </tbody>
-                                                    <tfoot>
+                                                    <!-- <tfoot>
                                                     <tr>
                                                         <th>#</th>
                                                         <th>PFN</th>
@@ -297,7 +297,7 @@ use Illuminate\Support\Facades\DB;
                                                         <th>Department</th>
                                                         <th></th>
                                                     </tr>
-                                                    </tfoot>
+                                                    </tfoot> -->
                                                 </table>
                                             </div>
                                         </div>
@@ -525,21 +525,6 @@ use Illuminate\Support\Facades\DB;
                                                         </tr>
                                                     @endforelse
                                                     </tbody>
-                                                    <tfoot>
-                                                    <tr>
-                                                        <th>#</th>
-                                                        <th>PFN</th>
-                                                        <th style="width:150px;">Employee Name</th>
-                                                        <th>ID</th>
-                                                        <th>Kra Pin</th>
-                                                        <th>Nssf NO.</th>
-                                                        <th>Nhif NO.</th>
-                                                        <th>Gender</th>
-                                                        <th>Branch</th>
-                                                        <th>Department</th>
-                                                        <th></th>
-                                                    </tr>
-                                                    </tfoot>
                                                 </table>
                                             </div>
                                         </div>

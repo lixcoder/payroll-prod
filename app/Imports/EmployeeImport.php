@@ -16,6 +16,7 @@ use Maatwebsite\Excel\Events\AfterImport;
 class EmployeeImport implements ToModel, WithStartRow, WithValidation, SkipsOnError, WithEvents
 {
     protected $pfn_counter;
+    protected $errors = [];
 
     public function __construct()
     {
@@ -32,7 +33,7 @@ class EmployeeImport implements ToModel, WithStartRow, WithValidation, SkipsOnEr
 
     public function model(array $row)
     {
-        $row_count = Employee::count() + 1; // Approximate row count
+        $row_count = Employee::count() + 1;
         Log::debug('Processing row #' . $row_count . ': ' . json_encode($row));
 
         if (!Auth::check()) {
@@ -42,7 +43,7 @@ class EmployeeImport implements ToModel, WithStartRow, WithValidation, SkipsOnEr
 
         $job_group_id = Jobgroup::where('organization_id', Auth::user()->organization_id)->pluck('id')->first();
         if (!$job_group_id) {
-            Log::error('No job group found for row #' . $row_count);
+            Log::error('No job group found for row #' . $row_count . '. Ensure a job group exists for organization ID: ' . Auth::user()->organization_id);
             return null;
         }
 
@@ -80,8 +81,9 @@ class EmployeeImport implements ToModel, WithStartRow, WithValidation, SkipsOnEr
             $employee->save();
             Log::info('Employee saved successfully for row #' . $row_count . ': ID ' . $employee->id);
         } catch (\Exception $e) {
-            Log::error('Failed to save employee for row #' . $row_count . ': ' . $e->getMessage());
-            return null; // SkipsErrors will handle this
+            Log::error('Failed to save employee for row #' . $row_count . ': ' . $e->getMessage() . ' | Validation Errors: ' . ($employee->errors() ?? 'No validation errors'));
+            $this->errors[] = 'Row ' . $row_count . ': Failed to save employee. Reason: ' . $e->getMessage();
+            return null;
         }
 
         return $employee;
@@ -108,15 +110,15 @@ class EmployeeImport implements ToModel, WithStartRow, WithValidation, SkipsOnEr
     {
         $row_count = Employee::count() + 1; // Approximate
         Log::error('Import error for row #' . $row_count . ': ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
+        $this->errors[] = 'Row ' . $row_count . ': ' . $e->getMessage();
     }
 
     public function registerEvents(): array
     {
         return [
             AfterImport::class => function(AfterImport $event) {
-                $errors = collect($this->getErrors())->pluck('error')->all(); // Access errors from SkipsErrors
-                if (!empty($errors)) {
-                    session()->flash('import_errors', $errors);
+                if (!empty($this->errors)) {
+                    session()->flash('import_errors', $this->errors);
                 }
             },
         ];
