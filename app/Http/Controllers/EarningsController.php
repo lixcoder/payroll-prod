@@ -60,7 +60,7 @@ class EarningsController extends Controller
             'created_at' => DB::raw('NOW()'),
             'updated_at' => DB::raw('NOW()'));
         $check = DB::table('x_earningsettings')->insertGetId($data);
-        // $id = DB::table('earningsettings')->insertGetId( $data );
+        $id = DB::table('earningsettings')->insertGetId( $data );
         if ($check > 0) {
             Audit::logaudit(date('Y-m-d'), Auth::user()->username, 'created: ' . $postearning['name'], 'Earningsettings', 0);
             return $check;
@@ -92,6 +92,8 @@ class EarningsController extends Controller
         $earning->narrative = $request->get('narrative');
 
         $earning->formular = $request->get('formular');
+
+        $earning->organization_id = Auth::user()->organization_id;
 
         if ($request->get('formular') == 'Instalments') {
             $earning->instalments = $request->get('instalments');

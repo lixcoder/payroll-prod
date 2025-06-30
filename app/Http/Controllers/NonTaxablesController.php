@@ -5,6 +5,8 @@ use App\Models\Nontaxable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 
 class NonTaxablesController extends BaseController {
 
@@ -126,7 +128,7 @@ class NonTaxablesController extends BaseController {
 
             Nontaxable::destroy($id);
 
-            Audit::logaudit('Nontaxables', 'delete', 'deleted: '.$nontaxable->name);
+            Audit::logaudit('date', 'user', 'action: '.$nontaxable->name);
 
             return Redirect::route('nontaxables.index')->withDeleteMessage('Non taxable income successfully deleted!');
         }
