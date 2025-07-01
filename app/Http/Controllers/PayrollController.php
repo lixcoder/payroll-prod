@@ -122,6 +122,7 @@ class PayrollController extends Controller
             'name' => $postaccount['name'],
             'code' => $postaccount['code'],
             'category' => $postaccount['category'],
+            'balance' => 0,
             'active' => 1,
             'organization_id' => Auth::user()->organization_id,
             'created_at' => DB::raw('NOW()'),

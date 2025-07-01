@@ -2208,7 +2208,7 @@ class Payroll extends Model
 //        $a=0.00;
             $total_pay = $a;
             $total_nssf = static::nssfcalc($gross);
-            $taxable = $total_pay - $total_nssf;
+            $taxable = floatval($total_pay) - floatval($total_nssf);
             if ($taxable >= 12298 && $taxable < 23885) {
                 $paye = (1229.8 + ($taxable - 12298) * 15 / 100) - 1408.00;
             } else if ($taxable >= 23885 && $taxable < 35472) {
@@ -2290,11 +2290,11 @@ class Payroll extends Model
         try {
             $total_net = 0.00;
             //$gross=0.00;
-            $total_net = $gross - static::payecalc($gross) - static::nssfcalc($gross) - static::nhifcalc($gross);
+            $total_net = floatval(str_replace(',', '', $gross)) - static::payecalc($gross) - static::nssfcalc($gross) - static::nhifcalc($gross);
             if ($total_net < 0) {
                 $total_net = 0;
             } else {
-                $total_net = $gross - static::payecalc($gross) - static::nssfcalc($gross) - static::nhifcalc($gross);
+                $total_net = floatval(str_replace(',', '', $gross)) - static::payecalc($gross) - static::nssfcalc($gross) - static::nhifcalc($gross);
             }
 
             return round($total_net, 2);
