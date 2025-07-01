@@ -94,15 +94,15 @@ class EmployeeImport implements ToModel, WithStartRow, WithValidation, SkipsOnEr
         return [
             '0' => 'required|string|max:255',
             '1' => 'required|string|max:255',
-            '2' => 'nullable|email|unique:x_employees,email_office',
+            '2' => 'nullable|email|unique:x_employee,email_office',
             '3' => 'required|numeric|min:0',
-            '4' => 'nullable|string|unique:x_employees,pin',
-            '5' => 'nullable|string|unique:x_employees,social_security_number',
-            '6' => 'nullable|string|unique:x_employees,identity_number',
-            '7' => 'nullable|string|unique:x_employees,hospital_insurance_number',
+            '4' => 'nullable|string|unique:x_employee,pin',
+            '5' => 'nullable|string|unique:x_employee,social_security_number',
+            '6' => 'nullable|string|unique:x_employee,identity_number',
+            '7' => 'nullable|string|unique:x_employee,hospital_insurance_number',
             '8' => 'required|in:Male,Female,Other',
             '9' => 'required|in:Bank,Cash,Cheque',
-            '10' => 'required_if:9,Bank|nullable|string|unique:x_employees,bank_account_number|regex:/^[0-9]+$/',
+            '10' => 'required_if:9,Bank|nullable|string|unique:x_employee,bank_account_number|regex:/^[0-9]+$/',
         ];
     }
 
@@ -122,5 +122,19 @@ class EmployeeImport implements ToModel, WithStartRow, WithValidation, SkipsOnEr
                 }
             },
         ];
+    }
+
+    public function prepareForValidation($row, $index)
+    {
+        if (isset($row[10])) {
+            $row[10] = (string) $row[10];
+            Log::debug("prepareForValidation: Row $index, bank_account_number set to: " . $row[10] . ' (type: ' . gettype($row[10]) . ')');
+        }
+        return $row;
+    }
+
+    public function getErrors()
+    {
+        return $this->errors;
     }
 }

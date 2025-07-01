@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
             PermissionTableSeeder::class,
             UsersTableSeeder::class,
             BanksTableSeeder::class,
-            BankBranchesTableSeeder::class
+            BankBranchesTableSeeder::class,
+            OrganizationsTableSeeder::class
         ]);
     }
 }

@@ -2269,7 +2269,7 @@
 
                 valid = valid && checkLength(bname, "Please insert branch name!");
 
-                valid = valid && checkLength( bid, "Please select bank for this branch!" );
+                // valid = valid && checkLength( bid, "Please select bank for this branch!" );
 
                 valid = valid && checkRegexp(bname, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for branch name.");
 
@@ -2389,7 +2389,7 @@
 
                 valid = valid && checkLength(dname, "Please insert department name!");
 
-                valid = valid && checkLength( bid, "Please select bank for this branch!" );
+                // valid = valid && checkLength( bid, "Please select bank for this branch!" );
 
                 valid = valid && checkRegexp(dname, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for department name.");
 
@@ -2509,7 +2509,7 @@
 
                 valid = valid && checkLength(jname, "Please insert job group!");
 
-                valid = valid && checkLength( bid, "Please select bank for this branch!" );
+                // valid = valid && checkLength( bid, "Please select bank for this branch!" );
 
                 valid = valid && checkRegexp(jname, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for job group.");
 
@@ -2530,7 +2530,7 @@
        });
        }
                     const jobGroup = {
-                        "name": document.getElementById('jname').value,
+                        "job_group_name": document.getElementById('jname').value,
                         "_token": "{{csrf_token()}}"
                     }
                     $.ajax({
@@ -2627,7 +2627,7 @@
 
                 valid = valid && checkLength(tname, "Please insert employee type name!");
 
-                valid = valid && checkLength( bid, "Please select bank for this branch!" );
+                // valid = valid && checkLength( bid, "Please select bank for this branch!" );
 
                 valid = valid && checkRegexp(tname, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for employee type name.");
 

@@ -232,7 +232,8 @@ class EmployeesController extends Controller
     public function creategroup(Request $request)
     {
         $postgroup = $request->all();
-        $data = array('name' => $postgroup['name'],
+        $data = array(
+            'job_group_name' => $postgroup['job_group_name'],
             'organization_id' => Auth::user()->organization_id,
             'created_at' => DB::raw('NOW()'),
             'updated_at' => DB::raw('NOW()'));
@@ -558,8 +559,7 @@ class EmployeesController extends Controller
 
             return Redirect::route('employees.index')->withFlashMessage('Employee successfully created!');
         } catch (\Exception $e) {
-            return Redirect::back()->withInput()->withErrors($e);
-            return $e;
+            return Redirect::back()->withInput()->withErrors($e->getMessage());
         }
     }
 
@@ -595,9 +595,10 @@ public function importEmployees(Request $request)
         Excel::import($import, $request->file('file'));
         Audit::logaudit(now(), Auth::user()->username, 'import', 'Imported employees via file upload');
 
-        if (!empty($import->errors)) {
-            Log::warning('Import errors: ' . json_encode($import->errors));
-            return redirect()->back()->with('import_errors', $import->errors);
+            $errors = $import->getErrors();
+            if (!empty($errors)) {
+                Log::warning('Import errors: ' . json_encode($errors));
+                return redirect()->back()->with('import_errors', $errors);
         }
 
         return redirect()->back()->with('flash_message', 'Employees successfully uploaded!');
