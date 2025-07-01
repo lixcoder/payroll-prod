@@ -38,13 +38,20 @@ class AdvanceController extends Controller
             'category' => $postaccount['category'],
             'active' => 1,
             'organization_id' => Auth::user()->organization_id,
+            'balance' => 0,
             'created_at' => DB::raw('NOW()'),
             'updated_at' => DB::raw('NOW()'));
         $check = DB::table('x_accounts')->insertGetId($data);
 
         if ($check > 0) {
 
-            Audit::logaudit('Accounts', 'create', 'created: ' . $postaccount['name']);
+            Audit::logAudit(
+                now(),
+                Auth::user()->username,
+                'create',
+                'Accounts',
+                0
+            );
             return $check;
         } else {
             return 1;
