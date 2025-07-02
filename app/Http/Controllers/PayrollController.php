@@ -173,11 +173,17 @@ class PayrollController extends Controller
     public function create(Request $request)
     {
         set_time_limit(2000);
-        $unlock = Lockpayroll::where('user_id', Auth::user()->id)->where('period', request('period'))->count();
 
-        if (!Auth::user()->can('reprocess_payroll') && $unlock == 0) {
+        $period = request('period');
+        $period_date = \Carbon\Carbon::createFromFormat('m-Y', $period)->format('Y-m-d');
+
+        $unlock = Lockpayroll::where('user_id', Auth::user()->id)
+            ->where('period', $period_date)
+            ->count();
+
+        if (!auth()->user()->can('reprocess_payroll') && $unlock == 0) {
             $check = DB::table('x_transact')
-                ->where('financial_month_year', '=', request('period'))
+                ->where('financial_month_year', '=', $period_date)
                 ->where('organization_id',Auth::user()->organization_id)
                 ->count();
 

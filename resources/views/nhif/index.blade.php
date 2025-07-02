@@ -41,7 +41,7 @@
                                                 <td>{{ $nrate->id }}</td>
                                                 <td>{{ $nrate->income_from }}</td>
                                                 <td>{{ $nrate->income_to }}</td>
-                                                <td>{{ $nrate->hi_amount }}</td>
+                                                <td>{{ $nrate->amount }}</td>
                                                 <td>
                                                                                           <div class="btn-group">
                                                         <button type="button"

@@ -704,6 +704,7 @@ class Payroll extends Model
         $end = date('Y-m-t', strtotime("01-" . $period));
 
         if ($type == 'management') {
+            if ($jgroup && isset($jgroup->id)) {
 
             $rel = DB::table('x_employee_relief')
                 ->join('x_employee', 'x_employee_relief.employee_id', '=', 'x_employee.id')
@@ -713,8 +714,13 @@ class Payroll extends Model
                 ->where('job_group_id', $jgroup->id)
                 ->where('relief_id', '=', $relief_id)
                 ->sum('relief_amount');
+            } else {
+                $rel = 0;
+            }
         } else {
-            $rel = DB::table('x_employee_relief')
+            if ($jgroup && isset($jgroup->id)) {
+
+                $rel = DB::table('x_employee_relief')
                 ->join('x_employee', 'x_employee_relief.employee_id', '=', 'x_employee.id')
                 ->where('x_employee.organization_id', Auth::user()->organization_id)
                 ->where('in_employment', 'Y')
@@ -722,6 +728,9 @@ class Payroll extends Model
                 ->where('job_group_id', '!=', $jgroup->id)
                 ->where('relief_id', '=', $relief_id)
                 ->sum('relief_amount');
+            } else {
+                $rel = 0;
+            }
         }
         return round($rel, 2);
 

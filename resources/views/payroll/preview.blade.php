@@ -313,11 +313,12 @@ function asMoney($value)
                                                     <td align='right'><strong>{{asMoney($totaltax)}}</strong></td>
                                                     <td align='right'><strong>{{asMoney($totaltaxrelief)}}</strong></td>
                                                     @foreach($reliefs as $relief)
-                                                        <?php
-                                                        $totalrelief . $relief->id = $totalrelief + (double)App\Models\Payroll::totalreliefs($relief->id, $period, $type);
-                                                        ?>
-                                                        <td align='right'><strong>{{asMoney($totalrelief.$relief->id)}}</strong>
-                                                        </td>
+                                                        @if($relief && isset($relief->id))
+                                                            <?php
+                                                            $totalrelief . $relief->id = $totalrelief + (double)App\Models\Payroll::totalreliefs($relief->id, $period, $type);
+                                                            ?>
+                                                            <td align='right'><strong>{{asMoney($totalrelief.$relief->id)}}</strong></td>
+                                                        @endif
                                                     @endforeach
                                                     <td align='right'><strong>{{asMoney($totalpaye)}}</strong></td>
                                                     <td align='right'><strong>{{asMoney($totalnssf)}}</strong></td>

@@ -40,7 +40,14 @@ class LoanAccountExport implements FromCollection, WithHeadings, WithColumnForma
 
     public function collection()
     {
-        $this->rowCount = $this->registerEvents();
+        return collect([
+            [
+                '', // LOAN ACCOUNT
+                '', // DATE
+                '', // PRINCIPAL PAID
+                '', // INTEREST PAID
+            ]
+        ]);
     }
 
     public function registerEvents(): array

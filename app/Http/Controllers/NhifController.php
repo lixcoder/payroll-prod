@@ -119,7 +119,7 @@ class NhifController extends BaseController {
 
         $nrate->income_to = request('maximum');
 
-        $nrate->hi_amount = request('contribution');
+        $nrate->amount = request('contribution');
 
         $nrate->organization_id = Auth::user()->organization_id;
 
@@ -176,7 +176,7 @@ class NhifController extends BaseController {
 
         $nrate->income_to = request('income_to');
 
-        $nrate->hi_amount = request('hi_amount');
+        $nrate->amount = request('amount');
 
         $nrate->update();
 

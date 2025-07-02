@@ -26,7 +26,10 @@ class payslipEmailController extends Controller
             $monthss1 = Transact::where('organization_id',Auth::user()->organization_id)->where('financial_month_year',$months[$i])->sum('basic_pay');
         }
         $employees = Employee::where('organization_id', Auth::user()->organization_id)->get();
-        $payslips = Transact::where('organization_id', Auth::user()->organization_id)->groupBy('financial_month_year')->get();
+        $payslips = Transact::where('organization_id', Auth::user()->organization_id)
+            ->select('financial_month_year')
+            ->groupBy('financial_month_year')
+            ->get();
         return View::make('payslips.index', compact('employees','payslips'));
     }
 
@@ -50,6 +53,7 @@ class payslipEmailController extends Controller
                     ->where('x_transact_allowances.organization_id', Auth::user()->organization_id)
                     ->where('financial_month_year', '=', request('period'))
                     ->where('x_employee.id', '=', $user->id)
+                    ->select('allowance_name', DB::raw('SUM(allowance_amount) as total_amount'))
                     ->groupBy('allowance_name')
                     ->get();
 
@@ -57,6 +61,7 @@ class payslipEmailController extends Controller
                     ->join('x_employee', 'x_transact_earnings.employee_id', '=', 'x_employee.id')
                     ->where('financial_month_year', '=', request('period'))
                     ->where('x_employee.id', '=', $user->id)
+                    ->select('earning_name', DB::raw('SUM(earning_amount) as total_amount'))
                     ->groupBy('earning_name')
                     ->get();
 
@@ -64,6 +69,7 @@ class payslipEmailController extends Controller
                     ->join('x_employee', 'x_transact_deductions.employee_id', '=', 'x_employee.id')
                     ->where('financial_month_year', '=', request('period'))
                     ->where('x_employee.id', '=', $user->id)
+                    ->select('deduction_name', DB::raw('SUM(deduction_amount) as total_amount'))
                     ->groupBy('deduction_name')
                     ->get();
 
@@ -133,18 +139,21 @@ class payslipEmailController extends Controller
                     ->join('x_employee', 'x_transact_overtimes.employee_id', '=', 'x_employee.id')
                     ->where('financial_month_year', '=', request('period'))
                     ->where('x_employee.id', '=', request('employeeid'))
+                    ->select('employee_id', DB::raw('SUM(overtime_amount) as total_overtime'))
                     ->groupBy('employee_id')
                     ->get();
                 $nontaxables = DB::table('x_transact_nontaxables')
                     ->join('x_employee', 'x_transact_nontaxables.employee_id', '=', 'x_employee.id')
                     ->where('financial_month_year', '=', request('period'))
-                    ->where('x_employee.id', '=', request('period'))
+                    ->where('x_employee.id', '=', request('employeeid'))
+                    ->select('nontaxable_name', DB::raw('SUM(nontaxable_amount) as total_amount'))
                     ->groupBy('nontaxable_name')
                     ->get();
                 $rels = DB::table('x_transact_reliefs')
                     ->join('x_employee', 'x_transact_reliefs.employee_id', '=', 'x_employee.id')
                     ->where('financial_month_year', '=', request('period'))
                     ->where('x_employee.id', '=', request('employeeid'))
+                    ->select('relief_name', DB::raw('SUM(relief_amount) as total_amount'))
                     ->groupBy('relief_name')
                     ->get();
                 $pension = DB::table('x_transact_pensions')
@@ -156,9 +165,12 @@ class payslipEmailController extends Controller
                 $select = "ALL";
 
                 $fileName = $user->first_name . '_' . $user->last_name . '_' . $fyear . '.pdf';
-                $filePath = 'app/views/temp/';
+                $filePath = storage_path('app/temp/');
                 $pdf = PDF::loadView('pdf.monthlySlip', compact('pension', 'nontaxables', 'rels', 'employees', 'select', 'transacts', 'allws', 'deds', 'earnings', 'period', 'currencies', 'organization', 'overtimes'))->setPaper('a4');
 
+                if (!file_exists($filePath)) {
+                    mkdir($filePath, 0777, true);
+                }
                 $pdf->save($filePath . $fileName);
 
                 Mail::send('payslips.message', compact('fperiod', 'user'), function ($message) use ($user, $filePath, $fileName) {

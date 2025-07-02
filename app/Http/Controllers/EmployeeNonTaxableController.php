@@ -112,6 +112,7 @@ class EmployeeNonTaxableController extends Controller
 
             $nontaxable->last_day_month = $Last;
 
+            $nontaxable->organization_id = Auth::user()->organization_id;
         } else {
             $nontaxable->instalments = '1';
             $a = str_replace(',', '', request()->input('amount'));
@@ -129,6 +130,7 @@ class EmployeeNonTaxableController extends Controller
 
             $nontaxable->last_day_month = $Last;
 
+            $nontaxable->organization_id = Auth::user()->organization_id;
         }
 
 

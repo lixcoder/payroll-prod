@@ -162,7 +162,7 @@
                     </tr>
                     <tr>
                         <td><strong>EARNINGS</strong></td>
-                        <td><strong>Amount ({{$currency->shortname}})</strong></td>
+                        <td><strong>Amount ({{$currencies[0]->shortname}})</strong></td>
                     </tr>
                     <tr>
                         <td>Basic Pay:</td>
