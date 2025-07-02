@@ -2268,10 +2268,10 @@ class Payroll extends Model
         $nssf_amts = DB::table('x_social_security')->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
 //        dd($nssf_amts);
         foreach ($nssf_amts as $nssf_amt) {
-            $from = $nssf_amt->income_from;
-            $to = $nssf_amt->income_to;
+            $from = $nssf_amt->nssf_lower_earning;
+            $to = $nssf_amt->nssf_upper_earning;
             if ($total >= $from && $total <= $to) {
-                $nssfAmt = $nssf_amt->ss_amount_employee;
+                $nssfAmt = $nssf_amt->employee_contribution ?? 0;
             }
         }
         return round($nssfAmt, 2);
