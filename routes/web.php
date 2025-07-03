@@ -49,6 +49,7 @@ use App\Http\Controllers\OvertimeSettingsController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\payslipEmailController;
 use App\Http\Controllers\ProbationController;
+use App\Http\Controllers\PayrollCalculatorController;
 use App\Http\Controllers\PromotionsController;
 use App\Http\Controllers\PropertiesController;
 use App\Http\Controllers\RegistrationController;
@@ -587,11 +588,22 @@ Route::get('repayments_template', [LoanrepaymentsController::class, 'createTempl
  *
  * Payroll Calculator
  * */
-Route::get('payrollcalculator', function () {
-    $currency = Currency::find(1);
-    return View::make('payroll.payroll_calculator', compact('currency'));
+// Route::get('payrollcalculator', function () {
+//     $currency = Currency::find(1);
+//     return View::make('payroll.payroll_calculator', compact('currency'));
 
-});
+// });
+
+/*
+ *
+ * New payroll calculator route added by Jeff 03/07/2025
+
+*/
+
+// Payroll Calculator Routes
+Route::get('/payrollcalculator', [PayrollCalculatorController::class, 'index'])->name('payroll.calculator');
+Route::post('/payroll/shownet', [PayrollCalculatorController::class, 'showNet'])->name('payroll.shownet');
+Route::post('/payroll/showgross', [PayrollCalculatorController::class, 'showGross'])->name('payroll.showgross');
 
 //
 Route::get('email/payslip', [payslipEmailController::class, 'index']);
@@ -625,11 +637,11 @@ Route::get('unlockpayroll/{id}', [PayrollController::class, 'unlockpayroll']);
 Route::post('unlockpayroll', [PayrollController::class, 'dounlockpayroll']);
 Route::post('createNewAccount', [PayrollController::class, 'createaccount']);
 
-Route::get('payrollcalculator', function () {
-    $currency = Currency::find(1);
-    return View::make('payroll.payroll_calculator', compact('currency'));
+// Route::get('payrollcalculator', function () {
+//     $currency = Currency::find(1);
+//     return View::make('payroll.payroll_calculator', compact('currency'));
 
-});
+// });
 
 Route::get('payrollReports', function () {
 

@@ -2288,7 +2288,7 @@ class Payroll extends Model
             $from=$nhif_amt->income_from;
             $to=$nhif_amt->income_to;
             if($total>=$from && $total<=$to){
-                $nhifAmt=$nhif_amt->hi_amount;
+                $nhifAmt = $nhif_amt->amount;
             }
         }
         return round($nhifAmt,2);
