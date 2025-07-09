@@ -4,17 +4,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\PayeRate;
+use \Traits\Encryptable;
 
 
 class Payroll extends Model
 {
     public $table = "x_transact";
-
-    /*
-
-    use \Traits\Encryptable;
-
-
     protected $encryptable = [
         'basic_pay',
         'earning_amount',
@@ -29,7 +24,6 @@ class Payroll extends Model
         'financial_month_year',
 
     ];
-    */
 
     public static $rules = [
         'period' => 'required',
@@ -42,7 +36,17 @@ class Payroll extends Model
     );
 
     // Don't forget to fill this array
-    protected $fillable = [];
+    protected $fillable = [
+        'id',
+        'category',
+        'code',
+        'name',
+        'balance',
+        'active',
+        'organization_id',
+        'created_at',
+        'updated_at',
+    ];
 
 
     public function employees()
@@ -97,7 +101,7 @@ class Payroll extends Model
     }
     public static function totalTaxablePay($period, $type){
         // Use the `DB::raw` method to apply COALESCE in the SQL query
-        $sum = Payroll::select(\DB::raw('COALESCE(SUM(taxable_income), 0) as total'))
+        $sum = Payroll::select(DB::raw('COALESCE(SUM(taxable_income), 0) as total'))
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year',$period)
             ->where('process_type', $type)
@@ -108,7 +112,7 @@ class Payroll extends Model
     }
     public static function totalHousingLevy($period, $type){
         // Use the `DB::raw` method to apply COALESCE in the SQL query
-        $sum = Payroll::select(\DB::raw('COALESCE(SUM(housing_levy), 0) as total'))
+        $sum = Payroll::select(DB::raw('COALESCE(SUM(housing_levy), 0) as total'))
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year',$period)
             ->where('process_type', $type)
@@ -1352,10 +1356,10 @@ class Payroll extends Model
         } else {
             $nssf_amts = DB::table('x_social_security')->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
             foreach ($nssf_amts as $nssf_amt) {
-                $nssfLowerEarning = $nssf_amt->nssf_lower_earning;
-                $to = $nssf_amt->nssf_upper_earning;
+                $nssfLowerEarning = $nssf_amt->income_from;
+                $to = $nssf_amt->income_to;
                 // Added by Dominick on 3/08/2023 to remove error of undefined variable $from
-                $from = $nssf_amt->nssf_lower_earning;
+                $from = $nssf_amt->income_from;
                 if ($total >= $from && $total <= $to) {
                     $nssfAmt = (($nssf_amt->employee_contribution)/100) * $total;
                 }
@@ -1380,7 +1384,7 @@ class Payroll extends Model
                 $from = $nhif_amt->income_from;
                 $to = $nhif_amt->income_to;
                 if ($total >= $from && $total <= $to) {
-                    $nhifAmt = $nhif_amt->hi_amount;
+                    $nhifAmt = $nhif_amt->amount;
                 }
             }
         }
@@ -2208,7 +2212,7 @@ class Payroll extends Model
 //        $a=0.00;
             $total_pay = $a;
             $total_nssf = static::nssfcalc($gross);
-            $taxable = $total_pay - $total_nssf;
+            $taxable = floatval($total_pay) - floatval($total_nssf);
             if ($taxable >= 12298 && $taxable < 23885) {
                 $paye = (1229.8 + ($taxable - 12298) * 15 / 100) - 1408.00;
             } else if ($taxable >= 23885 && $taxable < 35472) {
@@ -2262,7 +2266,7 @@ class Payroll extends Model
             $from = $nssf_amt->income_from;
             $to = $nssf_amt->income_to;
             if ($total >= $from && $total <= $to) {
-                $nssfAmt = $nssf_amt->ss_amount_employee;
+                $nssfAmt = $nssf_amt->graduated_scale;
             }
         }
         return round($nssfAmt, 2);
@@ -2279,7 +2283,7 @@ class Payroll extends Model
             $from=$nhif_amt->income_from;
             $to=$nhif_amt->income_to;
             if($total>=$from && $total<=$to){
-                $nhifAmt=$nhif_amt->hi_amount;
+                $nhifAmt=$nhif_amt->amount;
             }
         }
         return round($nhifAmt,2);
@@ -2290,11 +2294,11 @@ class Payroll extends Model
         try {
             $total_net = 0.00;
             //$gross=0.00;
-            $total_net = $gross - static::payecalc($gross) - static::nssfcalc($gross) - static::nhifcalc($gross);
+            $total_net = floatval(str_replace(',', '', $gross)) - static::payecalc($gross) - static::nssfcalc($gross) - static::nhifcalc($gross);
             if ($total_net < 0) {
                 $total_net = 0;
             } else {
-                $total_net = $gross - static::payecalc($gross) - static::nssfcalc($gross) - static::nhifcalc($gross);
+                $total_net = floatval(str_replace(',', '', $gross)) - static::nssfcalc($gross) - static::nhifcalc($gross);
             }
 
             return round($total_net, 2);
@@ -2345,7 +2349,7 @@ class Payroll extends Model
         $a = str_replace(',', '', $net);
         $total = $a;
 
-        $nssf_amts = DB::table('social_security')->whereNull('employee.organization_id')->orWhere('employee.organization_id', Auth::user()->organization_id)->get();
+        $nssf_amts = DB::table('x_social_security')->whereNull('employee.organization_id')->orWhere('employee.organization_id', Auth::user()->organization_id)->get();
         foreach ($nssf_amts as $nssf_amt) {
             $from = $nssf_amt->income_from;
             $to = $nssf_amt->income_to;
@@ -2367,7 +2371,7 @@ class Payroll extends Model
             $from = $nhif_amt->income_from;
             $to = $nhif_amt->income_to;
             if ($total >= $from && $total <= $to) {
-                $nhifAmt = $nhif_amt->hi_amount;
+                $nhifAmt = $nhif_amt->amount;
             }
         }
         return round($nhifAmt, 2);
