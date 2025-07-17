@@ -33,7 +33,9 @@ use Maatwebsite\Excel\Classes\PHPExcel;
 use Maatwebsite\Excel\Facades\Excel;
 use Zizaco\Entrust\Entrust;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Symfony\Component\Console\Input\Input as InputInput;
+use Illuminate\Support\Facades\Log;
 
 class PayrollController extends Controller
 {
@@ -174,6 +176,7 @@ class PayrollController extends Controller
     {
         set_time_limit(2000);
 
+        $type = request('type');
         $period = request('period');
         $period_date = \Carbon\Carbon::createFromFormat('m-Y', $period)->format('Y-m-d');
 
@@ -181,20 +184,23 @@ class PayrollController extends Controller
             ->where('period', $period_date)
             ->count();
 
-        if (!auth()->user()->can('reprocess_payroll') && $unlock == 0) {
-            $check = DB::table('x_transact')
-                ->where('financial_month_year', '=', $period_date)
-                ->where('organization_id',Auth::user()->organization_id)
-                ->count();
+        $user_can_reprocess = \Illuminate\Support\Facades\Gate::allows('reprocess_payroll');
+        $check = DB::table('x_transact')
+            ->where('financial_month_year', '=', $period_date)
+            ->where('organization_id', Auth::user()->organization_id)
+            ->count();
 
+        if (!$user_can_reprocess && $unlock == 0) {
             if ($check > 0) {
                 return redirect()->back()->with('notice', 'Payroll for this month is already processed! Please contact the admin if you wish to re-process it...');
             }
         }
 
         $period = request('period');
-        $start = date('Y-m-01', strtotime($period));
-        $end = date('Y-m-t', strtotime($period));
+        $date = Carbon::createFromFormat('m-Y', $period);
+        $start = $date->startOfMonth()->format('Y-m-d');
+        $end = $date->endOfMonth()->format('Y-m-d');
+
         $employees = DB::table('x_employee')
             ->where('in_employment', '=', 'Y')
             ->where('organization_id', Auth::user()->organization_id)
@@ -206,22 +212,19 @@ class PayrollController extends Controller
                 $query->whereNull('organization_id')
                     ->orWhere('organization_id', Auth::user()->organization_id);
             })->first();
-        $jgroup = Jobgroup::where('job_group_name', request('type'))
+
+        $jgroup = Jobgroup::whereRaw('LOWER(job_group_name) = ?', [strtolower($type)])
             ->where(function ($query) {
                 $query->whereNull('organization_id')
                     ->orWhere('organization_id', Auth::user()->organization_id);
             })->first();
-        //        dd($jgroup);
 
-        if(request('type') == "management" && Jobgroup::where('job_group_name', request('type'))
-            ->where(function ($query) {
-                $query->whereNull('organization_id')
-                    ->orWhere('organization_id', Auth::user()->organization_id);
-            })->count() == 0){
+        // Check for management category using lowercase
+        if (strtolower($type) == "management" && !$jgroup) {
             return redirect()->back()->with('notice', 'There are no employees in the management category, Kindly add employees to this category to continue...');
         }
 
-        if (request('type') == 'management') {
+        if (strtolower($type) == 'management') {
 
             $employees = DB::table('x_employee')
                 ->where('in_employment', '=', 'Y')
@@ -237,7 +240,6 @@ class PayrollController extends Controller
                 ->whereDate('date_joined', '<=', $end)
                 ->get();
         }
-
 
 
         $type = request('type');

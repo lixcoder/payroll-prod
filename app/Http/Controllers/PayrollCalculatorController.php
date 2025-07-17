@@ -18,7 +18,7 @@ class PayrollCalculatorController extends Controller
     public function index()
     {
         // Get currency from your existing setup
-        $currency = (object) ['shortname' => 'KES']; // Adjust based on your currency model
+        $currency = (object) ['shortname' => 'KES'];
         return view('payroll.payroll_calculator', compact('currency'));
     }
 
@@ -80,7 +80,7 @@ class PayrollCalculatorController extends Controller
                 'gross1' => $this->calculator->asMoney($result['gross_salary']),
                 'paye1' => $this->calculator->asMoney($result['deductions']['paye']),
                 'nssf1' => $this->calculator->asMoney($result['deductions']['nssf']['total']),
-                'shif' => $this->calculator->asMoney($result['deductions']['shif']), // Keep as nhif1 for JS compatibility
+                'shif' => $this->calculator->asMoney($result['deductions']['shif']),
                 'housing_levy1' => $this->calculator->asMoney($result['deductions']['housing_levy']),
                 'netv' => $this->calculator->asMoney($result['net_salary'])
             ]);
