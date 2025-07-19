@@ -10,7 +10,7 @@ use App\Models\HousingLevy;
 
 class KenyanPayrollCalculator
 {
-    // Keep personal relief as static since you mentioned to leave it as is
+    // Keep personal relief as static as of now
     private $personalRelief = 2400;
 
     // Dynamic data will be fetched from database
@@ -40,25 +40,33 @@ class KenyanPayrollCalculator
             $this->housingLevyRate = HousingLevy::getCurrentRate();
         } catch (Exception $e) {
             // Fallback to hardcoded values if database is not available
-            $this->setFallbackRates();
+            // $this->setFallbackRates();
+            throw new Exception("Failed to load rates from database: " . $e->getMessage());
         }
     }
 
-    private function setFallbackRates()
-    {
-        // Fallback to original hardcoded values
-        $this->payeBands = [
-            ['upper' => 24000,    'rate' => 0.10],
-            ['upper' => 32333,    'rate' => 0.25],
-            ['upper' => 500000,   'rate' => 0.30],
-            ['upper' => 800000,   'rate' => 0.325],
-            ['upper' => PHP_FLOAT_MAX, 'rate' => 0.35]
-        ];
+    // Uncomment this method if you want to use hardcoded fallback values
+    /*
+     * This method is commented out to avoid confusion with dynamic rates.
+     * If you want to use hardcoded values, you can uncomment it.
+     * It will set the original hardcoded values for PAYE, SHIF, NSSF, and Housing Levy.
+     */
 
-        $this->shifRates = ['rate' => 0.0275, 'minimum' => 300];
-        $this->nssfRates = ['lel' => 8000, 'uel' => 72000, 'rate1' => 0.06, 'rate2' => 0.06];
-        $this->housingLevyRate = 0.015;
-    }
+    // private function setFallbackRates()
+    // {
+    //     // Fallback to original hardcoded values
+    //     $this->payeBands = [
+    //         ['upper' => 24000,    'rate' => 0.10],
+    //         ['upper' => 32333,    'rate' => 0.25],
+    //         ['upper' => 500000,   'rate' => 0.30],
+    //         ['upper' => 800000,   'rate' => 0.325],
+    //         ['upper' => PHP_FLOAT_MAX, 'rate' => 0.35]
+    //     ];
+
+    //     $this->shifRates = ['rate' => 0.0275, 'minimum' => 300];
+    //     $this->nssfRates = ['lel' => 8000, 'uel' => 72000, 'rate1' => 0.06, 'rate2' => 0.06];
+    //     $this->housingLevyRate = 0.015;
+    // }
 
     public function calculatePayroll($data)
     {
