@@ -18,7 +18,7 @@ class CreatePayeTable extends Migration
             $table->increments('id');
 			$table->double('income_from',15,2)->default('0.00');
 			$table->double('income_to',15,2)->default('0.00');
-            $table->double('percentage,15,2')->defult('0.00');
+            $table->double('percentage', 15, 2)->default('0.00');
 			$table->integer('organization_id');
             $table->timestamps();
         });

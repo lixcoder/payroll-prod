@@ -38,7 +38,7 @@ class CreateXOccurencesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('occurences');
+		Schema::drop('x_occurences');
 	}
 
 }

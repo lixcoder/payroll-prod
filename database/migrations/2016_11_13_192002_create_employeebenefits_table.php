@@ -32,7 +32,7 @@ class CreateEmployeeBenefitsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('employeebenefits');
+		Schema::drop('x_employeebenefits');
 	}
 
 }

@@ -36,7 +36,7 @@ class CreateTransactReliefsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('transact_reliefs');
+		Schema::drop('x_transact_reliefs');
 	}
 
 

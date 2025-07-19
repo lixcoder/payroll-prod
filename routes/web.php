@@ -748,7 +748,7 @@ Route::get('housinglevy/edit/{id}', [HousingLevyController::class, 'edit']);
 */
 
 Route::resource('nhif', NhifController::class);
-Route::post('nhif/update/.$nrate->id', [NhifController::class, 'update']);
+Route::post('nhif/update/{id}', [NhifController::class, 'update']);
 Route::get('nhif/delete/{id}', [NhifController::class, 'destroy']);
 Route::get('nhif/edit/{id}', [NhifController::class, 'edit']);
 //

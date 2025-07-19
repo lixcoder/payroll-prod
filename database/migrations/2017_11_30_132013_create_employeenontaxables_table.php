@@ -37,7 +37,7 @@ class CreateEmployeeNonTaxablesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('employee_deductions');
+		Schema::drop('x_employeenontaxables');
 	}
 
 }

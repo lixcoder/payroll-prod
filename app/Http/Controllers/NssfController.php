@@ -50,28 +50,12 @@ class NssfController extends Controller {
             return Redirect::back()->withErrors($validator)->withInput();
         }
 
-        $nrate = new NssfRates;
-
-        $nrate->employee_contribution = request('employee_contribution');
-
-        $nrate->employer_contribution = request('employer_contribution');
-
-        $nrate->total_contribution = request('total_contribution');
-
-        $nrate->max_employee_nssf = request('max_employee_nssf');
-
-        $nrate->max_employer_nssf = request('max_employer_nssf');
-
-        $nrate->nssf_lower_earning = request('nssf_lower_earning');
-
-        $nrate->nssf_upper_earning = request('nssf_upper_earning');
-
-        $nrate->employer_nssf_upper_earning = request('employer_nssf_upper_earning');
-
-        $nrate->graduated_scale = request('graduated_scale');
-
+        $nrate = new NssfRates();
+        $nrate->lower_earnings_limit = request('lower_earnings_limit');
+        $nrate->upper_earnings_limit = request('upper_earnings_limit');
+        $nrate->rate_tier1 = request('rate_tier1');
+        $nrate->rate_tier2 = request('rate_tier2');
         $nrate->organization_id = Auth::user()->organization_id;
-
         $nrate->save();
 
         return Redirect::route('nssf.index');
@@ -120,23 +104,10 @@ class NssfController extends Controller {
             return Redirect::back()->withErrors($validator)->withInput();
         }
 
-        $nrate->employee_contribution = request('employee_contribution');
-
-        $nrate->employer_contribution = request('employer_contribution');
-
-        $nrate->total_contribution = request('total_contribution');
-
-        $nrate->max_employee_nssf = request('max_employee_nssf');
-
-        $nrate->max_employer_nssf = request('max_employer_nssf');
-
-        $nrate->nssf_lower_earning = request('nssf_lower_earning');
-
-        $nrate->nssf_upper_earning = request('nssf_upper_earning');
-
-        $nrate->employer_nssf_upper_earning = request('employer_nssf_upper_earning');
-
-        $nrate->graduated_scale = request('graduated_scale');
+        $nrate->lower_earnings_limit = request('lower_earnings_limit');
+        $nrate->upper_earnings_limit = request('upper_earnings_limit');
+        $nrate->rate_tier1 = request('rate_tier1');
+        $nrate->rate_tier2 = request('rate_tier2');
 
         $nrate->update();
         return Redirect::route('nssf.index');

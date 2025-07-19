@@ -60,9 +60,16 @@ class CreateBankReconciliationTables extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('bank_accounts');
-		Schema::drop('bank_statements');
-		Schema::drop('stmt_transactions');
-	}
+		Schema::table('stmt_transactions', function (Blueprint $table) {
+			$table->dropForeign('stmt_transactions_bank_statement_id_foreign');
+		});
 
+		Schema::table('bank_statements', function (Blueprint $table) {
+			$table->dropForeign('bank_statements_bank_account_id_foreign');
+		});
+
+		Schema::drop('stmt_transactions');
+		Schema::drop('bank_statements');
+		Schema::drop('bank_accounts');
+	}
 }

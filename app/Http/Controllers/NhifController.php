@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\NhifRates;
+use App\Models\ShifRates;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Response;
 
-class NhifController extends BaseController {
+class NhifController extends BaseController
+{
 
     /**
      * Display a listing of branches
@@ -19,8 +20,8 @@ class NhifController extends BaseController {
     public function index()
     {
         $nrates = DB::table('x_hospital_insurance')->where('organization_id', Auth::user()->organization_id)->get();
-//		$nrates = DB::table('x_hospital_insurance')->where('income_from', '!=', 0)->get();
-//        dd($nrates);
+        //		$nrates = DB::table('x_hospital_insurance')->where('income_from', '!=', 0)->get();
+        //        dd($nrates);
 
         return View::make('nhif.index', compact('nrates'));
     }
@@ -105,27 +106,22 @@ class NhifController extends BaseController {
      */
     public function store()
     {
-//        dd(request('amount'));
-        $validator = Validator::make($data = request()->all(), NhifRates::$rules,NhifRates::$messages);
+        $validator = Validator::make($data = request()->all(), ShifRates::$rules, ShifRates::$messages);
 
-        if ($validator->fails())
-        {
+        if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $nrate = new NhifRates;
+        $nrate = new ShifRates;
 
-        $nrate->income_from = request('minimum');
+        $nrate->rate = request('rate');
 
-        $nrate->income_to = request('maximum');
-
-        $nrate->amount = request('contribution');
+        $nrate->minimum_amount = request('minimum_amount');
 
         $nrate->organization_id = Auth::user()->organization_id;
 
         $nrate->save();
 
-//		return Redirect::route('nhif.index');
         return redirect()->route('nhif.index');
     }
 
@@ -137,7 +133,7 @@ class NhifController extends BaseController {
      */
     public function show($id)
     {
-        $nrate = NhifRates::findOrFail($id);
+        $nrate = ShifRates::findOrFail($id);
 
         return View::make('nhif.show', compact('nrate'));
     }
@@ -150,7 +146,7 @@ class NhifController extends BaseController {
      */
     public function edit($id)
     {
-        $nrate = NhifRates::find($id);
+        $nrate = ShifRates::find($id);
 
         return View::make('nhif.edit', compact('nrate'));
     }
@@ -163,20 +159,17 @@ class NhifController extends BaseController {
      */
     public function update($id)
     {
-        $nrate = NhifRates::findOrFail($id);
+        $nrate = ShifRates::findOrFail($id);
 
-        $validator = Validator::make($data = request()->all(), NhifRates::$rules,NhifRates::$messages);
+        $validator = Validator::make($data = request()->all(), ShifRates::$rules, ShifRates::$messages);
 
-        if ($validator->fails())
-        {
+        if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $nrate->income_from = request('income_from');
+        $nrate->rate = request('rate');
 
-        $nrate->income_to = request('income_to');
-
-        $nrate->amount = request('amount');
+        $nrate->minimum_amount = request('minimum_amount');
 
         $nrate->update();
 
@@ -191,7 +184,7 @@ class NhifController extends BaseController {
      */
     public function destroy($id)
     {
-        NhifRates::destroy($id);
+        ShifRates::destroy($id);
 
         return redirect()->route('nhif.index');
     }
