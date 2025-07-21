@@ -153,13 +153,13 @@
                                                             style="color:red">*</span></label>
                                                     <select name="type" id="type" class="form-control" required>
                                                         <option></option>
-                                                        @if(Auth::user()->can('manager_payroll'))
+                                                        @if(Auth::user()->can('$group'))
                                                             <option value="management"> Management</option>
                                                         @endif
-                                                        @foreach($jgroups as $jgroup)
-                                                            <option>{{$jgroup->job_group_name}}</option>
+                                                        @foreach($groups as $group)
+                                                            <option>{{ $group->name }}</option>
                                                         @endforeach
-{{--                                                        <option value="normal"> Normal</option>--}}
+                                                        <!-- <option value="normal"> Normal</option> -->
                                                     </select>
                                                 </div>
 

@@ -14,6 +14,7 @@ use App\Models\Earningsetting;
 use App\Models\Email;
 use App\Models\Employee;
 use App\Http\Controllers\Controller;
+use App\Models\Group;
 use App\Models\Jobgroup;
 use App\Models\Lockpayroll;
 use App\Models\Nontaxable;
@@ -31,10 +32,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use Maatwebsite\Excel\Classes\PHPExcel;
 use Maatwebsite\Excel\Facades\Excel;
-use Zizaco\Entrust\Entrust;
 use Illuminate\Http\Request;
-use Symfony\Component\Console\Input\Input as InputInput;
+use Illuminate\Support\Facades\Log;
 
+use Symfony\Component\Console\Input\Input as InputInput;
 class PayrollController extends Controller
 {
     // public $start = '2023-08-01';
@@ -54,7 +55,7 @@ class PayrollController extends Controller
         $department = Department::whereNull('organization_id')
             ->orWhere('organization_id', Auth::user()->organization_id)
             ->where('name', 'Management')->first();
-        $jgroups = Jobgroup::where(function ($query) {
+        $groups = Group::where(function ($query) {
             $query->whereNull('organization_id')
                 ->orWhere('organization_id', Auth::user()->organization_id);
         })->get();
@@ -63,7 +64,7 @@ class PayrollController extends Controller
         //        } else {
         //            $type = Employee::where('organization_id', Auth::user()->organization_id)->/*where('job_group_id',$jgroup->id)->*/ where('personal_file_number', Auth::user()->username)->count();
         //        }
-        return View::make('payroll.index', compact('accounts', 'jgroups'));
+        return View::make('payroll.index', compact('accounts', 'groups'));
     }
 
     public function unlockindex()
@@ -117,25 +118,40 @@ class PayrollController extends Controller
 
     public function createaccount()
     {
-        $postaccount = request()->all();
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        try {
+            $postaccount = request()->all();
+            $validatedData = validator($postaccount,[
+                'name' => 'required|string|max:255',
+                'code' => 'required|integer|unique:x_accounts,code',
+                'category' => 'required|in:ASSET,INCOME,EXPENSE,EQUITY,LIABILITY',
+            ])->validate();
         $data = array(
             'name' => $postaccount['name'],
             'code' => $postaccount['code'],
             'category' => $postaccount['category'],
-            'balance' => 0,
+            'balance'=> 0,
             'active' => 1,
             'organization_id' => Auth::user()->organization_id,
             'created_at' => DB::raw('NOW()'),
             'updated_at' => DB::raw('NOW()')
         );
-        $check = DB::table('x_accounts')->insertGetId($data);
+            $check = DB::table('x_accounts')->insertGetId($data);
 
-        if ($check > 0) {
-
-            Audit::logaudit('Accounts', 'create', 'created: ' . $postaccount['name'],NULL,Auth::user()->organization_id);
-            return $check;
-        } else {
-            return 1;
+            if ($check > 0) {
+                Audit::logaudit('Accounts', 'create', 'created: ' . $postaccount['name'], NULL, $user->organization_id);
+                // return $check;
+                return response()->json(['id'=>$check]);
+            } else {
+                return response()->json(['error' => 'Failed to create account.'], 500);
+            }
+        } catch (\Exception $e) {
+            Log::error('Account creation Failed : '. $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -173,18 +189,18 @@ class PayrollController extends Controller
     public function create(Request $request)
     {
         set_time_limit(2000);
+        $user = Auth::user();
 
-        $period = request('period');
-        $period_date = \Carbon\Carbon::createFromFormat('m-Y', $period)->format('Y-m-d');
+        if (!$user) {
+            return redirect('login');
+        }
+        $unlock = Lockpayroll::where('user_id', $user->id)->where('period', request('period'))->count();
 
-        $unlock = Lockpayroll::where('user_id', Auth::user()->id)
-            ->where('period', $period_date)
-            ->count();
-
-        if (!auth()->user()->can('reprocess_payroll') && $unlock == 0) {
+        // Replace $user->can() with Gate::allows() for permission check
+        if (!\Illuminate\Support\Facades\Gate::allows('reprocess_payroll') && $unlock == 0) {
             $check = DB::table('x_transact')
-                ->where('financial_month_year', '=', $period_date)
-                ->where('organization_id',Auth::user()->organization_id)
+                ->where('financial_month_year', '=', request('period'))
+                ->where('organization_id', $user->organization_id)
                 ->count();
 
             if ($check > 0) {
@@ -197,26 +213,26 @@ class PayrollController extends Controller
         $end = date('Y-m-t', strtotime($period));
         $employees = DB::table('x_employee')
             ->where('in_employment', '=', 'Y')
-            ->where('organization_id', Auth::user()->organization_id)
+            ->where('organization_id', $user->organization_id)
             ->whereDate('date_joined', '<=', $end)
             ->get();
 
         $department = Department::where('name', 'Management')
-            ->where(function ($query) {
+            ->where(function ($query) use ($user) {
                 $query->whereNull('organization_id')
-                    ->orWhere('organization_id', Auth::user()->organization_id);
+                    ->orWhere('organization_id', $user->organization_id);
             })->first();
         $jgroup = Jobgroup::where('job_group_name', request('type'))
-            ->where(function ($query) {
+            ->where(function ($query) use ($user) {
                 $query->whereNull('organization_id')
-                    ->orWhere('organization_id', Auth::user()->organization_id);
+                    ->orWhere('organization_id', $user->organization_id);
             })->first();
         //        dd($jgroup);
 
         if(request('type') == "management" && Jobgroup::where('job_group_name', request('type'))
-            ->where(function ($query) {
+            ->where(function ($query) use ($user) {
                 $query->whereNull('organization_id')
-                    ->orWhere('organization_id', Auth::user()->organization_id);
+                    ->orWhere('organization_id', $user->organization_id);
             })->count() == 0){
             return redirect()->back()->with('notice', 'There are no employees in the management category, Kindly add employees to this category to continue...');
         }
@@ -225,14 +241,14 @@ class PayrollController extends Controller
 
             $employees = DB::table('x_employee')
                 ->where('in_employment', '=', 'Y')
-                ->where('organization_id', Auth::user()->organization_id)
+                ->where('organization_id', $user->organization_id)
                 ->where('job_group_id', $jgroup->id)
                 ->whereDate('date_joined', '<=', $end)
                 ->get();
         } else {
             $employees = DB::table('x_employee')
                 ->where('in_employment', '=', 'Y')
-                ->where('organization_id', Auth::user()->organization_id)
+                ->where('organization_id', $user->organization_id)
                 ->where('job_group_id', '=', $jgroup->id)
                 ->whereDate('date_joined', '<=', $end)
                 ->get();
@@ -242,30 +258,30 @@ class PayrollController extends Controller
 
         $type = request('type');
         $account = request('account');
-        $earnings = Earningsetting::where('organization_id', Auth::user()->organization_id)->orWhereNull('organization_id')->get();
-        //$pays = Dailypay::where('organization_id',Auth::user()->organization_id)->get();
+        $earnings = Earningsetting::where('organization_id', $user->organization_id)->orWhereNull('organization_id')->get();
+        //$pays = Dailypay::where('organization_id',$user->organization_id)->get();
         $overtimes = Overtime::all();
-        $allowances = Allowance::where('organization_id', Auth::user()->organization_id)
+        $allowances = Allowance::where('organization_id', $user->organization_id)
             ->orWhereNull('organization_id')->get();
         //        dd($allowances);
-        $nontaxables = Nontaxable::where('organization_id', Auth::user()->organization_id)
+        $nontaxables = Nontaxable::where('organization_id', $user->organization_id)
             ->orWhereNull('organization_id')->get();
         //        dd($nontaxables);
-        $reliefs = Relief::where('organization_id', Auth::user()->organization_id)
+        $reliefs = Relief::where('organization_id', $user->organization_id)
             ->orWhereNull('organization_id')->get();
-        $deductions = Deduction::where('organization_id', Auth::user()->organization_id)
+        $deductions = Deduction::where('organization_id', $user->organization_id)
             ->orWhereNull('organization_id')->get();
         //        print_r($accounts);
         // var_dump($overtimes); echo "<br><br>";
 
-        Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'preview', 'previewed payroll',NULL,Auth::user()->organization_id);
+        Audit::logaudit(date('Y-m-d'), $user->name, 'preview', 'previewed payroll',NULL, $user->organization_id);
 
         return View::make('payroll.preview', compact('employees', 'period', 'account', 'nontaxables', 'earnings', 'overtimes', 'allowances', 'reliefs', 'deductions', 'type'));
     }
 
     public function del_exist()
     {
-        $postedit = Input::all();
+        $postedit = request()->all();
         $part1 = $postedit['period1'];
         $part2 = $postedit['period2'];
         $part3 = $postedit['period3'];
@@ -379,7 +395,7 @@ class PayrollController extends Controller
         return $display;
         exit();*/
         $currency = Currency::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->first();
-        //return View::make('payroll.payroll_calculator', compact('gross','paye','nssf','nhif','currency'));
+        return View::make('payroll.payroll_calculator', compact('gross','paye','nssf','nhif','currency'));
 
 
         echo json_encode(array("paye" => $paye, "nssf" => $nssf, "nhif" => $nhif));
@@ -445,13 +461,6 @@ class PayrollController extends Controller
 
         Excel::create('Payroll_Preview_' . $month, function ($excel) use ($data, $month, $period, $earnings, $overtimes, $allowances, $reliefs, $deductions) {
 
-            require_once(base_path() . "/vendor/phpoffice/phpexcel/Classes/PHPExcel/NamedRange.php");
-            require_once(base_path() . "/vendor/phpoffice/phpexcel/Classes/PHPExcel/IOFactory.php");
-
-
-            $objPHPExcel = new PHPExcel();
-            // Set the active Excel worksheet to sheet 0
-            $objPHPExcel->setActiveSheetIndex(0);
 
 
             $excel->sheet('Payroll_Preview_' . $month, function ($sheet) use ($data, $month, $period, $earnings, $overtimes, $allowances, $reliefs, $deductions) {
@@ -693,9 +702,9 @@ class PayrollController extends Controller
 
         for ($i = $net;; $i--) {
 
-            /*$nssf1 = DB::table('social_security')->whereNull('organization_id')->whereRaw($gross.' between income_from and income_to')->pluck('ss_amount_employee');
+            //$nssf1 = DB::table('x_social_security')->whereNull('organization_id')->whereRaw($gross.' between income_from and income_to')->pluck('ss_amount_employee');
 
-        $nhif1 = DB::table('hospital_insurance')->whereNull('organization_id')->whereRaw($gross.' between income_from and income_to')->pluck('hi_amount');    */
+            //$nhif1 = DB::table('hospital_insurance')->whereNull('organization_id')->whereRaw($gross.' between income_from and income_to')->pluck('hi_amount');
 
             $nssf1 = Payroll::nssfcalc($gross);
             $nhif1 = Payroll::nhifcalc($gross);
@@ -826,7 +835,7 @@ class PayrollController extends Controller
 
         $earnings = Earningsetting::where('organization_id', Auth::user()->organization_id)
             ->orWhereNull('organization_id')->get();
-        $pays = Dailypay::where('organization_id', Auth::user()->organization_id)->get();
+        //$pays = Dailypay::where('organization_id', Auth::user()->organization_id)->get();
         $overtimes = Overtime::all();
         $allowances = Allowance::where('organization_id', Auth::user()->organization_id)
             ->orWhereNull('organization_id')->get();
@@ -1068,7 +1077,7 @@ class PayrollController extends Controller
 	      // $this->getDataendpoints();
 		
 	      }
-	    } catch (Exception $e) {
+	    } catch (\Exception $e) {
 	      echo "Error: " . $e->getMessage();
 	    }
 
@@ -1227,8 +1236,13 @@ class PayrollController extends Controller
                 $payroll->organization_id = Auth::user()->organization_id;
                 $payroll->save();
                 
+                $employee_name = $employee->first_name;
+                $basic_pay = Payroll::basicpay($employee->id, request('period'));
+                $financial_month_year = request('period');
+                $total_deductions = Payroll::total_deductions($employee->id, request('period'));
+                $net = Payroll::net($employee->id, request('period'));
                 $employeephoneno = $employee->telephone_mobile;
-                $this->africastalkingfunction($employeephoneno);
+                $this->africastalkingfunction($employeephoneno, $employee_name, $net, $financial_month_year, $basic_pay, $total_deductions);
                 //Crons
                 $email = new Email();
                 $email->employee_id = $employee->id;
@@ -2159,7 +2173,7 @@ class PayrollController extends Controller
     {
         $deduction = Deduction::findOrFail($id);
 
-        $validator = Validator::make($data = Input::all(), Deduction::$rules, Deduction::$messages);
+        $validator = Validator::make($data = request()->all(), Deduction::$rules, Deduction::$messages);
 
         if ($validator->fails()) {
             return Redirect::back()->withErrors($validator)->withInput();

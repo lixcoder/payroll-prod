@@ -30,7 +30,7 @@
                                         @foreach($jgroups as $jgroup)
                                             <tr>
                                                 <td> {{ $i }}</td>
-                                                <td>{{ $jgroup->job_group_name }}</td>
+                                                <td>{{ $jgroup->name }}</td>
                                                 <td>
                                                     <div class="btn-group">
                                                         <button type="button"

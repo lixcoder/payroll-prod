@@ -116,7 +116,8 @@ function asMoney($value)
 
             <td style="width:150px">
 
-                <img src="{{public_path().'/uploads/logo/'.$organization->logo}}" alt="logo" width="80%">
+                <!-- <img src="{{public_path().'/uploads/logo/'.$organization->logo}}" alt="logo" width="80%"> -->
+                 <img src="https://www.kra.go.ke/templates/kra/images/kra/logo.png" alt="logo" class="img-fluid">
 
 
             </td>

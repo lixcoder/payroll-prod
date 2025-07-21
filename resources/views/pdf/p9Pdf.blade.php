@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Support\Facades\DB;
 $transactions = DB::table('x_transact')
     ->where('financial_month_year', 'LIKE', '%' . $year)
     ->where('organization_id', $organization->id)

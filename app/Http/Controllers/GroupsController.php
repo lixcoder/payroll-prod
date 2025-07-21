@@ -77,7 +77,7 @@ class GroupsController extends Controller {
 	{
 		$group = Group::findOrFail($id);
 
-		return view('groups.show', compact('group'));
+		return view('groups.index', compact('group'));
 	}
 
 	/*
@@ -132,9 +132,10 @@ class GroupsController extends Controller {
 public function destroy($id)
     {
         try {
-            Group::destroy($id);
+			$group = Group::findOrFail($id);
+            $group->delete();
             Log::info('Group deleted: ID ' . $id);
-            return Redirect::route('groups.index')->with('success', 'Group deleted successfully!');
+            return Redirect::route('groups.show')->with('success', 'Group deleted successfully!');
         } catch (\Exception $e) {
             Log::error('Group deletion failed: ' . $e->getMessage());
             return Redirect::back()->with('error', 'Failed to delete group: ' . $e->getMessage());
