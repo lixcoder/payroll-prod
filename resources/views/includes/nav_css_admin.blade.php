@@ -389,7 +389,7 @@
                                 </li>
                                 <li class="">
                                     <a href="{{ url('nhif')}}" class="waves-effect waves-dark">
-                                        <span class="pcoded-mtext">NHIF Rates</span>
+                                        <span class="pcoded-mtext">SHIF Rates</span>
                                     </a>
                                 </li>
                                 <li class="">

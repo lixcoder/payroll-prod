@@ -1,40 +1,36 @@
 <?php
-namespace App\Models;
 
+namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class NssfRates extends Model
 {
-
     public $table = "x_social_security";
 
     public static $rules = [
-        'employee_contribution' => 'required',
-        'employer_contribution' => 'required',
-        'total_contribution'=> 'required',
-        'max_employee_nssf' => 'required',
-        'max_employer_nssf' => 'required',
-        'nssf_lower_earning' => 'required',
-        'nssf_upper_earning' => 'required',
-        'employer_nssf_upper_earning'=>'required',
+        'lower_earnings_limit' => 'required|numeric',
+        'upper_earnings_limit' => 'required|numeric',
+        'rate_tier1' => 'required|numeric',
+        'rate_tier2' => 'required|numeric',
     ];
 
-
     public static $messages = array(
-        'employee_contribution.required' => 'Please insert employee_contribution!',
-        'employer_contribution.required' => 'Please insert employer_contribution!',
-        'total_contribution.required' => 'Please insert max_employer_nssf!',
-        'max_employee_nssf.required' => 'Please insert max_employer_nssf!',
-        'max_employer_nssf.required' => 'Please insert max_employer_nssf!',
-        'nssf_lower_earning.required' => 'Please insert nssf_lower_earning!',
-        'nssf_upper_earning.required' => 'Please insert nssf_upper_earning!',
-        'employer_nssf_upper_earning' => 'Please insert employer_nssf_upper_earning!',
-        'employer_nssf_upper_earning' => 'Please insert employer_nssf_upper_earning!',
-        'graduated_scale' => 'Please insert graduated_scale!',
+        'lower_earnings_limit.required' => 'Please insert lower earnings limit!',
+        'upper_earnings_limit.required' => 'Please insert upper earnings limit!',
+        'rate_tier1.required' => 'Please insert rate tier 1!',
+        'rate_tier2.required' => 'Please insert rate tier 2!',
     );
 
-    // Don't forget to fill this array
-    protected $fillable = [];
-    
+    protected $fillable = ['lower_earnings_limit', 'upper_earnings_limit', 'rate_tier1', 'rate_tier2'];
 
+    public static function getCurrentRates()
+    {
+        $rates = self::first();
+        return [
+            'lel' => $rates ? $rates->lower_earnings_limit : 8000,
+            'uel' => $rates ? $rates->upper_earnings_limit : 72000,
+            'rate1' => $rates ? $rates->rate_tier1 / 100 : 0.06, // Convert to decimal
+            'rate2' => $rates ? $rates->rate_tier2 / 100 : 0.06
+        ];
+    }
 }

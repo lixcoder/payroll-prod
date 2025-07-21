@@ -8,7 +8,7 @@
                 <div class="page-body">
                     <div class="row">
                         <div class="col-lg-12">
-                            <h3>Nhif Rates</h3>
+                            <h3>Shif Rates</h3>
                             <hr>
                         </div>
                         
@@ -17,7 +17,7 @@
                             <div class="card">
                                 <div class="card-body">
                                     <div class="mb-2">
-                                        <a class="btn btn-info btn-sm-2" href="{{ URL::to('nhif/create')}}">add nhif
+                                        <a class="btn btn-info btn-sm-2" href="{{ URL::to('nhif/create')}}">add shif
                                             rates slab</a>
                                     </div>
                                     
@@ -27,21 +27,19 @@
                                         <thead>
                                         <tr>
                                             <th>id</th>
-                                            <th>Income From</th>
-                                            <th>Income To</th>
-                                            <th>Amount</th>
+                                            <th>Rate</th>
+                                            <th>Minimum Amount</th>
                                         </tr>
                                         </thead>
                                         <tbody>
 
     
-                                        @foreach($nrates as $nrate)
+ @foreach($nrates as $nrate)
                                             <tr>
 
                                                 <td>{{ $nrate->id }}</td>
-                                                <td>{{ $nrate->income_from }}</td>
-                                                <td>{{ $nrate->income_to }}</td>
-                                                <td>{{ $nrate->amount }}</td>
+                                                <td>{{ $nrate->rate }}</td>
+                                                <td>{{ $nrate->minimum_amount }}</td>
                                                 <td>
                                                                                           <div class="btn-group">
                                                         <button type="button"
@@ -63,10 +61,10 @@
                                                     </div>
                                                 </td>
                                 
+
                                             </tr>
 
                                             
-                                       
 
 
                                         </tbody>

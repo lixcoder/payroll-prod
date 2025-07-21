@@ -39,7 +39,7 @@ class CreateAppraisalsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('appraisals');
+		Schema::drop('x_appraisals');
 	}
 
 }

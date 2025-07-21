@@ -3,31 +3,70 @@
 namespace App\Calculations;
 
 use Exception;
+use App\Models\PayeRate;
+use App\Models\ShifRates;
+use App\Models\NssfRates;
+use App\Models\HousingLevy;
 
 class KenyanPayrollCalculator
 {
-
-    /**
-     *Disclaimer: make data dynamic in future 
-     */
-    // 2025 PAYE Tax Bands (KRA Official Rates)
-    private $payeBands = [
-        ['upper' => 24000,    'rate' => 0.10],   // First 24,000
-        ['upper' => 32333,    'rate' => 0.25],   // Next 8,333
-        ['upper' => 500000,   'rate' => 0.30],   // Next 467,667
-        ['upper' => 800000,   'rate' => 0.325],  // Next 300,000
-        ['upper' => PHP_FLOAT_MAX, 'rate' => 0.35]
-    ];
-
-    // 2025 Constants
+    // Keep personal relief as static as of now
     private $personalRelief = 2400;
-    private $shifRate = 0.0275;
-    private $shifMin = 300;
-    private $nssfLEL = 8000;
-    private $nssfUEL = 72000;
-    private $nssfRate1 = 0.06;
-    private $nssfRate2 = 0.06;
-    private $housingLevyRate = 0.015;
+
+    // Dynamic data will be fetched from database
+    private $payeBands = [];
+    private $shifRates = [];
+    private $nssfRates = [];
+    private $housingLevyRate = 0;
+
+    public function __construct()
+    {
+        $this->loadRatesFromDatabase();
+    }
+
+    private function loadRatesFromDatabase()
+    {
+        try {
+            // Load PAYE tax bands
+            $this->payeBands = PayeRate::getTaxBands();
+
+            // Load SHIF rates
+            $this->shifRates = ShifRates::getCurrentRates();
+
+            // Load NSSF rates
+            $this->nssfRates = NssfRates::getCurrentRates();
+
+            // Load Housing Levy rate
+            $this->housingLevyRate = HousingLevy::getCurrentRate();
+        } catch (Exception $e) {
+            // Fallback to hardcoded values if database is not available
+            // $this->setFallbackRates();
+            throw new Exception("Failed to load rates from database: " . $e->getMessage());
+        }
+    }
+
+    // Uncomment this method if you want to use hardcoded fallback values
+    /*
+     * This method is commented out to avoid confusion with dynamic rates.
+     * If you want to use hardcoded values, you can uncomment it.
+     * It will set the original hardcoded values for PAYE, SHIF, NSSF, and Housing Levy.
+     */
+
+    // private function setFallbackRates()
+    // {
+    //     // Fallback to original hardcoded values
+    //     $this->payeBands = [
+    //         ['upper' => 24000,    'rate' => 0.10],
+    //         ['upper' => 32333,    'rate' => 0.25],
+    //         ['upper' => 500000,   'rate' => 0.30],
+    //         ['upper' => 800000,   'rate' => 0.325],
+    //         ['upper' => PHP_FLOAT_MAX, 'rate' => 0.35]
+    //     ];
+
+    //     $this->shifRates = ['rate' => 0.0275, 'minimum' => 300];
+    //     $this->nssfRates = ['lel' => 8000, 'uel' => 72000, 'rate1' => 0.06, 'rate2' => 0.06];
+    //     $this->housingLevyRate = 0.015;
+    // }
 
     public function calculatePayroll($data)
     {
@@ -72,9 +111,9 @@ class KenyanPayrollCalculator
             $netPay = $this->validateInput($netPay, 'Net Pay');
 
             // Binary search to find gross pay
-            $tolerance = 0.01; // Precision in KES
+            $tolerance = 0.01;
             $low = $netPay;
-            $high = $netPay * 3; // Increased upper bound for better coverage
+            $high = $netPay * 3;
             $gross = null;
             $maxIterations = 1000;
             $iterations = 0;
@@ -85,24 +124,22 @@ class KenyanPayrollCalculator
                 $testResult = $this->calculatePayroll(['gross' => $testGross]);
 
                 if ($testResult['net_salary'] >= $netPay) {
-                    break; // Found a good upper bound
+                    break;
                 }
 
-                $high *= 2; // Double the upper bound
+                $high *= 2;
                 $iterations++;
 
-                if ($iterations > 10) { // Prevent infinite loop
+                if ($iterations > 10) {
                     break;
                 }
             }
 
-            // Reset iterations for binary search
             $iterations = 0;
 
             while ($iterations < $maxIterations) {
                 $mid = ($low + $high) / 2;
 
-                // Calculate net pay for current guess
                 $testResult = $this->calculatePayroll(['gross' => $mid]);
                 $calculatedNet = $testResult['net_salary'];
 
@@ -124,7 +161,6 @@ class KenyanPayrollCalculator
                 throw new Exception("Could not calculate gross pay from net pay. Please try a different amount.");
             }
 
-            // Return full payroll details using the calculated gross
             return $this->calculatePayroll(['gross' => $gross]);
         } catch (Exception $e) {
             throw new Exception('Net-to-gross calculation error: ' . $e->getMessage());
@@ -133,11 +169,17 @@ class KenyanPayrollCalculator
 
     private function calculateNSSF($gross)
     {
-        $contributionBase = max(min($gross, $this->nssfUEL), $this->nssfLEL);
+        $lel = $this->nssfRates['lel'];
+        $uel = $this->nssfRates['uel'];
+        $rate1 = $this->nssfRates['rate1'];
+        $rate2 = $this->nssfRates['rate2'];
+
+        $contributionBase = max(min($gross, $uel), $lel);
+
         return [
-            'tier1' => $this->nssfLEL * $this->nssfRate1,
-            'tier2' => ($contributionBase - $this->nssfLEL) * $this->nssfRate2,
-            'total' => $contributionBase * $this->nssfRate1
+            'tier1' => $lel * $rate1,
+            'tier2' => ($contributionBase - $lel) * $rate2,
+            'total' => $contributionBase * $rate1
         ];
     }
 
@@ -161,7 +203,10 @@ class KenyanPayrollCalculator
 
     private function calculateSHIF($gross)
     {
-        return floor(max($gross * $this->shifRate, $this->shifMin));
+        $rate = $this->shifRates['rate'];
+        $minimum = $this->shifRates['minimum'];
+
+        return floor(max($gross * $rate, $minimum));
     }
 
     private function calculateHousingLevy($gross)
@@ -176,9 +221,14 @@ class KenyanPayrollCalculator
         return $num;
     }
 
-    // Helper methods for backward compatibility with your current UI
     public function asMoney($value)
     {
         return number_format($value, 2);
+    }
+
+    // Method to refresh rates from database if needed
+    public function refreshRates()
+    {
+        $this->loadRatesFromDatabase();
     }
 }

@@ -8,7 +8,7 @@
                 <div class="page-body">
                     <div class="row">
                         <div class="col-lg-12">
-                            <h3>New Nhif Rate</h3>
+                            <h3>New Shif Rate</h3>
                             <hr>
                         </div>
                         <div class="col-lg-12">
@@ -26,26 +26,20 @@
                                         <fieldset>
 
                                             <div class="form-group">
-                                                <label for="username">minimum <span style="color:red">*</span> </label>
-                                                <input class="form-control" placeholder="" type="text" name="minimum" id="minimum"
-                                                       value="{{{ old('minimum') }}}">
+                                                <label for="username">Rate <span style="color:red">*</span> </label>
+                                                <input class="form-control" placeholder="" type="text" name="rate" id="rate"
+                                                       value="{{{ old('rate') }}}">
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="username">maximum <span style="color:red">*</span> </label>
-                                                <input class="form-control" placeholder="" type="text" name="maximum" id="maximum"
-                                                       value="{{{ old('maximum') }}}">
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="username">contribution<span style="color:red">*</span> </label>
-                                                <input class="form-control" placeholder="" type="text" name="contribution" id="contribution"
-                                                       value="{{{ old('contribution') }}}">
+                                                <label for="username">Minimum Amount <span style="color:red">*</span> </label>
+                                                <input class="form-control" placeholder="" type="text" name="minimum_amount" id="minimum_amount"
+                                                       value="{{{ old('minimum_amount') }}}">
                                             </div>
 
                                             <div class="form-actions form-group">
 
-                                                <button type="submit" class="btn btn-primary btn-sm">Create Nhif Rate</button>
+                                                <button type="submit" class="btn btn-primary btn-sm">Create Shif Rate</button>
                                             </div>
 
                                         </fieldset>

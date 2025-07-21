@@ -83,58 +83,47 @@ class payslipEmailController extends Controller
                 $fperiod = '';
 
                 $part = explode("-", $period);
-//                dd($part[1]);
-                if ($part[1] == 1) {
-                    $fyear = 'January_' . $part[0];
-                } else if ($part[1] == 2) {
-                    $fyear = 'Febraury_' . $part[0];
-                } else if ($part[1] == 3) {
-                    $fyear = 'March_' . $part[0];
-                } else if ($part[1] == 4) {
-                    $fyear = 'April_' . $part[0];
-                } else if ($part[1] == 5) {
-                    $fyear = 'May_' . $part[0];
-                } else if ($part[1] == 6) {
-                    $fyear = 'June_' . $part[0];
-                } else if ($part[1] == 7) {
-                    $fyear = 'July_' . $part[0];
-                } else if ($part[1] == 8) {
-                    $fyear = 'August_' . $part[0];
-                } else if ($part[1] == 9) {
-                    $fyear = 'September_' . $part[0];
-                } else if ($part[1] == 10) {
-                    $fyear = 'October_' . $part[0];
-                } else if ($part[1] == 11) {
-                    $fyear = 'November_' . $part[0];
-                } else if ($part[1] == 12) {
-                    $fyear = 'December_' . $part[0];
+                $month = intval($part[0]);
+                $year = $part[1];
+
+                if ($month == 1) {
+                    $fyear = 'January_' . $year;
+                    $fperiod = 'January-' . $year;
+                } else if ($month == 2) {
+                    $fyear = 'February_' . $year;
+                    $fperiod = 'February-' . $year;
+                } else if ($month == 3) {
+                    $fyear = 'March_' . $year;
+                    $fperiod = 'March-' . $year;
+                } else if ($month == 4) {
+                    $fyear = 'April_' . $year;
+                    $fperiod = 'April-' . $year;
+                } else if ($month == 5) {
+                    $fyear = 'May_' . $year;
+                    $fperiod = 'May-' . $year;
+                } else if ($month == 6) {
+                    $fyear = 'June_' . $year;
+                    $fperiod = 'June-' . $year;
+                } else if ($month == 7) {
+                    $fyear = 'July_' . $year;
+                    $fperiod = 'July-' . $year;
+                } else if ($month == 8) {
+                    $fyear = 'August_' . $year;
+                    $fperiod = 'August-' . $year;
+                } else if ($month == 9) {
+                    $fyear = 'September_' . $year;
+                    $fperiod = 'September-' . $year;
+                } else if ($month == 10) {
+                    $fyear = 'October_' . $year;
+                    $fperiod = 'October-' . $year;
+                } else if ($month == 11) {
+                    $fyear = 'November_' . $year;
+                    $fperiod = 'November-' . $year;
+                } else if ($month == 12) {
+                    $fyear = 'December_' . $year;
+                    $fperiod = 'December-' . $year;
                 }
-//                dd($fyear);
-                if ($part[1] == 1) {
-                    $fperiod = 'January-' . $part[0];
-                } else if ($part[1] == 2) {
-                    $fperiod = 'Febraury-' . $part[0];
-                } else if ($part[1] == 3) {
-                    $fperiod = 'March-' . $part[0];
-                } else if ($part[1] == 4) {
-                    $fperiod = 'April-' . $part[0];
-                } else if ($part[1] == 5) {
-                    $fperiod = 'May-' . $part[0];
-                } else if ($part[1] == 6) {
-                    $fperiod = 'June-' . $part[0];
-                } else if ($part[1] == 7) {
-                    $fperiod = 'July-' . $part[0];
-                } else if ($part[1] == 8) {
-                    $fperiod = 'August-' . $part[0];
-                } else if ($part[1] == 9) {
-                    $fperiod = 'September-' . $part[0];
-                } else if ($part[1] == 10) {
-                    $fperiod = 'October-' . $part[0];
-                } else if ($part[1] == 11) {
-                    $fperiod = 'November-' . $part[0];
-                } else if ($part[1] == 12) {
-                    $fperiod = 'December-' . $part[0];
-                }
+
                 $overtimes = DB::table('x_transact_overtimes')
                     ->join('x_employee', 'x_transact_overtimes.employee_id', '=', 'x_employee.id')
                     ->where('financial_month_year', '=', request('period'))
@@ -198,14 +187,18 @@ class payslipEmailController extends Controller
 
             $allws = DB::table('x_transact_allowances')
                 ->join('x_employee', 'x_transact_allowances.employee_id', '=', 'x_employee.id')
+                ->where('x_transact_allowances.organization_id', Auth::user()->organizationId)
                 ->where('financial_month_year', '=', request('period'))
                 ->where('x_employee.id', '=', request('employeeid'))
+                ->select('allowance_name', DB::raw('SUM(allowance_amount) as total_amount'))
                 ->groupBy('allowance_name')
                 ->get();
+
             $overtimes = DB::table('x_transact_overtimes')
                 ->join('x_employee', 'x_transact_overtimes.employee_id', '=', 'x_employee.id')
                 ->where('financial_month_year', '=', request('period'))
                 ->where('x_employee.id', '=', request('employeeid'))
+                ->select('employee_id', DB::raw('SUM(overtime_amount) as total_overtime'))
                 ->groupBy('employee_id')
                 ->get();
 
@@ -213,27 +206,31 @@ class payslipEmailController extends Controller
                 ->join('x_employee', 'x_transact_earnings.employee_id', '=', 'x_employee.id')
                 ->where('financial_month_year', '=', request('period'))
                 ->where('x_employee.id', '=', request('employeeid'))
+                ->select('earning_name', DB::raw('SUM(earning_amount) as total_amount'))
                 ->groupBy('earning_name')
                 ->get();
 
             $deds = DB::table('x_transact_deductions')
                 ->join('x_employee', 'x_transact_deductions.employee_id', '=', 'x_employee.id')
                 ->where('financial_month_year', '=', request('period'))
-                ->where('x_employee.id', '=', request('employeeid'))
+                ->where('x_employee.id', '=', request('employeeid'))->select('deduction_name', DB::raw('SUM(deduction_amount) as total_amount'))
                 ->groupBy('deduction_name')
                 ->get();
             $nontaxables = DB::table('x_transact_nontaxables')
                 ->join('x_employee', 'x_transact_nontaxables.employee_id', '=', 'x_employee.id')
                 ->where('financial_month_year', '=', request('period'))
-                ->where('x_employee.id', '=', request('period'))
+                ->where('x_employee.id', '=', request('employeeid'))
+                ->select('nontaxable_name', DB::raw('SUM(nontaxable_amount) as total_amount'))
                 ->groupBy('nontaxable_name')
                 ->get();
             $rels = DB::table('x_transact_reliefs')
                 ->join('x_employee', 'x_transact_reliefs.employee_id', '=', 'x_employee.id')
                 ->where('financial_month_year', '=', request('period'))
                 ->where('x_employee.id', '=', request('employeeid'))
+                ->select('relief_name', DB::raw('SUM(relief_amount) as total_amount'))
                 ->groupBy('relief_name')
                 ->get();
+
             $pension = DB::table('x_transact_pensions')
                 ->join('x_employee', 'x_transact_pensions.employee_id', '=', 'x_employee.id')
                 ->where('financial_month_year', '=', request('period'))
@@ -241,7 +238,7 @@ class payslipEmailController extends Controller
                 ->first();
 
             $currencies = DB::table('x_currencies')
-                ->pluck('shortname')
+                ->select('shortname')
                 ->first();
 
             $organization = Organization::find(1);
@@ -250,73 +247,77 @@ class payslipEmailController extends Controller
             $fperiod = '';
 
             $part = explode("-", $period);
-            if ($part[1] == 1) {
-                $fyear = 'January_' . $part[0];
-            } else if ($part[1] == 2) {
-                $fyear = 'Febraury_' . $part[0];
-            } else if ($part[1] == 3) {
-                $fyear = 'March_' . $part[0];
-            } else if ($part[1] == 4) {
-                $fyear = 'April_' . $part[0];
-            } else if ($part[1] == 5) {
-                $fyear = 'May_' . $part[0];
-            } else if ($part[1] == 6) {
-                $fyear = 'June_' . $part[0];
-            } else if ($part[1] == 7) {
-                $fyear = 'July_' . $part[0];
-            } else if ($part[1] == 8) {
-                $fyear = 'August_' . $part[0];
-            } else if ($part[1] == 9) {
-                $fyear = 'September_' . $part[0];
-            } else if ($part[1] == 10) {
-                $fyear = 'October_' . $part[0];
-            } else if ($part[1] == 11) {
-                $fyear = 'November_' . $part[0];
-            } else if ($part[1] == 12) {
-                $fyear = 'December_' . $part[0];
+            $month = intval($part[0]);
+            $year = $part[1];
+
+            if ($month == 1) {
+                $fyear = 'January_' . $year;
+                $fperiod = 'January-' . $year;
+            } else if ($month == 2) {
+                $fyear = 'February_' . $year;
+                $fperiod = 'February-' . $year;
+            } else if ($month == 3) {
+                $fyear = 'March_' . $year;
+                $fperiod = 'March-' . $year;
+            } else if ($month == 4) {
+                $fyear = 'April_' . $year;
+                $fperiod = 'April-' . $year;
+            } else if ($month == 5) {
+                $fyear = 'May_' . $year;
+                $fperiod = 'May-' . $year;
+            } else if ($month == 6) {
+                $fyear = 'June_' . $year;
+                $fperiod = 'June-' . $year;
+            } else if ($month == 7) {
+                $fyear = 'July_' . $year;
+                $fperiod = 'July-' . $year;
+            } else if ($month == 8) {
+                $fyear = 'August_' . $year;
+                $fperiod = 'August-' . $year;
+            } else if ($month == 9) {
+                $fyear = 'September_' . $year;
+                $fperiod = 'September-' . $year;
+            } else if ($month == 10) {
+                $fyear = 'October_' . $year;
+                $fperiod = 'October-' . $year;
+            } else if ($month == 11) {
+                $fyear = 'November_' . $year;
+                $fperiod = 'November-' . $year;
+            } else if ($month == 12) {
+                $fyear = 'December_' . $year;
+                $fperiod = 'December-' . $year;
             }
 
-            if ($part[1] == 1) {
-                $fperiod = 'January-' . $part[0];
-            } else if ($part[1] == 2) {
-                $fperiod = 'Febraury-' . $part[0];
-            } else if ($part[1] == 3) {
-                $fperiod = 'March-' . $part[0];
-            } else if ($part[1] == 4) {
-                $fperiod = 'April-' . $part[0];
-            } else if ($part[1] == 5) {
-                $fperiod = 'May-' . $part[0];
-            } else if ($part[1] == 6) {
-                $fperiod = 'June-' . $part[0];
-            } else if ($part[1] == 7) {
-                $fperiod = 'July-' . $part[0];
-            } else if ($part[1] == 8) {
-                $fperiod = 'August-' . $part[0];
-            } else if ($part[1] == 9) {
-                $fperiod = 'September-' . $part[0];
-            } else if ($part[1] == 10) {
-                $fperiod = 'October-' . $part[0];
-            } else if ($part[1] == 11) {
-                $fperiod = 'November-' . $part[0];
-            } else if ($part[1] == 12) {
-                $fperiod = 'December-' . $part[0];
-            }
             $select = "";
-//            dd($overtimes);
+            //            dd($overtimes);
             $fileName = $employee->first_name . '_' . $employee->last_name . '_' . $fyear . '.pdf';
-            $filePath = 'resources/views/temp/';
-            $pdf = PDF::loadView('pdf.monthlySlip', compact('employee', 'nontaxables', 'select', 'transacts', 'allws', 'deds', 'earnings', 'period', 'currencies', 'organization', 'overtimes', 'rels', 'pension'))->setPaper('a4');
-//            $pdf->save($filePath . $fileName);
+            $filePath = storage_path('app/temp/');
+            $pdf = PDF::loadView('pdf.monthlySlip', compact(
+                'employee',
+                'nontaxables',
+                'select',
+                'transacts',
+                'allws',
+                'deds',
+                'earnings',
+                'period',
+                'currencies',
+                'organization',
+                'overtimes',
+                'rels',
+                'pension'
+            ))->setPaper('a4');
 
-            $user = Employee::find($id);
+            if (!file_exists($filePath)) {
+                mkdir($filePath, 0777, true);
+            }
+            $pdf->save($filePath . $fileName);
 
-
-            Mail::send('payslips.message', compact('fperiod', 'user'), function ($message) use ($user, $filePath, $fileName) {
-                $message->to($user->email_office, $user->first_name . ' ' . $user->last_name)->subject('Payslip');
+            Mail::send('payslips.message', ['fperiod' => $fperiod, 'user' => $employee], function ($message) use ($employee, $filePath, $fileName) {
+                $message->to($employee->email_office, $employee->first_name . ' ' . $employee->last_name)->subject('Payslip');
                 $message->attach($filePath . $fileName);
             });
             unlink($filePath . $fileName);
-
         }
         return Redirect::back()->with('success', 'Email Sent!');
     }
