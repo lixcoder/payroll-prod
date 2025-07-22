@@ -7,13 +7,12 @@ use App\Models\PayeRate;
 use App\Models\ShifRates;
 use App\Models\NssfRates;
 use App\Models\HousingLevy;
+use App\Models\PersonalRelief;
 
 class KenyanPayrollCalculator
 {
-    // Keep personal relief as static as of now
-    private $personalRelief = 2400;
-
     // Dynamic data will be fetched from database
+    private $personalRelief = 0;
     private $payeBands = [];
     private $shifRates = [];
     private $nssfRates = [];
@@ -27,6 +26,9 @@ class KenyanPayrollCalculator
     private function loadRatesFromDatabase()
     {
         try {
+            // Load Personal Relief amount
+            $this->personalRelief = PersonalRelief::getCurrentAmount();
+
             // Load PAYE tax bands
             $this->payeBands = PayeRate::getTaxBands();
 
@@ -49,12 +51,13 @@ class KenyanPayrollCalculator
     /*
      * This method is commented out to avoid confusion with dynamic rates.
      * If you want to use hardcoded values, you can uncomment it.
-     * It will set the original hardcoded values for PAYE, SHIF, NSSF, and Housing Levy.
+     * It will set the original hardcoded values for PAYE, SHIF, NSSF, Housing Levy, and Personal Relief.
      */
 
     // private function setFallbackRates()
     // {
     //     // Fallback to original hardcoded values
+    //     $this->personalRelief = 2400;
     //     $this->payeBands = [
     //         ['upper' => 24000,    'rate' => 0.10],
     //         ['upper' => 32333,    'rate' => 0.25],
@@ -167,7 +170,7 @@ class KenyanPayrollCalculator
         }
     }
 
-    private function calculateNSSF($gross)
+    public function calculateNSSF($gross)
     {
         $lel = $this->nssfRates['lel'];
         $uel = $this->nssfRates['uel'];
@@ -183,7 +186,7 @@ class KenyanPayrollCalculator
         ];
     }
 
-    private function calculatePAYE($taxableIncome)
+    public function calculatePAYE($taxableIncome)
     {
         $tax = 0;
         $remaining = $taxableIncome;
@@ -201,7 +204,7 @@ class KenyanPayrollCalculator
         return max($tax - $this->personalRelief, 0);
     }
 
-    private function calculateSHIF($gross)
+    public function calculateSHIF($gross)
     {
         $rate = $this->shifRates['rate'];
         $minimum = $this->shifRates['minimum'];
@@ -209,9 +212,19 @@ class KenyanPayrollCalculator
         return floor(max($gross * $rate, $minimum));
     }
 
-    private function calculateHousingLevy($gross)
+    public function calculateHousingLevy($gross)
     {
         return floor($gross * $this->housingLevyRate);
+    }
+
+    public function calculatePersonalRelief()
+    {
+        return floor($this->personalRelief);
+    }
+
+    public function getPayeBands()
+    {
+        return $this->payeBands;
     }
 
     private function validateInput($value, $field)

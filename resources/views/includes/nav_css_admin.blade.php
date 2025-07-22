@@ -403,6 +403,11 @@
                                     </a>
                                 </li>
                                 <li class="">
+                                    <a href="{{ url('personalrelief')}}" class="waves-effect waves-dark">
+                                        <span class="pcoded-mtext">Personal relief</span>
+                                    </a>
+                                </li>
+                                <li class="">
                                     <a href="{{ url('nontaxables')}}" class="waves-effect waves-dark">
                                         <span class="pcoded-mtext">Non Taxables</span>
                                     </a>

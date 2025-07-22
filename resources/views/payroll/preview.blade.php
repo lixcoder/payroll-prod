@@ -84,6 +84,7 @@ function asMoney($value)
 {
     return number_format($value, 2);
 }
+
 ?>
 @section('xara_cbs')
     @include('partials.breadcrumbs')
@@ -100,9 +101,8 @@ function asMoney($value)
                                 </div>
                                 <div class="card-body">
                                     <!-- Commented for Testing on 01/09/2023 by Dominick -->
-                                    <form method="POST" action="{{{ URL::to('payroll') }}}" accept-charset="UTF-8">
-                                    <!-- <form method="POST" action="{{{ URL::to('payroll/stored1') }}}" accept-charset="UTF-8"> -->
-
+                                    <form method="POST" action="{{{ URL::to('payroll/store') }}}" accept-charset="UTF-8">
+                                    
                                         @csrf
                                         <div class="form-actions form-group float-right">
 
@@ -122,229 +122,220 @@ function asMoney($value)
                                             <table id="example" data-show-refresh="true"
                                                    class="table table-condensed table-bordered tab table-hover nowrap">
 
-
                                                 <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>PF Number</th>
-                                                    <th>Employee</th>
-                                                    <th>Basic Pay</th>
-                                                    @foreach($earnings as $earning)
-                                                        <th>{{$earning->earning_name}}</th>
-                                                    @endforeach
-                                                    <th>Overtime-Hourly</th>
-                                                    <th>Overtime-Daily</th>
-                                                    @foreach($allowances as $allowance)
-                                                        <th>{{$allowance->allowance_name}}</th>
-                                                    @endforeach
-                                                    <th>Gross Pay</th>
-                                                    <th>Taxable Pay</th>
-                                                    @foreach($nontaxables as $nontaxable)
-                                                        <th>{{$nontaxable->name}}</th>
-                                                    @endforeach
-                                                    <th>Total Tax</th>
-                                                    <th>Tax Relief</th>
-                                                    @foreach($reliefs as $relief)
-                                                        <th>{{$relief->relief_name}}</th>
-                                                    @endforeach
-                                                    <th>Paye</th>
-                                                    <th>Nssf</th>
-                                                    <th>Nhif</th>
-                                                    @foreach($deductions as $deduction)
-                                                        <th>{{$deduction->deduction_name}}</th>
-                                                    @endforeach
-                                                    <th>Pension Contribution</th>
-                                                    <th>Total Deductions</th>
-                                                    <th>Net Pay</th>
-                                                </tr>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>PF Number</th>
+                                                        <th>Employee</th>
+                                                        <th>Basic Pay</th>
+                                                        @foreach($earnings as $earning)
+                                                            <th>{{$earning->earning_name}}</th>
+                                                        @endforeach
+                                                        <th>Overtime-Hourly</th>
+                                                        <th>Overtime-Daily</th>
+                                                        @foreach($allowances as $allowance)
+                                                            <th>{{$allowance->allowance_name}}</th>
+                                                        @endforeach
+                                                        <th>Gross Pay</th>
+                                                        <th>Taxable Pay</th>
+                                                        @foreach($nontaxables as $nontaxable)
+                                                            <th>{{$nontaxable->name}}</th>
+                                                        @endforeach
+                                                        <th>Total Tax</th>
+                                                        <th>Tax Relief</th>
+                                                        @foreach($reliefs as $relief)
+                                                            <th>{{$relief->relief_name}}</th>
+                                                        @endforeach
+                                                        <th>Paye</th>
+                                                        <th>Nssf</th>
+                                                        <th>Shif</th>
+                                                        <th>Housing Levy</th>
+                                                        @foreach($deductions as $deduction)
+                                                                <th>{{$deduction->deduction_name}}</th>
+                                                        @endforeach
+                                                        <th>Pension Contribution</th>
+                                                        <th>Total Deductions</th>
+                                                        <th>Net Pay</th>
+                                                    </tr>
                                                 </thead>
                                                 <tbody class="displayrecord">
-                                                <tr>
-                                                    <?php $i = 1;
-                                                    $totalsalary = 0.00;
-                                                    $totalearning = 0.00;
-                                                    $totalhourly = 0.00;
-                                                    $totaldaily = 0.00;
-                                                    $totalallowance = 0.00;
-                                                    $totalnontaxable = 0.00;
-                                                    $totalrelief = 0.00;
-                                                    $totalgross = 0.00;
-                                                    $totaltax = 0.00;
-                                                    $totaltaxrelief = 0.00;
-                                                    $totalpaye = 0.00;
-                                                    $totalnssf = 0.00;
-                                                    $totalnhif = 0.00;
-                                                    $totalpension = 0.00;
-                                                    $otherdeduction = 0.00;
-                                                    $totaldeduction = 0.00;
-                                                    $totalnet = 0.00;
-                                                    ?>
-                                                    @foreach($employees as $employee)
-                                                        <td> {{ $i }}</td>
-                                                        <td>{{ $employee->personal_file_number }}</td>
-                                                        <td>{{ $employee->first_name.' '.$employee->last_name }}</td>
-                                                        <?php
-                                                        $totalsalary = $totalsalary + App\Models\Payroll::basicpay($employee->id, request('period'));
+                                                    <tr>
+                                                        <?php $i = 1;
+                                                        $totalsalary = 0.00;
+                                                        $totalearning = 0.00;
+                                                        $totalhourly = 0.00;
+                                                        $totaldaily = 0.00;
+                                                        $totalallowance = 0.00;
+                                                        $totalnontaxable = 0.00;
+                                                        $totalrelief = 0.00;
+                                                        $totalgross = 0.00;
+                                                        $totaltaxable = 0.00;
+                                                        $totaltax = 0.00;
+                                                        $totaltaxrelief = 0.00;
+                                                        $totalpaye = 0.00;
+                                                        $totalnssf = 0.00;
+                                                        $totalshif = 0.00;
+                                                        $totalhousing = 0.00;
+                                                        $totalpension = 0.00;
+                                                        $otherdeduction = 0.00;
+                                                        $totaldeduction = 0.00;
+                                                        $totalnet = 0.00;
                                                         ?>
-                                                        <td align="right">{{ App\Models\Payroll::basicpay($employee->id,request('period')) }}</td>
-
-
-                                                        @foreach($earnings as $earning)
-                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::earnings($employee->id,$earning->id,$period)) }}</td>
-                                                        @endforeach
-                                                        <?php
-                                                        $totalhourly = $totalhourly + (double)App\Models\Payroll::overtimes($employee->id, 'Hourly', $period);
-                                                        ?>
-                                                        <?php
-                                                        $totaldaily = $totaldaily + (double)App\Models\Payroll::overtimes($employee->id, 'Daily', $period);
-                                                        ?>
-                                                        <td align="right">{{ asMoney((double)App\Models\Payroll::overtimes($employee->id,'Hourly',$period)) }}</td>
-                                                        <td align="right">{{ asMoney((double)App\Models\Payroll::overtimes($employee->id,'Daily',$period)) }}</td>
-                                                        @foreach($allowances as $allowance)
-                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::allowances($employee->id,$allowance->id,$period)) }}</td>
-                                                        @endforeach
-
-                                                        <?php
-                                                        $totalgross = $totalgross + (double)App\Models\Payroll::gross($employee->id, $period);
-                                                        ?>
-                                                        <?php
-                                                        $totaltax = $totaltax + (double)App\Models\Payroll::totaltax($employee->id, $period);
-                                                        ?>
-                                                        <?php
-                                                        if ($employee->income_tax_applicable == 1 && (double)App\Models\Payroll::gross($employee->id, $period) >= 11180 && $employee->income_tax_relief_applicable == 1) {
-                                                            $totaltaxrelief = $totaltaxrelief + 1408;
-                                                        }
-                                                        ?>
-                                                        <?php
-                                                        $totalpaye = $totalpaye + (double)App\Models\Payroll::tax($employee->id, $period);
-                                                        ?>
-                                                        <?php
-                                                        $totalnssf = $totalnssf + (double)App\Models\Payroll::nssf($employee->id, $period);
-                                                        ?>
-
-                                                        <?php
-                                                        $totalnhif = $totalnhif + (double)App\Models\Payroll::nhif($employee->id, $period);
-                                                        ?>
-
-                                                        <td align="right">
-                                                            <strong>{{ asMoney((double)App\Models\Payroll::gross($employee->id,$period)) }}</strong>
-                                                        </td>
-                                                                                                                <td align="right">{{ App\Models\Payroll::taxablePay($employee->id,request('period')) }}</td>
-                                                        @foreach($nontaxables as $nontaxable)
-                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::nontaxables($employee->id,$nontaxable->id,$period)) }}</td>
-                                                        @endforeach
-                                                        <td align="right">{{ asMoney((double)App\Models\Payroll::totaltax($employee->id,$period)) }}</td>
-                                                        @if($employee->income_tax_applicable == 1 && (double)App\Models\Payroll::gross($employee->id,$period)>=11180 && $employee->income_tax_relief_applicable == 1)
-                                                            <td align="right">{{ asMoney('2400') }}</td>
-                                                            
-                                                        @else
-                                                            <td align="right">{{ asMoney('0.00') }}</td>
-                                                        @endif
-                                                        @foreach($reliefs as $relief)
-                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::reliefs($employee->id,$relief->id,$period)) }}</td>
-                                                        @endforeach
-                                                        <td align="right">{{ asMoney((double)App\Models\Payroll::tax($employee->id,$period)) }}</td>
-                                                        <td align="right">{{ asMoney((double)App\Models\Payroll::nssf($employee->id,$period)) }}</td>
-                                                        <td align="right">{{ asMoney((double)App\Models\Payroll::nhif($employee->id,$period)) }}</td>
-                                                        @foreach($deductions as $deduction)
-                                                            @if($deduction->deduction_name=='Housing Levy')
-                                                                <td align="right">{{ asMoney((double)App\Models\Payroll::housingLevy($employee->id,$period)) }}</td>
-                                                            @endif
-                                                            @if($deduction->deduction_name!='Housing Levy')
-                                                                <td align="right">{{ asMoney((double)App\Models\Payroll::deductions($employee->id,$deduction->id,$period)) }}</td>
-                                                            @endif
-                                                        @endforeach
-                                                        <td align="right">{{ asMoney((double)App\Models\Payroll::pension($employee->id,$period)) }}</td>
-                                                        <?php
-                                                        $totalpension = $totalpension + (double)App\Models\Payroll::pension($employee->id, $period);
-                                                        $totaldeduction = $totaldeduction + (double)App\Models\Payroll::total_deductions($employee->id, $period);
-                                                        ?>
-                                                        <?php
-                                                        $totalnet = $totalnet + (double)App\Models\Payroll::net($employee->id, $period);
-                                                        ?>
-                                                        <td align="right">
-                                                            <strong>{{ asMoney((double)App\Models\Payroll::total_deductions($employee->id,$period)) }}</strong>
-                                                        </td>
-                                                        <td align="right">
-                                                            <strong>{{ asMoney((double)App\Models\Payroll::net($employee->id,$period)) }}</strong>
-                                                        </td>
-
-                                                </tr>
-
-                                                <?php $i++; ?>
-                                                @endforeach
-
-
-                                                <tr style="background:#EEE;">
-                                                    <td style="border-right:0 #FFF;"><span style="display:none">{{$i}}</span>
-                                                    </td>
-                                                    <td></td>
-                                                    <td align='right'><strong>Totals</strong></td>
-                                                    <td align='right'><strong>{{asMoney($totalsalary)}}</strong></td>
-                                                    @foreach($earnings as $earning)
-                                                        <?php
-                                                        $totalearning . $earning->id = $totalearning + (double)App\Models\Payroll::totalearnings($earning->id, $period, $type);
-                                                        ?>
-                                                        <td align='right'>
-                                                            <strong>{{asMoney($totalearning.$earning->id)}}</strong>
-                                                        </td>
-                                                    @endforeach
-                                                    <td align='right'><strong>{{asMoney($totalhourly)}}</strong></td>
-                                                    <td align='right'><strong>{{asMoney($totaldaily)}}</strong></td>
-                                                    @foreach($allowances as $allowance)
-                                                        <?php
-                                                        $totalallowance . $allowance->id = $totalallowance + (double)App\Models\Payroll::totalallowances($allowance->id, $period, $type);
-                                                        ?>
-                                                        <td align='right'>
-                                                            <strong>{{asMoney($totalallowance.$allowance->id)}}</strong></td>
-                                                    @endforeach
-
-                                                    <td align='right'><strong>{{asMoney($totalgross)}}</strong></td>
-                                                    <td align='right'><strong>{{App\Models\Payroll::totalTaxablePay($period, request('type'))}}</strong></td>
-                                                    @foreach($nontaxables as $nontaxable)
-                                                        <?php
-                                                        $totalnontaxable . $nontaxable->id = $totalnontaxable + (double)App\Models\Payroll::totalnontaxable($nontaxable->id, $period, $type);
-                                                        ?>
-
-                                                        <td align='right'>
-                                                            <strong>{{asMoney($totalnontaxable.$nontaxable->id)}}</strong>
-                                                        </td>
-                                                    @endforeach
-                                                    <td align='right'><strong>{{asMoney($totaltax)}}</strong></td>
-                                                    <td align='right'><strong>{{asMoney($totaltaxrelief)}}</strong></td>
-                                                    @foreach($reliefs as $relief)
-                                                        @if($relief && isset($relief->id))
+                                                        @foreach($employees as $employee)
+                                                            <td> {{ $i }}</td>
+                                                            <td>{{ $employee->personal_file_number }}</td>
+                                                            <td>{{ $employee->first_name.' '.$employee->last_name }}</td>
                                                             <?php
-                                                            $totalrelief . $relief->id = $totalrelief + (double)App\Models\Payroll::totalreliefs($relief->id, $period, $type);
+                                                            $totalsalary = $totalsalary + App\Models\Payroll::basicpay($employee->id, request('period'));
                                                             ?>
-                                                            <td align='right'><strong>{{asMoney($totalrelief.$relief->id)}}</strong></td>
-                                                        @endif
-                                                    @endforeach
-                                                    <td align='right'><strong>{{asMoney($totalpaye)}}</strong></td>
-                                                    <td align='right'><strong>{{asMoney($totalnssf)}}</strong></td>
-                                                    <td align='right'><strong>{{asMoney($totalnhif)}}</strong></td>
-                                                    @foreach($deductions as $deduction)
-                                                        <?php 
-                                                        $otherdeduction . $deduction->id = $otherdeduction + (double)App\Models\Payroll::totaldeductions($deduction->id, $period, $type);
-                                                        ?>
+                                                            <td align="right">{{ App\Models\Payroll::basicpay($employee->id,request('period')) }}</td>
 
-                                                            @if($deduction->deduction_name=='Housing Levy')
-                                                                <td align="right">{{ asMoney((double)App\Models\Payroll::totalHousingLevy($period, request('type'))) }}</td>
-                                                            @endif
-                                                            @if($deduction->deduction_name!='Housing Levy')
+                                                            @foreach($earnings as $earning)
+                                                                <td align="right">{{ asMoney((double)App\Models\Payroll::earnings($employee->id,$earning->id,$period)) }}</td>
+                                                            @endforeach
+                                                            <?php
+                                                            $totalhourly = $totalhourly + (double)App\Models\Payroll::overtimes($employee->id, 'Hourly', $period);
+                                                            ?>
+                                                            <?php
+                                                            $totaldaily = $totaldaily + (double)App\Models\Payroll::overtimes($employee->id, 'Daily', $period);
+                                                            ?>
+                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::overtimes($employee->id,'Hourly',$period)) }}</td>
+                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::overtimes($employee->id,'Daily',$period)) }}</td>
+                                                            @foreach($allowances as $allowance)
+                                                                <td align="right">{{ asMoney((double)App\Models\Payroll::allowances($employee->id,$allowance->id,$period)) }}</td>
+                                                            @endforeach
+
+                                                            <?php
+                                                            $totalgross = $totalgross + (double)App\Models\Payroll::gross($employee->id, $period);
+                                                            ?>
+                                                            <?php
+                                                            $totaltaxable = $totaltaxable + (double)App\Models\Payroll::taxableIncome($employee->id, $period);
+                                                            ?>
+                                                            <?php
+                                                            $totaltax = $totaltax + (double)App\Models\Payroll::totalTax($employee->id, $period);
+                                                            ?>
+                                                            <?php
+                                                            $employeeRelief = (double)App\Models\Payroll::getPersonalReliefAmount($employee->id, $period);
+                                                                $totaltaxrelief = $totaltaxrelief + $employeeRelief;
+    
+                                                            ?>
+                                                            <?php
+                                                            $totalpaye = $totalpaye + (double)App\Models\Payroll::tax($employee->id, $period);
+                                                            ?>
+                                                            <?php
+                                                            $totalnssf = $totalnssf + (double)App\Models\Payroll::nssf($employee->id, $period);
+                                                            ?>
+                                                            <?php
+                                                            $totalshif = $totalshif + (double)App\Models\Payroll::shif($employee->id, $period);
+                                                            ?>
+                                                            <?php
+                                                            $totalhousing = $totalhousing + (double)App\Models\Payroll::housingLevy($employee->id, $period);
+                                                            ?>
+
+                                                            <td align="right">
+                                                                <strong>{{ asMoney((double)App\Models\Payroll::gross($employee->id,$period)) }}</strong>
+                                                            </td>
+                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::taxableIncome($employee->id,$period)) }}</td> <!-- Updated to use taxableIncome -->
+                                                            @foreach($nontaxables as $nontaxable)
+                                                                <td align="right">{{ asMoney((double)App\Models\Payroll::nontaxables($employee->id,$nontaxable->id,$period)) }}</td>
+                                                            @endforeach
+                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::totalTax($employee->id,$period)) }}</td>
+                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::getPersonalReliefAmount($employee->id,$period)) }}</td>
+                                                            @foreach($reliefs as $relief)
+                                                                <td align="right">{{ asMoney((double)App\Models\Payroll::reliefs($employee->id,$relief->id,$period)) }}</td>
+                                                            @endforeach
+                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::tax($employee->id,$period)) }}</td>
+                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::nssf($employee->id,$period)) }}</td>
+                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::shif($employee->id,$period)) }}</td>
+                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::housingLevy($employee->id,$period)) }}</td>
+                                                            @foreach($deductions as $deduction)
+                                                                    <td align="right">{{ asMoney((double)App\Models\Payroll::deductions($employee->id,$deduction->id,$period)) }}</td>
+                                                            @endforeach
+                                                            <td align="right">{{ asMoney((double)App\Models\Payroll::pension($employee->id,$period)) }}</td>
+                                                            <?php
+                                                            $totalpension = $totalpension + (double)App\Models\Payroll::pension($employee->id, $period);
+                                                            $totaldeduction = $totaldeduction + (double)App\Models\Payroll::total_deductions($employee->id, $period);
+                                                            ?>
+                                                            <?php
+                                                            $totalnet = $totalnet + (double)App\Models\Payroll::net($employee->id, $period);
+                                                            ?>
+                                                            <td align="right">
+                                                                <strong>{{ asMoney((double)App\Models\Payroll::total_deductions($employee->id,$period)) }}</strong>
+                                                            </td>
+                                                            <td align="right">
+                                                                <strong>{{ asMoney((double)App\Models\Payroll::net($employee->id,$period)) }}</strong>
+                                                            </td>
+
+                                                        </tr>
+
+                                                        <?php $i++; ?>
+                                                        @endforeach
+
+                                                        <!-- Updated totals row -->
+                                                        <tr style="background:#EEE;">
+                                                            <td style="border-right:0 #FFF;"><span style="display:none">{{$i}}</span></td>
+                                                            <td></td>
+                                                            <td align='right'><strong>Totals</strong></td>
+                                                            <td align='right'><strong>{{asMoney($totalsalary)}}</strong></td>
+                                                            @foreach($earnings as $earning)
+                                                                <?php
+                                                                $totalearning . $earning->id = $totalearning + (double)App\Models\Payroll::totalearnings($earning->id, $period, $type);
+                                                                ?>
                                                                 <td align='right'>
-                                                                    <strong>{{asMoney($otherdeduction.$deduction->id)}}</strong>
+                                                                    <strong>{{asMoney($totalearning.$earning->id)}}</strong>
                                                                 </td>
-                                                            @endif
-                                                        
-                                                        
-                                                    @endforeach
-                                                    <td align='right'><strong>{{asMoney($totalpension)}}</strong></td>
-                                                    <td align='right'><strong>{{asMoney($totaldeduction)}}</strong></td>
-                                                    <td align='right'><strong>{{asMoney($totalnet)}}</strong></td>
-                                                </tr>
+                                                            @endforeach
+                                                            <td align='right'><strong>{{asMoney($totalhourly)}}</strong></td>
+                                                            <td align='right'><strong>{{asMoney($totaldaily)}}</strong></td>
+                                                            @foreach($allowances as $allowance)
+                                                                <?php
+                                                                $totalallowance . $allowance->id = $totalallowance + (double)App\Models\Payroll::totalallowances($allowance->id, $period, $type);
+                                                                ?>
+                                                                <td align='right'>
+                                                                    <strong>{{asMoney($totalallowance.$allowance->id)}}</strong></td>
+                                                            @endforeach
 
-                                                </tbody>
+                                                            <td align='right'><strong>{{asMoney($totalgross)}}</strong></td>
+                                                            <td align='right'><strong>{{asMoney($totaltaxable)}}</strong></td> 
+                                                            @foreach($nontaxables as $nontaxable)
+                                                                <?php
+                                                                $totalnontaxable . $nontaxable->id = $totalnontaxable + (double)App\Models\Payroll::totalnontaxable($nontaxable->id, $period, $type);
+                                                                ?>
+
+                                                                <td align='right'>
+                                                                    <strong>{{asMoney($totalnontaxable.$nontaxable->id)}}</strong>
+                                                                </td>
+                                                            @endforeach
+                                                            <td align='right'><strong>{{asMoney($totaltax)}}</strong></td>
+                                                            <td align='right'><strong>{{asMoney($totaltaxrelief)}}</strong></td>
+                                                            @foreach($reliefs as $relief)
+                                                                @if($relief && isset($relief->id))
+                                                                    <?php
+                                                                    $totalrelief . $relief->id = $totalrelief + (double)App\Models\Payroll::totalreliefs($relief->id, $period, $type);
+                                                                    ?>
+                                                                    <td align='right'><strong>{{asMoney($totalrelief.$relief->id)}}</strong></td>
+                                                                @endif
+                                                            @endforeach
+                                                            <td align='right'><strong>{{asMoney($totalpaye)}}</strong></td>
+                                                            <td align='right'><strong>{{asMoney($totalnssf)}}</strong></td>
+                                                            <td align='right'><strong>{{asMoney($totalshif)}}</strong></td>
+                                                            <td align='right'><strong>{{asMoney($totalhousing)}}</strong></td>
+                                                            @foreach($deductions as $deduction)
+                                                                @if($deduction->deduction_name != 'Housing Levy')
+                                                                    <?php 
+                                                                    $otherdeduction . $deduction->id = $otherdeduction + (double)App\Models\Payroll::totaldeductions($deduction->id, $period, $type);
+                                                                    ?>
+                                                                    <td align='right'>
+                                                                        <strong>{{asMoney($otherdeduction.$deduction->id)}}</strong>
+                                                                    </td>
+                                                                @endif
+                                                            @endforeach
+                                                            <td align='right'><strong>{{asMoney($totalpension)}}</strong></td>
+                                                            <td align='right'><strong>{{asMoney($totaldeduction)}}</strong></td>
+                                                            <td align='right'><strong>{{asMoney($totalnet)}}</strong></td>
+                                                        </tr>
+
+                                                    </tbody>
 
                                             </table>
                                         </div>

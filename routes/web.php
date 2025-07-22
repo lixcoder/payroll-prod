@@ -42,6 +42,7 @@ use App\Http\Controllers\NssfController;
 use App\Http\Controllers\PayeController;
 use App\Http\Controllers\HousingLevyController;
 use App\Http\Controllers\OccurencesController;
+use App\Http\Controllers\PersonalReliefController;
 use App\Http\Controllers\OccurencesettingsController;
 use App\Http\Controllers\OrganizationsController;
 use App\Http\Controllers\OvertimesController;
@@ -624,7 +625,7 @@ Route::post('payroll/preview', [PayrollController::class, 'create']);
 Route::post('payroll/edit{id}', [PayrollController::class, 'edit']);
 
 //Added by Dominick on 01/09/2023 for testing processing stage of the payroll generation
-Route::post('payroll/stored1', [PayrollController::class, 'store1']);
+Route::post('payroll/store', [PayrollController::class, 'store']);
 
 
 Route::post('showrecord', [PayrollController::class, 'display']);
@@ -751,6 +752,15 @@ Route::resource('nhif', NhifController::class);
 Route::post('nhif/update/{id}', [NhifController::class, 'update']);
 Route::get('nhif/delete/{id}', [NhifController::class, 'destroy']);
 Route::get('nhif/edit/{id}', [NhifController::class, 'edit']);
+
+/*
+* Personal Relief routes
+*/
+Route::resource('personalrelief', PersonalReliefController::class);
+Route::post('personalrelief/update/{id}', [PersonalReliefController::class, 'update']);
+Route::get('personalrelief/delete/{id}', [PersonalReliefController::class, 'destroy']);
+Route::get('personalrelief/edit/{id}', [PersonalReliefController::class, 'edit']);
+
 //
 Route::get('api/pay', function () {
     $id = request('option');
