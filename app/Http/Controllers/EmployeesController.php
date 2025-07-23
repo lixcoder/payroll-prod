@@ -309,6 +309,16 @@ class EmployeesController extends Controller
      *
      * @return Response
      */
+    /*
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    /*
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
     public function store(Request $request)
     {
         //
@@ -317,7 +327,18 @@ class EmployeesController extends Controller
             'fname' => 'required',
             'education' => 'required',
             'pin' => 'required|unique:x_employee',
+            'passport_number' => 'nullable|unique:x_employee,passport_number', // Added passport number uniqueness check
+            'identity_number' => 'nullable|unique:x_employee,identity_number', // Added identity number uniqueness check
+            'military_id' => 'nullable|unique:x_employee,military_id', // Added military ID uniqueness check
+            'social_security_number' => 'nullable|unique:x_employee,social_security_number', // Added SSN uniqueness check
+            'hospital_insurance_number' => 'nullable|unique:x_employee,hospital_insurance_number', // Added hospital insurance uniqueness check
+            'work_permit_number' => 'nullable|unique:x_employee,work_permit_number', // Added work permit uniqueness check
             'swift_code' => 'unique:x_employee',
+            'citizenship' => 'required|exists:citizenships,id', // Added citizenship validation
+            'branch_id' => 'required|exists:x_branches,id',      // Added branch validation
+            'department_id' => 'required|exists:x_departments,id', // Added department validation
+            'jgroup_id' => 'required|exists:x_job_group,id',     // Added job group validation
+            'type_id' => 'required|exists:x_employee_type,id',   // Added employee type validation
         ]);
         if ($validator->fails()) {
             return Redirect::back()->withErrors($validator)->withInput();
@@ -378,24 +399,19 @@ class EmployeesController extends Controller
                 $employee->work_permit_number = null;
             }
             $employee->job_title = $request->get('jtitle');
-            if ($request->get('education') == '') {
-                $employee->education_type_id = null;
-            } else {
-                // Set education type id as null to avoid errors, this should be corrected to indicate correct details
-                // $employee->education_type_id = $request->get('education_type_id');
-                $employee->education_type_id =0;
-            }
+            
+            // Fixed education_type_id handling
+            $employee->education_type_id = $request->get('education') ?: 0;
+            
             $a = str_replace(',', '', $request->get('pay'));
             $employee->basic_pay = $a;
             $employee->gender = $request->get('gender');
             $employee->marital_status = $request->get('status');
             $employee->yob = $request->get('dob');
-            if ($request->get('citizenship') == '') {
-                $employee->citizenship_id = null;
-            } else {
-                $employee->citizenship_id = $request->get('citizenship') ?? null;
-                // $employee->citizenship_id = 0;
-            }
+            
+            // Fixed citizenship_id handling - now required field
+            $employee->citizenship_id = $request->get('citizenship');
+            
             $employee->mode_of_payment = $request->get('modep');
             if ($request->get('bank_account_number') != null) {
                 $employee->bank_account_number = $request->get('bank_account_number');
@@ -440,27 +456,19 @@ class EmployeesController extends Controller
             } else {
                 $employee->bank_branch_id = $request->get('bbranch_id');
             }
-            if ($request->get('branch_id') == '') {
-                $employee->branch_id = null;
-            } else {
-                $employee->branch_id = $request->get('branch_id');
-            }
-            if ($request->get('department_id') == '') {
-                $employee->department_id = null;
-            } else {
-                $employee->department_id = $request->get('department_id');
-            }
-            if ($request->get('jgroup_id') == '') {
-                $employee->job_group_id = null;
-            } else {
-                $employee->job_group_id = $request->get('jgroup_id');
-            }
-            if ($request->get('type_id') == '') {
-                $employee->type_id = null;
-            } else {
-                $employee->type_id = $request->get('type_id');
-                // $employee->type_id = 0;
-            }
+            
+            // Fixed branch_id handling - now required field
+            $employee->branch_id = $request->get('branch_id');
+            
+            // Fixed department_id handling - now required field
+            $employee->department_id = $request->get('department_id');
+            
+            // Fixed job_group_id handling - now required field
+            $employee->job_group_id = $request->get('jgroup_id');
+            
+            // Fixed type_id handling - now required field
+            $employee->type_id = $request->get('type_id');
+            
             if ($request->get('i_tax') != null) {
                 $employee->income_tax_applicable = '1';
             } else {

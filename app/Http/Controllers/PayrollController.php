@@ -37,7 +37,6 @@ use Illuminate\Support\Carbon;
 use Symfony\Component\Console\Input\Input as InputInput;
 use Illuminate\Support\Facades\Log;
 
-use Symfony\Component\Console\Input\Input as InputInput;
 class PayrollController extends Controller
 {
     // public $start = '2023-08-01';
@@ -191,7 +190,7 @@ class PayrollController extends Controller
     public function create(Request $request)
     {
         set_time_limit(2000);
-
+        $user = Auth::user();
         $type = request('type');
         $period = request('period');
         $period_date = \Carbon\Carbon::createFromFormat('m-Y', $period)->format('Y-m-d');
@@ -232,7 +231,7 @@ class PayrollController extends Controller
         $jgroup = Jobgroup::whereRaw('LOWER(job_group_name) = ?', [strtolower($type)])
             ->where(function ($query) {
                 $query->whereNull('organization_id')
-                    ->orWhere('organization_id', $user->organization_id);
+                    ->orWhere('organization_id', Auth::user()->organization_id);
             })->first();
 
         // Check for management category using lowercase
