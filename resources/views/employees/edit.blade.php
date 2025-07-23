@@ -356,7 +356,7 @@
                                                         <div class="form-group">
                                                             <label for="username">Citizenship</label>
                                                             <select name="citizenship" id="citizenship"
-                                                                    class="form-control">
+                                                                    class="form-control" required>
                                                                 <option></option>
                                                                 <option value="Citizenship">Create New</option>
                                                                 @foreach($citizenships as $citizenship)
@@ -367,7 +367,7 @@
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="username">Education Background</label>
-                                                            <select name="education" id="education" class="form-control">
+                                                            <select name="education" id="education" class="form-control" required>
                                                                 <option></option>
                                                                 <option value="cnew">Create New</option>
                                                                 @foreach($educations as $education)
@@ -511,7 +511,7 @@
 
                                                         <div class="form-group">
                                                             <label for="username">Bank</label>
-                                                            <select id="bank_id" name="bank_id" class="form-control">
+                                                            <select id="bank_id" name="bank_id" class="form-control" required>
                                                                 <option></option>
                                                                 <option value="cnew">Create New</option>
                                                                 @foreach($banks as $bank)
@@ -526,7 +526,7 @@
 
                                                         <div class="form-group">
                                                             <label for="username">Bank Branch</label>
-                                                            <select id="bbranch_id" name="bbranch_id" class="form-control">
+                                                            <select id="bbranch_id" name="bbranch_id" class="form-control" required>
                                                                 <option></option>
                                                                 <option value="cnew">Create New</option>
                                                                 @foreach($bbranches as $bbranch)
@@ -575,7 +575,7 @@
                                                     <div class="col-lg-4">
                                                         <div class="form-group">
                                                             <label for="username">Employee Branch</label>
-                                                            <select name="branch_id" id="branch_id" class="form-control">
+                                                            <select name="branch_id" id="branch_id" class="form-control" required>
                                                                 <option></option>
                                                                 <option value="cnew">Create New</option>
                                                                 @foreach($branches as $branch)
@@ -591,7 +591,7 @@
                                                         <div class="form-group">
                                                             <label for="username">Employee Department</label>
                                                             <select name="department_id" id="department_id"
-                                                                    class="form-control">
+                                                                    class="form-control" required>
                                                                 <option></option>
                                                                 <option value="cnew">Create New</option>
                                                                 @foreach($departments as $department)
@@ -621,7 +621,7 @@
                                                         <div class="form-group">
                                                             <label for="username">Employee Type <span
                                                                     style="color:red">*</span></label>
-                                                            <select name="type_id" id="type_id" class="form-control">
+                                                            <select name="type_id" id="type_id" class="form-control" required>
                                                                 <option></option>
                                                                 <option value="cnew">Create New</option>
                                                                 @foreach($etypes as $etype)
@@ -686,7 +686,7 @@
                                                                     <input class="form-control" placeholder="" type="text"
                                                                            name="pay" id="pay"
                                                                            @if($employee->basic_pay==='') value="{{$employee->basic_pay}}"
-                                                                           @else value="{{$employee->basic_pay}}" @endif>
+                                                                           @else value="{{$employee->basic_pay}}" @endif required>
                                                                 </div>
                                                             </div>
                                                         

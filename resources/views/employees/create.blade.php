@@ -256,7 +256,7 @@
                                                                 style="color:red">*</span></label>
                                                         <input class="form-control" placeholder="" type="text"
                                                                name="personal_file_number" id="personal_file_number"
-                                                               value="{{initials($organization->name,$pfn)}}">
+                                                               value="{{initials($organization->name, $pfn)}}">
                                                     </div>
                                                     <div class="form-group col-sm-4">
                                                         <label for="lname">Surname <span
