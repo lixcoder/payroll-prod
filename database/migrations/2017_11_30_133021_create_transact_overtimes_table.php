@@ -34,7 +34,7 @@ class CreateTransactOvertimesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('transact_overtimes');
+		Schema::drop('x_transact_overtimes');
 	}
 
 

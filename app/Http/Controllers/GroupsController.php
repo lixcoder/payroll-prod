@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
-
+use PHPUnit\TextUI\XmlConfiguration\Groups;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Log;
+use App\Models\Group;
 
 class GroupsController extends Controller {
 
@@ -19,8 +22,8 @@ class GroupsController extends Controller {
 	 */
 	public function index()
 	{
-		$groups = Jobgroup::where('organization_id',Auth::user()->organization_id)->get();
-
+		$groups = Group::where('organization_id',Auth::user()->organization_id)->get();
+		Log::info('Fetched groups: ' . $groups->count() . ' records for organization_id: ' . Auth::user()->organization_id);
 		return view('groups.index', compact('groups'));
 	}
 
@@ -40,20 +43,29 @@ class GroupsController extends Controller {
 	 * @return Response
 	 */
 	public function store(Request $request)
-	{
-		$validator = Validator::make($data = $request->all(), Group::$rules);
-		if ($validator->fails())
-		{
-			return Redirect::back()->withErrors($validator)->withInput();
-		}
-		$group = new Group;
-		$group->name = $request->get('name');
-		$group->description = $request->get('description');
-        $group->organization_id  = Auth::user()->organization_id;
-		$group->save();
+    {
+        $validator = Validator::make($request->all(), Group::$rules, [
+            'name.required' => 'Group name is required.',
+        ]);
 
-		return Redirect::route('groups.index');
-	}
+        if ($validator->fails()) {
+            Log::error('Group validation failed: ' . json_encode($validator->errors()));
+            return Redirect::back()->withErrors($validator)->withInput();
+        }
+
+        try {
+            $group = new Group;
+            $group->name = $request->input('name');
+            $group->description = $request->input('description');
+            $group->organization_id = Auth::user()->organization_id ?? 1;
+            $group->save();
+            Log::info('Group created: ' . $group->name);
+            return Redirect::route('groups.index')->with('success', 'Group created successfully!');
+        } catch (\Exception $e) {
+            Log::error('Group creation failed: ' . $e->getMessage());
+            return Redirect::back()->with('error', 'Failed to create group: ' . $e->getMessage())->withInput();
+        }
+    }
 
 	/*
 	 * Display the specified group.
@@ -75,11 +87,10 @@ class GroupsController extends Controller {
 	 * @return Response
 	 */
 	public function edit($id)
-	{
-		$group = Jobgroup::find($id);
-
-		return view('groups.edit', compact('group'));
-	}
+    {
+        $group = Group::findOrFail($id);
+        return View::make('groups.edit', compact('group'));
+    }
 
 	/*
 	 * Update the specified group in storage.
@@ -87,18 +98,30 @@ class GroupsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update(Request $request,$id)
-	{
-		$group = Jobgroup::findOrFail($id);
-		$validator = Validator::make($data = $request->all(), Jobgroup::$rules);
-		if ($validator->fails())
-		{
-			return Redirect::back()->withErrors($validator)->withInput();
-		}
-		$group->job_group_name = $request->get('job_group_name');
-		$group->update();
-		return Redirect::route('groups.index');
-	}
+	public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), Group::$rules, [
+            'name.required' => 'Group name is required.',
+        ]);
+
+        if ($validator->fails()) {
+            Log::error('Group update validation failed: ' . json_encode($validator->errors()));
+            return Redirect::back()->withErrors($validator)->withInput();
+        }
+
+        try {
+            $group = Group::findOrFail($id);
+            $group->name = $request->input('name');
+            $group->description = $request->input('description');
+            $group->organization_id = Auth::user()->organization_id ?? 1;
+            $group->save();
+            Log::info('Group updated: ' . $group->name);
+            return Redirect::route('groups.index')->with('success', 'Group updated successfully!');
+        } catch (\Exception $e) {
+            Log::error('Group update failed: ' . $e->getMessage());
+            return Redirect::back()->with('error', 'Failed to update group: ' . $e->getMessage())->withInput();
+        }
+    }
 
 	/*
 	 * Remove the specified group from storage.
@@ -106,9 +129,15 @@ class GroupsController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
-	{
-		Jobgroup::destroy($id);
-		return Redirect::route('groups.index');
-	}
+public function destroy($id)
+    {
+        try {
+            Group::destroy($id);
+            Log::info('Group deleted: ID ' . $id);
+            return Redirect::route('groups.index')->with('success', 'Group deleted successfully!');
+        } catch (\Exception $e) {
+            Log::error('Group deletion failed: ' . $e->getMessage());
+            return Redirect::back()->with('error', 'Failed to delete group: ' . $e->getMessage());
+        }
+    }
 }

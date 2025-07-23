@@ -1,30 +1,31 @@
-<?php namespace App\Models;
+<?php
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class Jobgroup extends Model
 {
+    protected $table = 'x_job_group';
 
-    public $table = "x_job_group";
-
-    public static $rules = [
-        'job_group_name' => 'required',
-        'amount[]' => 'regex:/^(\$?(?(?=\()(\())\d+(?:,\d+)?(?:\.\d+)?(?(2)\)))$/'
+    protected $fillable = [
+        'job_group_name', 'organization_id',
     ];
 
-    public static $messages = array(
-        'name.required' => 'Please insert job group!',
-        'amount[].regex' => 'Please insert a valid amount!',
-    );
+    public static $rules = [
+        'name' => 'required|string|max:255',
+    ];
 
-    // Don't forget to fill this array
-    protected $fillable = [];
+    public static $messages = [
+        'name.required' => 'Please insert job group name!',
+    ];
 
+    public function employees()
+    {
+        return $this->hasMany(Employee::class, 'job_group_id');
+    }
 
     public function employeebenefits()
     {
-
-        return $this->hasMany('Employeebenefit');
+        return $this->hasMany(Employeebenefit::class, 'jobgroup_id');
     }
-
 }

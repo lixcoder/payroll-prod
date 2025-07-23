@@ -38,7 +38,7 @@ class CreateEmployeeTable extends Migration {
 			$table->integer('citizenship_id')->unsigned()->default('0')->index('employee_citizenship_id_foreign');
 			$table->string('photo')->nullable();
 			$table->string('signature')->nullable();
-			$table->string('gender',6)->nullable();
+			$table->string('gender',10)->nullable();
 			$table->string('marital_status',15)->nullable();
 			$table->date('yob')->nullable();
 			//$table->string('citizenship',15)->nullable();

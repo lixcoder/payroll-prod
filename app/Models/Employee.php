@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Http\traits\Encryptable;
+use App\Models\Pension;
 
 
 class Employee extends Model
@@ -99,21 +100,22 @@ class Employee extends Model
     );
 
     // Don't forget to fill this array
-    protected $fillable = [
-        'personal_file_number',
-        'first_name',
-        'last_name',
-        'email_office',
-        'basic_pay',
-        'pin',
-        'social_security_number',
-        'identity_number',
-        'hospital_insurance_number',
-        'gender',
-        'mode_of_payment',
-        'bank_account_number',
-        'organization_id',
-    ];
+protected $fillable = [
+    'personal_file_number', 
+    'first_name', 
+    'last_name', 
+    'email_office', 
+    'basic_pay',
+    'pin', 
+    'social_security_number', 
+    'identity_number', 
+    'hospital_insurance_number',
+    'gender', 
+    'mode_of_payment', 
+    'bank_account_number', 
+    'organization_id', 
+    'job_group_id',
+];
 
 
     public function branch()
@@ -219,7 +221,7 @@ class Employee extends Model
     public function pension()
     {
 
-        return $this->hasMany(Pension::class);
+        return $this->hasMany(Pensioninterest::class);
     }
 
 

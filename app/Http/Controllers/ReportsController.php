@@ -6356,8 +6356,8 @@ class ReportsController extends Controller
 
 
             } else if ($request->get('branch') != 'All' && $request->get('department') != 'All') {
-                $selBr = DB::table('branches')->find($request->get('branch'));
-                $selDt = DB::table('departments')->find($request->get('department'));
+                $selBr = DB::table('x_branches')->find($request->get('branch'));
+                $selDt = DB::table('x_departments')->find($request->get('department'));
 
                 if ($request->get('type') == 'All') {
                     $total_pay = DB::table('x_transact')
@@ -6432,15 +6432,15 @@ class ReportsController extends Controller
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum('net');
 
-                    $currencies = DB::table('currencies')
+                    $currencies = DB::table('x_currencies')
                         ->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)
                         ->select('shortname')
                         ->get();
 
                     $sums = DB::table('x_transact')
                         ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
-                        ->join('branches', 'x_employee.branch_id', '=', 'branches.id')
-                        ->join('departments', 'x_employee.department_id', '=', 'departments.id')
+                        ->join('x_branches', 'x_employee.branch_id', '=', 'x_branches.id')
+                        ->join('x_departments', 'x_employee.department_id', '=', 'x_departments.id')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('x_employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))
@@ -6529,15 +6529,15 @@ class ReportsController extends Controller
                         ->where('process_type', '=', $request->get('type'))
                         ->sum('net');
 
-                    $currencies = DB::table('currencies')
+                    $currencies = DB::table('x_currencies')
                         ->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)
                         ->select('shortname')
                         ->get();
 
                     $sums = DB::table('x_transact')
                         ->join('x_employee', 'x_transact.employee_id', '=', 'x_employee.personal_file_number')
-                        ->join('branches', 'x_employee.branch_id', '=', 'branches.id')
-                        ->join('departments', 'x_employee.department_id', '=', 'departments.id')
+                        ->join('x_branches', 'x_employee.branch_id', '=', 'x_branches.id')
+                        ->join('x_departments', 'x_employee.department_id', '=', 'x_departments.id')
                         ->where('branch_id', '=', $request->get('branch'))
                         ->where('x_employee.organization_id', Auth::user()->organization_id)
                         ->where('department_id', '=', $request->get('department'))

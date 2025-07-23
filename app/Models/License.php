@@ -8,18 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class License extends Model
 {
     //
-    protected $table = 'subscriptions';
+    protected $table = 'licenses';
 
     public static function checkSubscription($id){
-        $currentSub = License::where('business_id', $id)->get();
+        $currentSub = License::where('organization_id', $id)->get();
 
         if(count($currentSub)>=1){
-           $currentSub = json_decode($currentSub, true); 
+            $currentSub = json_decode($currentSub, true);
 
-            if(Carbon::now()->greaterThan(Carbon::parse($currentSub[0]['trial_end_date']))  || $currentSub[0]['status'] != 'approved' || $currentSub[0]['deleted_at'] != NULL){
+            if (Carbon::now()->greaterThan(Carbon::parse($currentSub[0]['end_date']))) {
+                //  || $currentSub[0]['status'] != 'approved' || $currentSub[0]['deleted_at'] != NULL
                 // && $currentSub[0]['status'] == 'approved' && $currentSub[0]['deleted_at'] == NULL
                 //indicates new subscrition needed to keep using services
-               return 0;
+                return 0;
 
                 // //added to test only uncomment retutn 0 above to achieve desired functionality...
                 // return 1;

@@ -17,14 +17,14 @@ class CreateNssfTable extends Migration {
 		Schema::create('x_social_security', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->int('employee_contribution',11)->default('0.00');
-			$table->int('employer_contribution',11)->default('0.00');
-			$table->int('total_contribution',11)->default('0.00');
-			$table->int('max_employee_nssf',11)->default('0.00');
-			$table->int('max_employer_nssf',11)->default('0.00');
-			$table->int('nssf_lower_earning',11)->default('0.00');
-			$table->int('nssf_upper_earning',11)->default('0.00');
-			$table->int('employer_nssf_upper_earning',11)->default('0.00');
+			$table->integer('employee_contribution')->default('0');
+			$table->integer('employer_contribution')->default('0');
+			$table->integer('total_contribution')->default('0');
+			$table->integer('max_employee_nssf')->default('0');
+			$table->integer('max_employer_nssf')->default('0');
+			$table->integer('nssf_lower_earning')->default('0');
+			$table->integer('nssf_upper_earning')->default('0');
+			$table->integer('employer_nssf_upper_earning')->default('0');
 			$table->integer('organization_id');
 			$table->timestamps();
 		});

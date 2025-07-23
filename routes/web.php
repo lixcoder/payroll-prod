@@ -42,6 +42,7 @@ use App\Http\Controllers\NssfController;
 use App\Http\Controllers\PayeController;
 use App\Http\Controllers\HousingLevyController;
 use App\Http\Controllers\OccurencesController;
+use App\Http\Controllers\PersonalReliefController;
 use App\Http\Controllers\OccurencesettingsController;
 use App\Http\Controllers\OrganizationsController;
 use App\Http\Controllers\OvertimesController;
@@ -49,6 +50,7 @@ use App\Http\Controllers\OvertimeSettingsController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\payslipEmailController;
 use App\Http\Controllers\ProbationController;
+use App\Http\Controllers\PayrollCalculatorController;
 use App\Http\Controllers\PromotionsController;
 use App\Http\Controllers\PropertiesController;
 use App\Http\Controllers\RegistrationController;
@@ -129,7 +131,8 @@ Route::resource('roles', RoleController::class);
  * */
 Route::resource('employees', EmployeesController::class);
 Route::get('employee/template', [EmployeesController::class, 'exportTemplate']);
-Route::post('employee/import', [EmployeesController::class, 'importEmployees']);
+// Route::post('employee/import', [EmployeesController::class, 'importEmployees']);
+Route::post('/employee/import', [EmployeesController::class, 'importEmployees'])->name('employees.import');
 Route::get('employees/show/{id}', [EmployeesController::class, 'show']);
 Route::get('v1/employees', [EmployeesController::class, 'getEmployees']);
 Route::get('employees/create', [EmployeesController::class, 'create']);
@@ -394,6 +397,7 @@ Route::get('branches/edit/{id}', [BranchesController::class, 'edit']);
 
 //=================GROUP ROUTES ===============================//
 Route::resource('groups', GroupsController::class);
+Route::post('/groups', [GroupsController::class, 'store'])->name('groups.store'); //Just added
 Route::post('groups/update/{id}', [GroupsController::class, 'update']);
 Route::get('groups/delete/{id}', [GroupsController::class, 'destroy']);
 Route::get('groups/edit/{id}', [GroupsController::class, 'edit']);
@@ -527,6 +531,7 @@ Route::get('overtimes/view/{id}', [OvertimesController::class, 'view']);
 */
 
 Route::resource('job_group', JobGroupController::class);
+Route::post('/job_group', [JobGroupController::class, 'store'])->name('job_group.store');
 Route::post('job_group/update/{id}', [JobGroupController::class, 'update']);
 Route::get('job_group/delete/{id}', [JobGroupController::class, 'destroy']);
 Route::get('job_group/edit/{id}', [JobGroupController::class, 'edit']);
@@ -584,11 +589,22 @@ Route::get('repayments_template', [LoanrepaymentsController::class, 'createTempl
  *
  * Payroll Calculator
  * */
-Route::get('payrollcalculator', function () {
-    $currency = Currency::find(1);
-    return View::make('payroll.payroll_calculator', compact('currency'));
+// Route::get('payrollcalculator', function () {
+//     $currency = Currency::find(1);
+//     return View::make('payroll.payroll_calculator', compact('currency'));
 
-});
+// });
+
+/*
+ *
+ * New payroll calculator route added by Jeff 03/07/2025
+
+*/
+
+// Payroll Calculator Routes
+Route::get('/payrollcalculator', [PayrollCalculatorController::class, 'index'])->name('payroll.calculator');
+Route::post('/payroll/shownet', [PayrollCalculatorController::class, 'showNet'])->name('payroll.shownet');
+Route::post('/payroll/showgross', [PayrollCalculatorController::class, 'showGross'])->name('payroll.showgross');
 
 //
 Route::get('email/payslip', [payslipEmailController::class, 'index']);
@@ -609,7 +625,7 @@ Route::post('payroll/preview', [PayrollController::class, 'create']);
 Route::post('payroll/edit{id}', [PayrollController::class, 'edit']);
 
 //Added by Dominick on 01/09/2023 for testing processing stage of the payroll generation
-Route::post('payroll/stored1', [PayrollController::class, 'store1']);
+Route::post('payroll/store', [PayrollController::class, 'store']);
 
 
 Route::post('showrecord', [PayrollController::class, 'display']);
@@ -622,11 +638,11 @@ Route::get('unlockpayroll/{id}', [PayrollController::class, 'unlockpayroll']);
 Route::post('unlockpayroll', [PayrollController::class, 'dounlockpayroll']);
 Route::post('createNewAccount', [PayrollController::class, 'createaccount']);
 
-Route::get('payrollcalculator', function () {
-    $currency = Currency::find(1);
-    return View::make('payroll.payroll_calculator', compact('currency'));
+// Route::get('payrollcalculator', function () {
+//     $currency = Currency::find(1);
+//     return View::make('payroll.payroll_calculator', compact('currency'));
 
-});
+// });
 
 Route::get('payrollReports', function () {
 
@@ -733,9 +749,18 @@ Route::get('housinglevy/edit/{id}', [HousingLevyController::class, 'edit']);
 */
 
 Route::resource('nhif', NhifController::class);
-Route::post('nhif/update/.$nrate->id', [NhifController::class, 'update']);
+Route::post('nhif/update/{id}', [NhifController::class, 'update']);
 Route::get('nhif/delete/{id}', [NhifController::class, 'destroy']);
 Route::get('nhif/edit/{id}', [NhifController::class, 'edit']);
+
+/*
+* Personal Relief routes
+*/
+Route::resource('personalrelief', PersonalReliefController::class);
+Route::post('personalrelief/update/{id}', [PersonalReliefController::class, 'update']);
+Route::get('personalrelief/delete/{id}', [PersonalReliefController::class, 'destroy']);
+Route::get('personalrelief/edit/{id}', [PersonalReliefController::class, 'edit']);
+
 //
 Route::get('api/pay', function () {
     $id = request('option');
@@ -790,7 +815,7 @@ Route::get('api/branchemployee', function () {
         ->first();
     //dd('bid=>'.$bid.' did=>'.$did);
     if (($bid == 'All' || $bid == '' || $bid == 0) && ($did == 'All' || $did == '' || $did == 0)) {
-        if (Auth::user()->can('manager_payroll')) {
+        if (Gate::allows('manager_payroll')) {
             $employee = Employee::select('id', DB::raw('CONCAT(personal_file_number, " : ", first_name," ",last_name) AS full_name'))
                 ->where('organization_id', Auth::user()->organization_id)
                 ->pluck('full_name', 'id');

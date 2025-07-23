@@ -37,7 +37,7 @@ class CreateTransactNontaxablesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('transact_deductions');
+		Schema::drop('x_transact_nontaxables');
 	}
 
 }

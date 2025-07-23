@@ -7,7 +7,7 @@
                 <div class="page-body">
                     <div class="row">
                         <div class="col-lg-12">
-                            <h3>Update Nhif Rate</h3>
+                            <h3>Update Shif Rate</h3>
 
                             <hr>
                         </div>
@@ -27,28 +27,22 @@
                                         <fieldset>
 
                                             <div class="form-group">
-                                                <label for="username">Income From <span
-                                                        style="color:red">*</span></label>
-                                                <input class="form-control" placeholder="" type="text" name="i_from"
-                                                       id="i_from"
-                                                       value="{{ $nrate->income_from}}">
+                                                <label for="username">Rate <span style="color:red">*</span></label>
+                                                <input class="form-control" placeholder="" type="text" name="rate"
+                                                       id="rate"
+                                                       value="{{ $nrate->rate }}">
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="username">Income To <span style="color:red">*</span></label>
-                                                <input class="form-control" placeholder="" type="text" name="i_to"
-                                                       id="i_to"
-                                                       value="{{ $nrate->income_to}}">
+                                                <label for="username">Minimum Amount <span style="color:red">*</span></label>
+                                                <input class="form-control" placeholder="" type="text" name="minimum_amount"
+                                                       id="minimum_amount"
+                                                       value="{{ $nrate->minimum_amount }}">
                                             </div>
-                                            <div class="form-group">
-                                                <label for="username">Amount<span style="color:red">*</span></label>
-                                                <input class="form-control" placeholder="" type="text" name="amount"
-                                                       id="amount"
-                                                       value="{{ $nrate->hi_amount}}">
-                                            </div>
+
                                             <div class="form-actions form-group">
 
-                                                <button type="submit" class="btn btn-primary btn-sm">Update Nhif Rate
+                                                <button type="submit" class="btn btn-primary btn-sm">Update Shif Rate
                                                 </button>
                                             </div>
 

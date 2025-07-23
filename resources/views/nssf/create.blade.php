@@ -26,72 +26,36 @@
                                         @csrf
                                         <fieldset>
                                             <div class="form-group">
-                                                <label for="employee_contribution">employee contribution <span style="color:red">*</span> </label>
-                                                <input class="form-control" placeholder="" type="text" name="employee_contribution"
-                                                       id="employee_contribution"
-                                                       value="{{{ old('employee_contribution') }}}">
+                                                <label for="lower_earnings_limit">Lower Earnings Limit <span style="color:red">*</span> </label>
+                                                <input class="form-control" placeholder="" type="text" name="lower_earnings_limit"
+                                                       id="lower_earnings_limit"
+                                                       value="{{{ old('lower_earnings_limit') }}}">
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="employer_contribution">employer contribution <span style="color:red">*</span>
+                                                <label for="upper_earnings_limit">Upper Earnings Limit <span style="color:red">*</span>
                                                 </label>
-                                                <input class="form-control" placeholder="" type="text" name="employer_contribution"
-                                                       id="employer_contribution"
-                                                       value="{{{ old('employer_contribution') }}}">
+                                                <input class="form-control" placeholder="" type="text" name="upper_earnings_limit"
+                                                       id="upper_earnings_limit"
+                                                       value="{{{ old('upper_earnings_limit') }}}">
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="total_contribution">Total contribution <span style="color:red">*</span>
+                                                <label for="rate_tier1">Rate Tier 1 <span style="color:red">*</span>
                                                 </label>
-                                                <input class="form-control" placeholder="" type="text" name="total_contribution"
-                                                       id="total_contribution"
-                                                       value="{{{ old('total_contribution') }}}">
+                                                <input class="form-control" placeholder="" type="text" name="rate_tier1"
+                                                       id="rate_tier1"
+                                                       value="{{{ old('rate_tier1') }}}">
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="max_employee_nssf">maximum employee nssf <span style="color:red">*</span>
+                                                <label for="rate_tier2">Rate Tier 2 <span style="color:red">*</span>
                                                 </label>
-                                                <input class="form-control" placeholder="" type="text" name="max_employee_nssf"
-                                                       id="max_employee_nssf"
-                                                       value="{{{ old('max_employee_nssf') }}}">
+                                                <input class="form-control" placeholder="" type="text" name="rate_tier2"
+                                                       id="rate_tier2"
+                                                       value="{{{ old('rate_tier2') }}}">
                                             </div>
 
-                                            <div class="form-group">
-                                                <label for="max_employer_nssf">maximum employer nssf <span style="color:red">*</span>
-                                                </label>
-                                                <input class="form-control" placeholder="" type="text" name="max_employer_nssf"
-                                                       id="max_employer_nssf"
-                                                       value="{{{ old('max_employer_nssf') }}}">
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="nssf_lower_earning">nssf lower earning <span style="color:red">*</span>
-                                                </label>
-                                                <input class="form-control" placeholder="" type="text"
-                                                       name="nssf_lower_earning"
-                                                       id="nssf_lower_earning" value="{{{ old('nssf_lower_earning') }}}">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="nssf_upper_earning">nssf upper earning <span style="color:red">*</span>
-                                                </label> 
-                                                <input class="form-control" placeholder="" type="text"
-                                                       name="nssf_upper_earning"
-                                                       id="nssf_upper_earning" value="{{{ old('nssf_upper_earning') }}}">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="employer_nssf_upper_earning">employer nssf upper earning <span style="color:red">*</span>
-                                                </label>
-                                                <input class="form-control" placeholder="" type="text"
-                                                       name="employer_nssf_upper_earning"
-                                                       id="employer_nssf_upper_earning" value="{{{ old('employer_nssf_upper_earning') }}}">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="graduated_scale">graduated scale <span style="color:red">*</span>
-                                                </label>
-                                                <input class="form-control" placeholder="" type="text"
-                                                       name="graduated_scale"
-                                                       id="graduated_scale" value="{{{ old('graduated_scale') }}}">
-                                            </div>
                                             <div class="form-actions form-group">
                                                 <button type="submit" class="btn btn-primary btn-sm">Create Nssf Rate
                                                 </button>

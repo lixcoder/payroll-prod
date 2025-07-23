@@ -33,7 +33,20 @@ public static $messages = array(
     );
 
 	// Don't forget to fill this array
-	protected $fillable = [];
+	protected $fillable = [
+		'employee_id',
+		'earning_id',
+		'narrative',
+		'formular',
+		'instalments',
+		'earnings_amount',
+		'earning_date',
+		'first_day_month',
+		'last_day_month',
+		'organization_id',
+		'created_at',
+		'updated_at',
+	];
 
 
 	public function employee(){

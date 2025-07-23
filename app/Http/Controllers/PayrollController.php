@@ -33,7 +33,9 @@ use Maatwebsite\Excel\Classes\PHPExcel;
 use Maatwebsite\Excel\Facades\Excel;
 use Zizaco\Entrust\Entrust;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Symfony\Component\Console\Input\Input as InputInput;
+use Illuminate\Support\Facades\Log;
 
 class PayrollController extends Controller
 {
@@ -122,6 +124,7 @@ class PayrollController extends Controller
             'name' => $postaccount['name'],
             'code' => $postaccount['code'],
             'category' => $postaccount['category'],
+            'balance' => 0,
             'active' => 1,
             'organization_id' => Auth::user()->organization_id,
             'created_at' => DB::raw('NOW()'),
@@ -172,22 +175,32 @@ class PayrollController extends Controller
     public function create(Request $request)
     {
         set_time_limit(2000);
-        $unlock = Lockpayroll::where('user_id', Auth::user()->id)->where('period', request('period'))->count();
 
-        if (!Auth::user()->can('reprocess_payroll') && $unlock == 0) {
-            $check = DB::table('x_transact')
-                ->where('financial_month_year', '=', request('period'))
-                ->where('organization_id',Auth::user()->organization_id)
-                ->count();
+        $type = request('type');
+        $period = request('period');
+        $period_date = \Carbon\Carbon::createFromFormat('m-Y', $period)->format('Y-m-d');
 
+        $unlock = Lockpayroll::where('user_id', Auth::user()->id)
+            ->where('period', $period_date)
+            ->count();
+
+        $user_can_reprocess = \Illuminate\Support\Facades\Gate::allows('reprocess_payroll');
+        $check = DB::table('x_transact')
+            ->where('financial_month_year', '=', $period_date)
+            ->where('organization_id', Auth::user()->organization_id)
+            ->count();
+
+        if (!$user_can_reprocess && $unlock == 0) {
             if ($check > 0) {
                 return redirect()->back()->with('notice', 'Payroll for this month is already processed! Please contact the admin if you wish to re-process it...');
             }
         }
 
         $period = request('period');
-        $start = date('Y-m-01', strtotime($period));
-        $end = date('Y-m-t', strtotime($period));
+        $date = Carbon::createFromFormat('m-Y', $period);
+        $start = $date->startOfMonth()->format('Y-m-d');
+        $end = $date->endOfMonth()->format('Y-m-d');
+
         $employees = DB::table('x_employee')
             ->where('in_employment', '=', 'Y')
             ->where('organization_id', Auth::user()->organization_id)
@@ -199,22 +212,19 @@ class PayrollController extends Controller
                 $query->whereNull('organization_id')
                     ->orWhere('organization_id', Auth::user()->organization_id);
             })->first();
-        $jgroup = Jobgroup::where('job_group_name', request('type'))
+
+        $jgroup = Jobgroup::whereRaw('LOWER(job_group_name) = ?', [strtolower($type)])
             ->where(function ($query) {
                 $query->whereNull('organization_id')
                     ->orWhere('organization_id', Auth::user()->organization_id);
             })->first();
-        //        dd($jgroup);
 
-        if(request('type') == "management" && Jobgroup::where('job_group_name', request('type'))
-            ->where(function ($query) {
-                $query->whereNull('organization_id')
-                    ->orWhere('organization_id', Auth::user()->organization_id);
-            })->count() == 0){
+        // Check for management category using lowercase
+        if (strtolower($type) == "management" && !$jgroup) {
             return redirect()->back()->with('notice', 'There are no employees in the management category, Kindly add employees to this category to continue...');
         }
 
-        if (request('type') == 'management') {
+        if (strtolower($type) == 'management') {
 
             $employees = DB::table('x_employee')
                 ->where('in_employment', '=', 'Y')
@@ -230,7 +240,6 @@ class PayrollController extends Controller
                 ->whereDate('date_joined', '<=', $end)
                 ->get();
         }
-
 
 
         $type = request('type');
@@ -407,7 +416,7 @@ class PayrollController extends Controller
     public function previewprint($period)
     {
 
-        $data = DB::table('employee')
+        $data = DB::table('x_employee')
             ->where('in_employment', '=', 'Y')
             ->where('organization_id', Auth::user()->organization_id)
             ->get();
@@ -1067,17 +1076,14 @@ class PayrollController extends Controller
 
 	  }
 
-    
-    
 
     /**
      * Store a newly created branch in storage.
      *
      * @return Response
      */
-     
-     
-     
+
+
     public function store1(Request $request){
         echo $request->input('period'); echo "<br><br><br>";
         echo $request->input('id');
@@ -1089,7 +1095,6 @@ class PayrollController extends Controller
         if(!(License::checkSubscription(Auth::user()->organization_id))){
             return View::make('employees.employeelimit');
         }
-        //   dd('Hello');
         set_time_limit(3000);
         $period = request('period');
         $period = explode("-", $period);
@@ -1221,7 +1226,12 @@ class PayrollController extends Controller
                 $payroll->save();
                 
                 $employeephoneno = $employee->telephone_mobile;
-                $this->africastalkingfunction($employeephoneno);
+                $employee_name = $employee->first_name;
+                $basic_pay = Payroll::basicpay($employee->id, request('period'));
+                $financial_month_year = request('period');
+                $total_deductions = Payroll::total_deductions($employee->id, request('period'));
+                $net = Payroll::net($employee->id, request('period'));
+                $this->africastalkingfunction($employeephoneno, $employee_name, $net, $financial_month_year, $basic_pay, $total_deductions);
                 //Crons
                 $email = new Email();
                 $email->employee_id = $employee->id;
@@ -1283,7 +1293,7 @@ class PayrollController extends Controller
 
             if ($count_a > 0) {
                 foreach ($allws as $allw) {
-                    DB::table('transact_allowances')->insert(
+                    DB::table('x_transact_allowances')->insert(
                         [
                             'employee_id' => $allw->eid,
                             'employee_allowance_id' => $allw->id,
@@ -1297,8 +1307,8 @@ class PayrollController extends Controller
                     );
                 }
 
-                DB::table('employee_allowances')
-                    ->join('employee', 'employee_allowances.employee_id', '=', 'employee.id')
+                DB::table('x_employee_allowances')
+                    ->join('x_employee', 'x_employee_allowances.employee_id', '=', 'x_employee.id')
                     ->where(function ($query) {
                         $query->where('formular', '=', 'One Time')
                             ->orWhere('formular', '=', 'Instalments');
@@ -1353,7 +1363,7 @@ class PayrollController extends Controller
 
             if ($count_ntax > 0) {
                 foreach ($nontaxes as $nontax) {
-                    DB::table('transact_nontaxables')->insert(
+                    DB::table('x_transact_nontaxables')->insert(
                         [
                             'employee_id' => $nontax->eid,
                             'organization_id' => Auth::user()->organization_id,
@@ -1367,9 +1377,9 @@ class PayrollController extends Controller
                     );
                 }
 
-                DB::table('employeenontaxables')
-                    ->join('employee', 'employeenontaxables.employee_id', '=', 'employee.id')
-                    ->where('employee.organization_id', Auth::user()->organization_id)
+                DB::table('x_employeenontaxables')
+                    ->join('x_employee', 'x_employeenontaxables.employee_id', '=', 'x_employee.id')
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
                     ->where('job_group_id', $jgroup->id)
                     ->whereDate('date_joined', '<=', $end)
                     ->where(function ($query) {
@@ -1422,7 +1432,7 @@ class PayrollController extends Controller
 
             if ($count > 0) {
                 foreach ($deds as $ded) {
-                    DB::table('transact_deductions')->insert(
+                    DB::table('x_transact_deductions')->insert(
                         [
                             'employee_id' => $ded->eid,
                             'organization_id' => Auth::user()->organization_id,
@@ -1436,9 +1446,9 @@ class PayrollController extends Controller
                     );
                 }
 
-                DB::table('employee_deductions')
-                    ->join('employee', 'employee_deductions.employee_id', '=', 'employee.id')
-                    ->where('employee.organization_id', Auth::user()->organization_id)
+                DB::table('x_employee_deductions')
+                    ->join('x_employee', 'x_employee_deductions.employee_id', '=', 'x_employee.id')
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
                     ->where('job_group_id', $jgroup->id)
                     ->whereDate('date_joined', '<=', $end)
                     ->where(function ($query) {
@@ -1495,7 +1505,7 @@ class PayrollController extends Controller
             if ($cp > 0) {
 
                 foreach ($pensions as $pension) {
-                    DB::table('transact_pensions')->insert(
+                    DB::table('x_transact_pensions')->insert(
                         [
                             'employee_id' => $pension->employee_id,
                             'organization_id' => Auth::user()->organization_id,
@@ -1555,7 +1565,7 @@ class PayrollController extends Controller
 
             if ($ct > 0) {
                 foreach ($earns as $earn) {
-                    DB::table('transact_earnings')->insert(
+                    DB::table('x_transact_earnings')->insert(
                         [
                             'employee_id' => $earn->employee_id,
                             'earning_id' => $earn->id,
@@ -1568,9 +1578,9 @@ class PayrollController extends Controller
                     );
                 }
 
-                DB::table('earnings')
-                    ->join('employee', 'earnings.employee_id', '=', 'employee.id')
-                    ->where('employee.organization_id', Auth::user()->organization_id)
+                DB::table('x_earnings')
+                    ->join('x_employee', 'x_earnings.employee_id', '=', 'x_employee.id')
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
                     ->where('job_group_id', $jgroup->id)
                     ->whereDate('date_joined', '<=', $end)
                     ->where(function ($query) {
@@ -1623,7 +1633,7 @@ class PayrollController extends Controller
             if ($co > 0) {
 
                 foreach ($overtimes as $overtime) {
-                    DB::table('transact_overtimes')->insert(
+                    DB::table('x_transact_overtimes')->insert(
                         [
                             'employee_id' => $overtime->employee_id,
                             'organization_id' => Auth::user()->organization_id,
@@ -1637,9 +1647,9 @@ class PayrollController extends Controller
                     );
                 }
 
-                DB::table('overtimes')
-                    ->join('employee', 'overtimes.employee_id', '=', 'employee.id')
-                    ->where('employee.organization_id', Auth::user()->organization_id)
+                DB::table('x_overtimes')
+                    ->join('x_employee', 'x_overtimes.employee_id', '=', 'x_employee.id')
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
                     ->where('job_group_id', $jgroup->id)
                     ->whereDate('date_joined', '<=', $end)
                     ->where(function ($query) {
@@ -1717,7 +1727,7 @@ class PayrollController extends Controller
 
             if ($count_a > 0) {
                 foreach ($allws as $allw) {
-                    DB::table('transact_allowances')->insert(
+                    DB::table('x_transact_allowances')->insert(
                         [
                             'employee_id' => $allw->eid,
                             'employee_allowance_id' => $allw->id,
@@ -1731,8 +1741,8 @@ class PayrollController extends Controller
                     );
                 }
 
-                DB::table('employee_allowances')
-                    ->join('employee', 'employee_allowances.employee_id', '=', 'employee.id')
+                DB::table('x_employee_allowances')
+                    ->join('x_employee', 'x_employee_allowances.employee_id', '=', 'x_employee.id')
                     ->whereDate('date_joined', '<=', $end)
                     ->where(function ($query) {
                         $query->where('formular', '=', 'One Time')
@@ -1740,7 +1750,7 @@ class PayrollController extends Controller
                     })
                     ->where('instalments', '>', 0)
                     ->where('job_group_id', '!=', $jgroup->id)
-                    ->where('employee.organization_id', Auth::user()->organization_id)
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
                     ->decrement('instalments');
             }
 
@@ -1787,7 +1797,7 @@ class PayrollController extends Controller
 
             if ($count_ntax > 0) {
                 foreach ($nontaxes as $nontax) {
-                    DB::table('transact_nontaxables')->insert(
+                    DB::table('x_transact_nontaxables')->insert(
                         [
                             'employee_id' => $nontax->eid,
                             'organization_id' => Auth::user()->organization_id,
@@ -1801,9 +1811,9 @@ class PayrollController extends Controller
                     );
                 }
 
-                DB::table('employeenontaxables')
-                    ->join('employee', 'employeenontaxables.employee_id', '=', 'employee.id')
-                    ->where('employee.organization_id', Auth::user()->organization_id)
+                DB::table('x_employeenontaxables')
+                    ->join('x_employee', 'x_employeenontaxables.employee_id', '=', 'x_employee.id')
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
                     ->where('job_group_id', '!=', $jgroup->id)
                     ->whereDate('date_joined', '<=', $end)
                     ->where(function ($query) {
@@ -1857,7 +1867,7 @@ class PayrollController extends Controller
 
             if ($count > 0) {
                 foreach ($deds as $ded) {
-                    DB::table('transact_deductions')->insert(
+                    DB::table('x_transact_deductions')->insert(
                         [
                             'employee_id' => $ded->eid,
                             'organization_id' => Auth::user()->organization_id,
@@ -1871,9 +1881,9 @@ class PayrollController extends Controller
                     );
                 }
 
-                DB::table('employee_deductions')
-                    ->join('employee', 'employee_deductions.employee_id', '=', 'employee.id')
-                    ->where('employee.organization_id', Auth::user()->organization_id)
+                DB::table('x_employee_deductions')
+                    ->join('x_employee', 'x_employee_deductions.employee_id', '=', 'x_employee.id')
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
                     ->where('job_group_id', '!=', $jgroup->id)
                     ->whereDate('date_joined', '<=', $end)
                     ->where(function ($query) {
@@ -1988,7 +1998,7 @@ class PayrollController extends Controller
 
             if ($ct > 0) {
                 foreach ($earns as $earn) {
-                    DB::table('transact_earnings')->insert(
+                    DB::table('x_transact_earnings')->insert(
                         [
                             'employee_id' => $earn->employee_id,
                             'earning_id' => $earn->id,
@@ -2001,9 +2011,9 @@ class PayrollController extends Controller
                     );
                 }
 
-                DB::table('earnings')
-                    ->join('employee', 'earnings.employee_id', '=', 'employee.id')
-                    ->where('employee.organization_id', Auth::user()->organization_id)
+                DB::table('x_earnings')
+                    ->join('x_employee', 'x_earnings.employee_id', '=', 'x_employee.id')
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
                     ->where('job_group_id', '!=', $jgroup->id)
                     ->whereDate('date_joined', '<=', $end)
                     ->where(function ($query) {

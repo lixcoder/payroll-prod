@@ -389,7 +389,7 @@
                                 </li>
                                 <li class="">
                                     <a href="{{ url('nhif')}}" class="waves-effect waves-dark">
-                                        <span class="pcoded-mtext">NHIF Rates</span>
+                                        <span class="pcoded-mtext">SHIF Rates</span>
                                     </a>
                                 </li>
                                 <li class="">
@@ -400,6 +400,11 @@
                                 <li class="">
                                     <a href="{{ url('housinglevy')}}" class="waves-effect waves-dark">
                                         <span class="pcoded-mtext">Housing levy</span>
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a href="{{ url('personalrelief')}}" class="waves-effect waves-dark">
+                                        <span class="pcoded-mtext">Personal relief</span>
                                     </a>
                                 </li>
                                 <li class="">

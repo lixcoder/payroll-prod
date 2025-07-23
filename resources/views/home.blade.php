@@ -2,6 +2,7 @@
 @section('xara_cbs')
     <?php
     use App\Models\Organization;
+    use Illuminate\Support\Facades\Auth;
     //use App\Branch;
     $organization = Organization::find(Auth::user()->organization_id);
     //dd($organization);
@@ -230,12 +231,12 @@
                     $emps = App\Models\Employee::where('type_id',$employeeTypes[$i]->id)->get();
                     if (count($employeeTypes[$i]->employees) > 0)
                     {
-                    ?>
+                    ?>,
                 labels: ["{{$employeeTypes[$i]->employee_type_name}}"],
                 <?php
                     }
                     }
-                    ?>
+                    ?>,
                 datasets: [{
                     label: "Employee Type Report",
                     <?php
@@ -244,12 +245,12 @@
                         {
                         if (count($employeeTypes[$i]->employees) > 0)
                         {
-                        ?>
+                        ?>,
                     data: ["{{count($employeeTypes[$i]->employees)}}"],
                     <?php
                         }
                         }
-                        ?>
+                        ?>,
                     backgroundColor: [
                         '#6dd144',
                         '#644ec5'
@@ -271,7 +272,7 @@
             data: {
                 labels: ['Male', 'Female'],
                 datasets: [{
-                    data: [{{$male}}, {{$female}}],
+                    data: [{$male}, {$female}],
                     backgroundColor: [
                         '#6dd144',
                         '#644ec5'
@@ -308,7 +309,7 @@
             data: {
                 labels: ['Approved', 'Cancelled', 'Applied'],
                 datasets: [{
-                    data: [{{$approved}}, {{$cancelled}}, {{$applied}}],
+                    data: [{$approved}, {$cancelled}, {$applied}],
                     backgroundColor: [
                         '#6dd144',
                         '#644ec5',
@@ -348,7 +349,7 @@
                 labels: ['{{$months[11]}}', '{{$months[10]}}', '{{$months[9]}}', '{{$months[8]}}', '{{$months[7]}}', '{{$months[6]}}', '{{$months[5]}}', '{{$months[4]}}', '{{$months[3]}}', '{{$months[2]}}', '{{$months[1]}}', '{{$months[0]}}'],
                 datasets: [{
                     label: "Leave Applications",
-                    data: [{{$month12}}, {{$month11}}, {{$month10}}, {{$month9}}, {{$month8}}, {{$month7}}, {{$month6}}, {{$month5}}, {{$month4}}, {{$month3}}, {{$month2}}, {{$month1}}],
+                    data: [{$month12}, {$month11}, {$month10}, {$month9}, {$month8}, {$month7}, {$month6}, {$month5}, {$month4}, {$month3}, {$month2}, {$month1}],
                     backgroundColor: [
                         '#6dd144',
                         // 'rgba(255, 159, 64, 0.2)'
@@ -381,7 +382,7 @@
                 labels: ['{{$months[11]}}', '{{$months[10]}}', '{{$months[9]}}', '{{$months[8]}}', '{{$months[7]}}', '{{$months[6]}}', '{{$months[5]}}', '{{$months[4]}}', '{{$months[3]}}', '{{$months[2]}}', '{{$months[1]}}', '{{$months[0]}}'],
                 datasets: [{
                     label: 'Amount Processed',
-                    data: [{{$monthss12}}, {{$monthss11}}, {{$monthss10}}, {{$monthss9}}, {{$monthss8}}, {{$monthss7}}, {{$monthss6}}, {{$monthss5}}, {{$monthss4}}, {{$monthss3}}, {{$monthss2}}, {{$monthss1}}],
+                    data: [{$monthss12}, {$monthss11}, {$monthss10}, {$monthss9}, {$monthss8}, {$monthss7}, {$monthss6}, {$monthss5}, {$monthss4}, {$monthss3}, {$monthss2}, {$monthss1}],
                     backgroundColor: [
                         '#644ec5',
                         // 'rgba(255, 159, 64, 0.2)'

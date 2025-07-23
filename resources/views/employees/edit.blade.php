@@ -145,16 +145,23 @@
 
                                                 <form>
                                                     <fieldset>
-                                                        <div class="form-group">
+                                                        <!-- <div class="form-group">
                                                             <label for="name">Name <span
                                                                     style="color:red">*</span></label>
                                                             <input type="text" name="ebname" id="ebname" value=""
                                                                    class="form-control">
 
-                                                            <!-- Allow form submission with keyboard without duplicating the dialog button -->
+                                                             Allow form submission with keyboard without duplicating the dialog button
                                                             <input type="submit" tabindex="-1"
                                                                    style="position:absolute; top:-1000px">
 
+                                                        </div> -->
+                                                        <div class="form-group">
+                                                            <label for="fname">First Name</label>
+                                                            <input type="text" name="fname" id="fname" class="form-control" value="{{ old('fname', $employee->first_name) }}">
+                                                            @error('fname')
+                                                                <span class="text-danger">{{ $message }}</span>
+                                                            @enderror
                                                         </div>
                                                     </fieldset>
                                                 </form>

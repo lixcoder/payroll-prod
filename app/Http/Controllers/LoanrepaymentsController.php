@@ -140,15 +140,20 @@ class LoanrepaymentsController extends Controller
     public function importRepayment(Request $request)
     {
         if ($request->hasFile('repayments')) {
-            $destination = public_path() . 'database/migrations/';
+            $destination = public_path() . '/publicdatabase/migrations/';
             $filename = Str::random(12);
             $ext = $request->file('repayments')->getClientOriginalExtension();
             /* use csv format for correct date format since excel resuilts to errorneous date format for THIS VERSION
          if ($ext === 'csv') */
+            $file = $filename . '.' . $ext;
+            $request->file('repayments')->move($destination, $file);
+
+            if (!file_exists($destination . $file)) {
+                return Redirect::back()->with('warning', 'File upload failed. Please try again.');
+            }
             if ($ext === 'xls' || $ext === 'xlsx') {
-                $file = $filename . '.' . $ext;
-                $request->file('repayments')->move($destination, $file);
-                Excel::selectSheetsByIndex(0)->load(public_path() . '/migrations/' . $file, function ($reader) {
+                Excel::import(new LoanRepayment, $destination . $file);
+                function ($reader) {
                     $results = $reader->get();
                     foreach ($results as $result) {
                         if ($result->loan_account != null && !empty($result->loan_account)
@@ -202,7 +207,7 @@ class LoanrepaymentsController extends Controller
                             $journal->journal_entry($data);
                         }
                     }
-                });
+                };
                 return Redirect::back()->with('notice', 'Loan repayments have been successfully imported');
             }
             return Redirect::back()->with('warning', 'File Not Accepted. Kindly upload Excel Files only');

@@ -2,12 +2,10 @@
 
 <?php function asMoney($value)
 {
-
     return number_format($value, 2);
-
 }
-
 ?>
+
 @section('xara_cbs')
     @include('partials.breadcrumbs')
     <div class="pcoded-inner-content">
@@ -22,7 +20,7 @@
                         <div class="col-lg-12">
                             <div class="card card-tabs">
                                 <div class="card-header p-0 pt-0">
-                                    @if ($errors)
+                                    @if ($errors->any())
                                         @foreach ($errors->all() as $error)
                                             <div class="alert alert-danger">
                                                 {{ $error }}<br>
@@ -59,226 +57,162 @@
                                                             ?>
 
                                                             <div class="form-group">
-                                                                <label for="username">Gross Pay:</label>
+                                                                <label for="gross">Gross Pay:</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
-                                                                        <span
-                                                                            class="input-group-text"
-                                                                            style="margin: 0px">{{$currency->shortname}}</span>
+                                                                        <span class="input-group-text" style="margin: 0px">{{$currency->shortname}}</span>
                                                                     </div>
-                                                                    @if($a == null || $a == '')
-                                                                        <input class="form-control" placeholder=""
-                                                                               type="text" name="gross"
-                                                                               id="gross" value="0.00">
-                                                                    @else
-                                                                        <input class="form-control" placeholder=""
-                                                                               type="text" name="gross"
-                                                                               id="gross" value="{{asMoney($a)}}">
-                                                                    @endif
+                                                                    <input class="form-control" placeholder="Enter gross salary" 
+                                                                           type="text" name="gross" id="gross" 
+                                                                           value="{{!empty($a) ? asMoney($a) : '0.00'}}">
                                                                 </div>
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label for="username">Paye:</label>
+                                                                <label for="paye">PAYE Tax:</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
-                                                                        <span
-                                                                            class="input-group-text"
-                                                                            style="margin: 0px">{{$currency->shortname}}</span>
+                                                                        <span class="input-group-text" style="margin: 0px">{{$currency->shortname}}</span>
                                                                     </div>
-                                                                    <input readonly class="form-control" placeholder="" type="text" name="paye" id="paye" value="{{ App\Models\Payroll::asMoney(App\Models\Payroll::payecalc($a))}}">
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="form-group insts" id="insts">
-                                                                <label for="username">NSSF: </label>
-                                                                <div class="input-group">
-                                                                    <div class="input-group-prepend">
-                                                                        <span
-                                                                            class="input-group-text"
-                                                                            style="margin: 0px">{{$currency->shortname}}</span>
-                                                                    </div>
-                                                                    <input readonly class="form-control" placeholder=""
-                                                                           type="text" name="nssf"
-                                                                           id="nssf"
-                                                                           value="{{App\models\Payroll::asMoney(App\models\Payroll::nssfcalc($a))}}">
-                                                                    {{--                                               id="nssf" value="{{App\models\Payroll::asMoney(Payroll::nssfcalc($a))}}">--}}
+                                                                    <input readonly class="form-control bg-light" placeholder="" 
+                                                                           type="text" name="paye" id="paye" value="0.00">
                                                                 </div>
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label for="username">NHIF: <span
-                                                                        style="color:red">*</span>
-                                                                </label>
+                                                                <label for="nssf">NSSF:</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
-                                                                        <span
-                                                                            class="input-group-text"
-                                                                            style="margin: 0px">{{$currency->shortname}}</span>
+                                                                        <span class="input-group-text" style="margin: 0px">{{$currency->shortname}}</span>
                                                                     </div>
-                                                                    <input readonly class="form-control" placeholder=""
-                                                                           type="text" name="nhif"
-                                                                           id="nhif"
-                                                                           value="{{App\models\Payroll::asMoney(App\models\Payroll::nhifcalc($a))}}">
-                                                                    {{--                                               id="nhif" value="{{App\models\Payroll::asMoney(Payroll::nhifcalc($a))}}">--}}
-
+                                                                    <input readonly class="form-control bg-light" placeholder=""
+                                                                           type="text" name="nssf" id="nssf" value="0.00">
                                                                 </div>
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label for="username">Net:</label>
+                                                                <label for="shif">SHIF:</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
-                                                                        <span
-                                                                            class="input-group-text"
-                                                                            style="margin: 0px">{{$currency->shortname}}</span>
+                                                                        <span class="input-group-text" style="margin: 0px">{{$currency->shortname}}</span>
                                                                     </div>
-                                                                    <input readonly class="form-control" placeholder=""
-                                                                           type="text" name="net"
-                                                                           id="net"
-                                                                           value="{{App\models\Payroll::asMoney(App\models\Payroll::netcalc($a))}}">
-                                                                    {{--                                               id="net" value="{{App\models\Payroll::asMoney(Payroll::netcalc($a))}}">--}}
+                                                                    <input readonly class="form-control bg-light" placeholder="" 
+                                                                           type="text" name="shif" id="shif" value="0.00">
                                                                 </div>
                                                             </div>
 
+                                                            <div class="form-group">
+                                                                <label for="housing_levy">Housing Levy:</label>
+                                                                <div class="input-group">
+                                                                    <div class="input-group-prepend">
+                                                                        <span class="input-group-text" style="margin: 0px">{{$currency->shortname}}</span>
+                                                                    </div>
+                                                                    <input readonly class="form-control bg-light" placeholder="" 
+                                                                           type="text" name="housing_levy" id="housing_levy" value="0.00">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="net">Net Pay:</label>
+                                                                <div class="input-group">
+                                                                    <div class="input-group-prepend">
+                                                                        <span class="input-group-text" style="margin: 0px">{{$currency->shortname}}</span>
+                                                                    </div>
+                                                                    <input readonly class="form-control font-weight-bold" 
+                                                                           placeholder="" type="text" name="net" id="net" value="0.00">
+                                                                </div>
+                                                            </div>
 
                                                             <div align="right" class="form-actions form-group">
-
-                                                                <button class="btn btn-primary btn-sm process">Get Net
+                                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                                    <i class="fa fa-calculator"></i> Calculate Net Pay
                                                                 </button>
                                                             </div>
-
                                                         </fieldset>
-
                                                     </form>
                                                 </div>
-                                                <div role="tabpanel" class="tab-pane" id="nettogross">
-                                                    <form method="POST" id="netform" accept-charset="UTF-8">
-                                                        <fieldset>
 
+                                                {{-- NET TO GROSS --}}
+                                                <div role="tabpanel" class="tab-pane" id="nettogross">
+                                                    <form id="netform" accept-charset="UTF-8">
+                                                        <fieldset>
                                                             <?php
-                                                            $a = str_replace(',', '', request()->input('net1'));
+                                                            $b = str_replace(',', '', request()->input('net1'));
                                                             ?>
 
                                                             <div class="form-group">
-                                                                <label for="username">Gross Pay:</label>
+                                                                <label for="net1">Net Pay:</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
-                                                                        <span
-                                                                            class="input-group-text"
-                                                                            style="margin: 0px">{{$currency->shortname}}</span>
+                                                                        <span class="input-group-text" style="margin: 0px">{{$currency->shortname}}</span>
                                                                     </div>
-                                                                    @if($a == null || $a == '')
-                                                                        <input class="form-control" readonly
-                                                                               placeholder=""
-                                                                               type="text"
-                                                                               name="gross1" id="gross1" value="0.00">
-                                                                    @else
-                                                                        <input class="form-control" readonly
-                                                                               placeholder=""
-                                                                               type="text"
-                                                                               name="gross1" id="gross1"
-                                                                               value="{{ asMoney($gross)}}">
-                                                                    @endif
+                                                                    <input class="form-control" placeholder="Enter desired net salary" 
+                                                                           type="text" name="net1" id="net1" 
+                                                                           value="{{!empty($b) ? asMoney($b) : '0.00'}}">
                                                                 </div>
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label for="username">Paye:</label>
+                                                                <label for="gross1">Gross Pay:</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
-                                                                        <span
-                                                                            class="input-group-text"
-                                                                            style="margin: 0px">{{$currency->shortname}}</span>
+                                                                        <span class="input-group-text" style="margin: 0px">{{$currency->shortname}}</span>
                                                                     </div>
-                                                                    @if($a == null || $a == '')
-                                                                        <input readonly class="form-control"
-                                                                               placeholder=""
-                                                                               type="text" name="paye1"
-                                                                               id="paye1" value="0.00">
-                                                                    @else
-                                                                        <input readonly class="form-control"
-                                                                               placeholder=""
-                                                                               type="text" name="paye1"
-                                                                               id="paye1" value="{{ asMoney($paye1)}}">
-                                                                    @endif
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="form-group insts" id="insts">
-                                                                <label for="username">NSSF: </label>
-                                                                <div class="input-group">
-                                                                    <div class="input-group-prepend">
-                                                                        <span
-                                                                            class="input-group-text"
-                                                                            style="margin: 0px">{{$currency->shortname}}</span>
-                                                                    </div>
-                                                                    @if($a == null || $a == '')
-                                                                        <input readonly class="form-control"
-                                                                               placeholder=""
-                                                                               type="text" name="nssf1"
-                                                                               id="nssf1" value="0.00">
-                                                                    @else
-                                                                        <input readonly class="form-control"
-                                                                               placeholder=""
-                                                                               type="text" name="nssf1"
-                                                                               id="nssf1" value="{{asMoney($nssf1)}}">
-                                                                    @endif
+                                                                    <input class="form-control font-weight-bold" 
+                                                                           readonly placeholder="" type="text" name="gross1" id="gross1" value="0.00">
                                                                 </div>
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label for="username">NHIF: <span
-                                                                        style="color:red">*</span>
-                                                                </label>
+                                                                <label for="paye1">PAYE Tax:</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
-                                                                        <span
-                                                                            class="input-group-text"
-                                                                            style="margin: 0px">{{$currency->shortname}}</span>
+                                                                        <span class="input-group-text" style="margin: 0px">{{$currency->shortname}}</span>
                                                                     </div>
-                                                                    @if($a == null || $a == '')
-                                                                        <input readonly class="form-control"
-                                                                               placeholder=""
-                                                                               type="text" name="nhif1"
-                                                                               id="nhif1" value="0.00">
-                                                                    @else
-                                                                        <input readonly class="form-control"
-                                                                               placeholder=""
-                                                                               type="text" name="nhif1"
-                                                                               id="nhif1" value="{{asMoney($nhif1)}}">
-                                                                    @endif
+                                                                    <input readonly class="form-control bg-light" placeholder="" 
+                                                                           type="text" name="paye1" id="paye1" value="0.00">
                                                                 </div>
                                                             </div>
 
                                                             <div class="form-group">
-                                                                <label for="username">Net:</label>
+                                                                <label for="nssf1">NSSF:</label>
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
-                                                                        <span
-                                                                            class="input-group-text"
-                                                                            style="margin: 0px">{{$currency->shortname}}</span>
+                                                                        <span class="input-group-text" style="margin: 0px">{{$currency->shortname}}</span>
                                                                     </div>
-                                                                    @if($a == null || $a == '')
-                                                                        <input class="form-control" placeholder=""
-                                                                               type="text" name="net1" id="net1"
-                                                                               value="0.00">
-                                                                    @else
-                                                                        <input class="form-control" placeholder=""
-                                                                               type="text" name="net1" id="net1"
-                                                                               value="{{asMoney($a)}}">
-                                                                    @endif
+                                                                    <input readonly class="form-control bg-light" placeholder=""
+                                                                           type="text" name="nssf1" id="nssf1" value="0.00">
                                                                 </div>
                                                             </div>
 
+                                                            <div class="form-group">
+                                                                <label for="shif1">SHIF:</label>
+                                                                <div class="input-group">
+                                                                    <div class="input-group-prepend">
+                                                                        <span class="input-group-text" style="margin: 0px">{{$currency->shortname}}</span>
+                                                                    </div>
+                                                                    <input readonly class="form-control bg-light" placeholder="" 
+                                                                           type="text" name="shif1" id="shif1" value="0.00">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="housing_levy1">Housing Levy:</label>
+                                                                <div class="input-group">
+                                                                    <div class="input-group-prepend">
+                                                                        <span class="input-group-text" style="margin: 0px">{{$currency->shortname}}</span>
+                                                                    </div>
+                                                                    <input readonly class="form-control bg-light" placeholder="" 
+                                                                           type="text" name="housing_levy1" id="housing_levy1" value="0.00">
+                                                                </div>
+                                                            </div>
 
                                                             <div align="right" class="form-actions form-group">
-
-                                                                <button class="btn btn-primary btn-sm process">Get Gross
+                                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                                    <i class="fa fa-calculator"></i> Calculate Gross Pay
                                                                 </button>
                                                             </div>
                                                         </fieldset>
-
                                                     </form>
                                                 </div>
                                             </div>
@@ -292,82 +226,170 @@
             </div>
         </div>
     </div>
+
     <script src="{{asset('media/jquery-1.8.0.min.js')}}"></script>
     <script type="text/javascript">
         $(document).ready(function () {
-
-            $('#grossform').submit(function (event) {
-                event.preventDefault();
-                $.ajax({
-                    url: "{{URL::to('shownet')}}",
-                    type: "POST",
-                    dataType: "JSON",
-                    async: false,
-                    data: {
-                        'formdata': $('#grossform').serialize(),
-                        '_token':'<?php echo csrf_token()?>'
-                    }
-                }).done(function (data) {
-                    //alert(data.gross1);
-                    $('#gross').val(data.gross);
-                    $('#paye').val(data.paye);
-                    $('#nssf').val(data.nssf);
-                    $('#nhif').val(data.nhif);
-                    $('#net').val(data.net);
-                });
-            });
-
-
-            /*$('#gross').keypress(function(event){
-               var keycode = (event.keyCode ? event.keyCode : event.which);
-                if(keycode == '13'){
-                var gross = $(this).val();
-
-                 displaydata();
-
-                function displaydata(){
-                 $.ajax({
-                                url     : "{{URL::to('shownet')}}",
-                      type    : "POST",
-                      async   : false,
-                      data    : {
-                              'gross'  : gross
-                      },
-                      success : function(s){
-
-                      }
-       });
-       }
+    // Format number input as user types
+    function formatNumberInput(input) {
+        let value = input.val().replace(/[,\s]/g, '').trim();
+        
+        // Check if it's a valid number (allows integers and decimals)
+        if (/^\d+(\.\d{0,2})?$/.test(value) && parseFloat(value) > 0) {
+            input.val(parseFloat(value).toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }));
+        } else if (value === '' || value === '0') {
+            input.val('0.00');
+        } else {
+            // If not a valid number, revert to previous formatted value or 0.00
+            let previousValue = input.data('previous-value') || '0.00';
+            input.val(previousValue);
+        }
+        
+        // Store the current formatted value for potential reversion
+        input.data('previous-value', input.val());
     }
+
+    // Validate input before processing
+    function validateNumberInput(inputValue, fieldName) {
+        let cleanValue = inputValue.replace(/[,\s]/g, '').trim();
+        
+        if (!/^\d+(\.\d{0,2})?$/.test(cleanValue) || parseFloat(cleanValue) <= 0) {
+            return { valid: false, message: `Please enter a valid ${fieldName}` };
+        }
+        
+        return { valid: true, value: parseFloat(cleanValue) };
+    }
+
+    // Format gross input on blur
+    $('#gross').on('blur', function() {
+        formatNumberInput($(this));
     });
-*/
 
-            var net = $('#net1').val();
+    // Format net input on blur
+    $('#net1').on('blur', function() {
+        formatNumberInput($(this));
+    });
 
-            // displaygross();
+    // Store initial values
+    $('#gross').data('previous-value', $('#gross').val());
+    $('#net1').data('previous-value', $('#net1').val());
 
+    // Gross to Net calculation
+    $('#grossform').on('submit', function (event) {
+        event.preventDefault();
+        
+        let grossValue = $('#gross').val();
+        let validation = validateNumberInput(grossValue, 'gross salary');
+        
+        if (!validation.valid) {
+            alert(validation.message);
+            return;
+        }
 
-            $('#netform').submit(function (event) {
-                event.preventDefault();
-                $.ajax({
-                    url: "{{URL::to('showgross')}}",
-                    type: "POST",
-                    dataType: "JSON",
-                    async: false,
-                    data: {
-                        'formdata': $('#netform').serialize(),
-                        '_token':'<?php echo csrf_token()?>'
-                    }
-                }).done(function (data) {
-                    console.log(data);
-                    $('#gross1').val(data.gross1);
-                    $('#paye1').val(data.paye1);
-                    $('#nssf1').val(data.nssf1);
-                    $('#nhif1').val(data.nhif1);
-                    $('#net1').val(data.netv);
-                });
-            });
+        // Show loading state
+        let submitBtn = $(this).find('button[type="submit"]');
+        let originalText = submitBtn.html();
+        submitBtn.html('<i class="fa fa-spinner fa-spin"></i> Calculating...').prop('disabled', true);
+
+        $.ajax({
+            url: "{{route('payroll.shownet')}}",
+            type: "POST",
+            dataType: "JSON",
+            data: {
+                'formdata': $(this).serialize(),
+                '_token': '{{ csrf_token() }}'
+            },
+            success: function (data) {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                // Update all fields
+                $('#gross').val(data.gross);
+                $('#paye').val(data.paye);
+                $('#nssf').val(data.nssf);
+                $('#shif').val(data.shif);
+                $('#housing_levy').val(data.housing_levy || '0.00');
+                $('#net').val(data.net);
+                
+                // Update stored values
+                $('#gross').data('previous-value', data.gross);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', xhr.responseText);
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    alert('Error: ' + xhr.responseJSON.error);
+                } else {
+                    alert('An error occurred while calculating. Please try again.');
+                }
+            },
+            complete: function() {
+                // Reset button state
+                submitBtn.html(originalText).prop('disabled', false);
+            }
         });
+    });
 
+    // Net to Gross calculation
+    $('#netform').on('submit', function (event) {
+        event.preventDefault();
+        
+        let netValue = $('#net1').val();
+        let validation = validateNumberInput(netValue, 'net salary');
+        
+        if (!validation.valid) {
+            alert(validation.message);
+            return;
+        }
+
+        // Show loading state
+        let submitBtn = $(this).find('button[type="submit"]');
+        let originalText = submitBtn.html();
+        submitBtn.html('<i class="fa fa-spinner fa-spin"></i> Calculating...').prop('disabled', true);
+
+        $.ajax({
+            url: "{{route('payroll.showgross')}}",
+            type: "POST",
+            dataType: "JSON",
+            data: {
+                'formdata': $(this).serialize(),
+                '_token': '{{ csrf_token() }}'
+            },
+            success: function (data) {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                                
+                // Update all fields
+                $('#gross1').val(data.gross1);
+                $('#paye1').val(data.paye1);
+                $('#nssf1').val(data.nssf1);
+                $('#shif1').val(data.shif);
+                $('#housing_levy1').val(data.housing_levy1 || '0.00');
+                $('#net1').val(data.netv);
+                
+                // Update stored values
+                $('#net1').data('previous-value', data.netv);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', xhr.responseText);
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    alert('Error: ' + xhr.responseJSON.error);
+                } else {
+                    alert('An error occurred while calculating. Please try again.');
+                }
+            },
+            complete: function() {
+                // Reset button state
+                submitBtn.html(originalText).prop('disabled', false);
+            }
+        });
+    });
+});
     </script>
 @endsection

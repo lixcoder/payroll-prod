@@ -1,5 +1,6 @@
 <?php namespace App\Models;
 
+use App\Calculations\KenyanPayrollCalculator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -85,39 +86,7 @@ class Payroll extends Model
         return round($allw, 2);
 
     }
-    
-    public static function taxablePay($id, $period){
-        $total_pay = static::gross($id, $period);
-        $total_nssf = static::nssf($id, $period);
-        $total_pension = static::grosspension($id, $period);
 
-        $taxable = $total_pay - $total_nssf - $total_pension;
-        
-        return $taxable;
-    }
-    public static function totalTaxablePay($period, $type){
-        // Use the `DB::raw` method to apply COALESCE in the SQL query
-        $sum = Payroll::select(\DB::raw('COALESCE(SUM(taxable_income), 0) as total'))
-            ->where('organization_id', Auth::user()->organization_id)
-            ->where('financial_month_year',$period)
-            ->where('process_type', $type)
-            ->first()->total;
-    
-        // $sum will contain the sum of the 'amount' column, handling NULL values and defaulting to 0
-        return (double) $sum;
-    }
-    public static function totalHousingLevy($period, $type){
-        // Use the `DB::raw` method to apply COALESCE in the SQL query
-        $sum = Payroll::select(\DB::raw('COALESCE(SUM(housing_levy), 0) as total'))
-            ->where('organization_id', Auth::user()->organization_id)
-            ->where('financial_month_year',$period)
-            ->where('process_type', $type)
-            ->first()->total;
-    
-        // $sum will contain the sum of the 'amount' column, handling NULL values and defaulting to 0
-        return (double) $sum;
-    }
-    
     public static function insuranceRelief($id, $period){
       return (15/100)* static::nhif($id, $period);      return 100.00;
     }
@@ -222,6 +191,7 @@ class Payroll extends Model
                         ->where('last_day_month', '>=', $start);
                 })->sum('allowance_amount');
         }
+        // dd($allw);
         return round($allw, 2);
 
     }
@@ -704,6 +674,7 @@ class Payroll extends Model
         $end = date('Y-m-t', strtotime("01-" . $period));
 
         if ($type == 'management') {
+            if ($jgroup && isset($jgroup->id)) {
 
             $rel = DB::table('x_employee_relief')
                 ->join('x_employee', 'x_employee_relief.employee_id', '=', 'x_employee.id')
@@ -713,8 +684,13 @@ class Payroll extends Model
                 ->where('job_group_id', $jgroup->id)
                 ->where('relief_id', '=', $relief_id)
                 ->sum('relief_amount');
+            } else {
+                $rel = 0;
+            }
         } else {
-            $rel = DB::table('x_employee_relief')
+            if ($jgroup && isset($jgroup->id)) {
+
+                $rel = DB::table('x_employee_relief')
                 ->join('x_employee', 'x_employee_relief.employee_id', '=', 'x_employee.id')
                 ->where('x_employee.organization_id', Auth::user()->organization_id)
                 ->where('in_employment', 'Y')
@@ -722,6 +698,9 @@ class Payroll extends Model
                 ->where('job_group_id', '!=', $jgroup->id)
                 ->where('relief_id', '=', $relief_id)
                 ->sum('relief_amount');
+            } else {
+                $rel = 0;
+            }
         }
         return round($rel, 2);
 
@@ -1073,333 +1052,125 @@ class Payroll extends Model
         $total_gross = static::basicpay($id, $period) + static::total_benefits($id, $period);
 
         return round($total_gross, 2);
-
     }
 
-    public static function totalgross($period)
+    public static function taxablePay($id, $period)
     {
-        $total_gross = 0.00;
+        $total_pay = static::gross($id, $period);
+        $total_nssf = static::nssf($id, $period);
+        $total_pension = static::grosspension($id, $period);
 
-        $part = explode("-", $period);
-        $start = $part[1] . "-" . $part[0] . "-01";
-        $end = date('Y-m-t', strtotime($start));
+        $taxable = $total_pay - $total_nssf - $total_pension;
 
-        $total_allw = DB::table('employee_allowances')
-            ->join('employee', 'employee_allowances.employee_id', '=', 'employee.id')
-            ->where('employee.organization_id', Auth::user()->organization_id)
-            ->where(function ($query) use ($start) {
-                $query->where('formular', '=', 'Recurring')
-                    ->where('first_day_month', '<=', $start);
-            })
-            ->orWhere(function ($query) use ($start) {
-                $query->where('instalments', '>', 0)
-                    ->where('first_day_month', '<=', $start)
-                    ->where('last_day_month', '>=', $start);
-            })->sum('allowance_amount');
-
-        $earn = DB::table('earnings')
-            ->join('employee', 'earnings.employee_id', '=', 'employee.id')
-            ->where('employee.organization_id', Auth::user()->organization_id)
-            ->where(function ($query) use ($start) {
-                $query->where('formular', '=', 'Recurring')
-                    ->where('first_day_month', '<=', $start);
-            })
-            ->orWhere(function ($query) use ($start) {
-                $query->where('instalments', '>', 0)
-                    ->where('first_day_month', '<=', $start)
-                    ->where('last_day_month', '>=', $start);
-            })->sum('earnings_amount');
-
-        $otime = DB::table('overtimes')
-            ->join('employee', 'overtimes.employee_id', '=', 'employee.id')
-            ->where('employee.organization_id', Auth::user()->organization_id)
-            ->where(function ($query) use ($start) {
-                $query->where('formular', '=', 'Recurring')
-                    ->where('first_day_month', '<=', $start);
-            })
-            ->orWhere(function ($query) use ($start) {
-                $query->where('instalments', '>', 0)
-                    ->where('first_day_month', '<=', $start)
-                    ->where('last_day_month', '>=', $start);
-            })->sum('amount*period');
-
-        $total_gross = static::totalpay() + $total_allw + $earn + $otime;
-
-        return round($total_gross, 2);
-
+        return $taxable;
     }
 
+    public static function taxableIncome($id, $period)
+    {
+        $gross = static::gross($id, $period);
+        $calculator = new KenyanPayrollCalculator();
+
+        // Calculate individual deductions
+        $nssf = $calculator->calculateNSSF($gross);
+        $shif = $calculator->calculateSHIF($gross);
+        $housingLevy = $calculator->calculateHousingLevy($gross);
+
+        // Calculate taxable income using Kenyan standards
+        $taxableIncome = max($gross - $nssf['total'] - $shif - $housingLevy, 0);
+
+        return round($taxableIncome, 2);
+    }
 
     public static function tax($id, $period)
     {
-        $paye = 0.00;
-        $total_pay = static::gross($id, $period);
-        $total_nssf = static::nssf($id, $period);
-        $total_pension = static::grosspension($id, $period);
-        $taxable = $total_pay - $total_nssf - $total_pension;
-        $emps = DB::table('x_employee')->where('id', '=', $id)->get();
-        foreach ($emps as $emp) {
-            if ($emp->income_tax_applicable == '0') {
-                $paye = 0.00;
-            } else if ($emp->income_tax_applicable == '1' && $emp->income_tax_relief_applicable == '1') {
+        $taxableIncome = static::taxableIncome($id, $period);
+        $calculator = new KenyanPayrollCalculator();
+        $paye = $calculator->calculatePAYE($taxableIncome);
 
-                //Automated PAYE calculation added by Dominick on 4/10/2023...
-                $rates = PayeRate::where('organization_id', Auth::user()->organization_id)->get();
-
-                $personalRelief = 0.00;
-
-                foreach($rates as $rate){
-                    if($rate->income_from <= $taxable){
-                        if($rate->income_from == 0){
-                            $personalRelief = $rate->income_to * ($rate->percentage)/100;
-                        }
-                        if($rate->income_to >= $taxable){
-                            $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
-                            $paye -= ($personalRelief + static::insuranceRelief($id, $period)) ;
-                                // - static::insuranceRelief($id, $period)
-                        }
-                        else{
-                            $paye +=(($rate->income_to - $rate->income_from) * ($rate->percentage)/100);                           
-                        }
-
-                    }
-                    // else if($rate->income_from >= $taxable){
-                    //     return $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
-                    // }
-                }
-
-                
-                // if ($taxable >= 13686 && $taxable < 23884) {
-                //     $paye = 1229.8 + ($taxable - 12298.33) * 15 / 100;
-                //     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
-                // } else if ($taxable > 24000 && $taxable <= 32333) {
-                //     $paye = 24000 * 10/100 + ($taxable-24000)*25/100;
-                //     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
-                // } else if ($taxable >32333  && $taxable <= 500000) {
-                //     $paye = 24000*0.1 + 8333 * 0.25 + ($taxable - 32333) * 0.3;
-                //     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
-                // } else if ($taxable >500000 && $taxable <= 800000 ) {
-                //     $paye = 2400 + 2083.25 + 467667*.3 + ($taxable - 500000)*0.325;
-                //     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
-                // } else if ($taxable > 800000 ) {
-                //     $paye = 2400 + 2083.25 + 467667*0.3 + 300000 * 0.325 + ($taxable - 800000) * 0.35;
-                //     $paye = $paye - 2400.00 - static::insuranceRelief($id, $period);
-                // } 
-                // else {
-                //     $paye = 0.00;
-                // }
-            } else if ($emp->income_tax_applicable == '1' && $emp->income_tax_relief_applicable == '0') {
-
-                //Automated PAYE calculation added by Dominick on 4/10/2023...
-                $rates = PayeRate::where('organization_id', Auth::user()->organization_id)->get();
-
-                $personalRelief = 0.00;
-
-                foreach($rates as $rate){
-                    if($rate->income_from <= $taxable){
-                        if($rate->income_from == 0){
-                            $personalRelief = $rate->income_to * ($rate->percentage)/100;
-                        }
-                        if($rate->income_to >= $taxable){
-                            $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
-                            $paye -= (static::insuranceRelief($id, $period)) ;
-                                // - static::insuranceRelief($id, $period)
-                        }
-                        else{
-                            $paye +=(($rate->income_to - $rate->income_from) * ($rate->percentage)/100);                           
-                        }
-
-                    }
-                    // else if($rate->income_from >= $taxable){
-                    //     return $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
-                    // }
-                }
-                // if ($taxable <= 24000) {
-                //     $paye = 24000 * 10 / 100;
-                //     $paye = $paye - static::taxrelief($id, $period);
-                // } else if ($taxable >= 23884 && $taxable < 35470) {
-                //     $paye = (1229.8 + ((11586.92) * 0.15)) + ($taxable - 23884) * 20 / 100;
-                //     $paye = $paye - static::taxrelief($id, $period);
-                // } else if ($taxable >= 35470 && $taxable < 47059) {
-                //     $paye = (1229.8 + (11586.92 * 0.15) + ((11586.92) * 0.2)) + ($taxable - 35470) * 25 / 100;
-                //     $paye = $paye - static::taxrelief($id, $period);
-                // } else if ($taxable >= 47059) {
-                //     $paye = (1229.8 + (11586.92 * 0.15) + (11586.92 * 0.2) + ((11586.92) * 0.25)) + ($taxable - 47059) * 30 / 100;
-                //     $paye = $paye - static::taxrelief($id, $period);
-                // } else {
-                //     $paye = 0.00;
-                // }
-            } else if ($emp->income_tax_applicable == '0' && $emp->income_tax_relief_applicable == '1') {
-                $paye = 0.00;
-            }
-        }
         if ($paye < 0) {
             $paye = 0.00;
         }
+
         return round($paye, 2);
     }
 
-
-    public static function totaltax($id, $period)
+    /**
+     * Calculate total tax BEFORE personal relief is applied
+     * This is the gross tax amount
+     */
+    public static function totalTax($id, $period)
     {
-        $paye = 0.00;
-        $total_pay = static::gross($id, $period);
-        $total_nssf = static::nssf($id, $period);
-        $total_pension = static::grosspension($id, $period);
-        $taxable = $total_pay - $total_nssf - $total_pension;
-        $emps = DB::table('x_employee')->where('id', '=', $id)->get();
-        foreach ($emps as $emp) {
-            if ($emp->income_tax_applicable == '0') {
-                $paye = 0.00;
-            } else if ($emp->income_tax_applicable == '1' && $emp->income_tax_relief_applicable == '1') {
-                //Automated PAYE calculation added by Dominick on 4/10/2023...
-                $rates = PayeRate::where('organization_id', Auth::user()->organization_id)->get();
+        $taxableIncome = static::taxableIncome($id, $period);
+        $calculator = new KenyanPayrollCalculator();
 
-                $personalRelief = 0.00;
+        // Calculate tax using PAYE bands but without applying personal relief
+        $tax = 0;
+        $remaining = $taxableIncome;
+        $prevUpper = 0;
 
-                foreach($rates as $rate){
-                    if($rate->income_from <= $taxable){
-                        if($rate->income_from == 0){
-                            $personalRelief = $rate->income_to * ($rate->percentage)/100;
-                        }
-                        if($rate->income_to >= $taxable){
-                            $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
-                            // $paye -= ($personalRelief + static::insuranceRelief($id, $period)) ;
-                                // - static::insuranceRelief($id, $period)
-                        }
-                        else{
-                            $paye +=(($rate->income_to - $rate->income_from) * ($rate->percentage)/100);                           
-                        }
+        // Get tax bands from calculator
+        $payeBands = $calculator->getPayeBands();
 
-                    }
-                    // else if($rate->income_from >= $taxable){
-                    //     return $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
-                    // }
-                }
-                // if ($taxable <= 24000) {
-                //     $paye = 24000 * 10 / 100;
-                // } else if ($taxable > 24000 && $taxable <= 32333) {
-                //     $paye = 24000 * 10/100 + ($taxable-24000)*25/100;
-                // } else if ($taxable >32333  && $taxable <= 500000) {
-                //     $paye = 24000*0.1 + 8333 * 0.25 + ($taxable - 32333) * 0.3;
-                //     $paye = $paye;
-                // } else if ($taxable >500000 && $taxable <= 800000 ) {
-                //     $paye = 2400 + 2083.25 + 467667*.3 + ($taxable - 500000)*0.325;
-                //     $paye = $paye;
-                // } else if ($taxable > 800000 ) {
-                //     $paye = 2400 + 2083.25 + 467667*0.3 + 300000 * 0.325 + ($taxable - 800000) * 0.35;
-                //     $paye = $paye;
-                // } else {
-                //     $paye = 0.00;
-                // }
-            } else if ($emp->income_tax_applicable == '1' && $emp->income_tax_relief_applicable == '0') {
-                //Automated PAYE calculation added by Dominick on 4/10/2023...
-                $rates = PayeRate::where('organization_id', Auth::user()->organization_id)->get();
-
-                $personalRelief = 0.00;
-
-                foreach($rates as $rate){
-                    if($rate->income_from <= $taxable){
-                        if($rate->income_from == 0){
-                            $personalRelief = $rate->income_to * ($rate->percentage)/100;
-                        }
-                        if($rate->income_to >= $taxable){
-                            $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
-                            // $paye -= ($personalRelief + static::insuranceRelief($id, $period)) ;
-                                // - static::insuranceRelief($id, $period)
-                        }
-                        else{
-                            $paye +=(($rate->income_to - $rate->income_from) * ($rate->percentage)/100);                           
-                        }
-
-                    }
-                    // else if($rate->income_from >= $taxable){
-                    //     return $paye +=($taxable - $rate->income_from)* ($rate->percentage)/100;
-                    // }
-                }
-                // if ($taxable >= 13686 && $taxable < 23884) {
-                //     $paye = 1229.8 + ($taxable - 12298) * 15 / 100;
-                //     $paye = $paye;
-                // } else if ($taxable >= 23884 && $taxable < 35470) {
-                //     $paye = (1229.8 + ((11586.92) * 0.15)) + ($taxable - 23884) * 20 / 100;
-                //     $paye = $paye;
-                // } else if ($taxable >= 35470 && $taxable < 47059) {
-                //     $paye = (1229.8 + (11586.92 * 0.15) + ((11586.92) * 0.2)) + ($taxable - 35470) * 25 / 100;
-                //     $paye = $paye;
-                // } else if ($taxable >= 47059) {
-                //     $paye = (1229.8 + (11586.92 * 0.15) + (11586.92 * 0.2) + ((11586.92) * 0.25)) + ($taxable - 47059) * 30 / 100;
-                //     $paye = $paye;
-                // } else {
-                //     $paye = 0.00;
-                // }
-            } else if ($emp->income_tax_applicable == '0' && $emp->income_tax_relief_applicable == '1') {
-                $paye = 0.00;
-            }
+        foreach ($payeBands as $band) {
+            $bandWidth = $band['upper'] - $prevUpper;
+            $taxableInBand = min($remaining, $bandWidth);
+            $tax += $taxableInBand * $band['rate'];
+            $remaining -= $taxableInBand;
+            $prevUpper = $band['upper'];
+            if ($remaining <= 0) break;
         }
-        if ($paye < 0) {
-            $paye = 0.00;
-        }
-        return round($paye, 2);
+
+        return round(max($tax, 0), 2);
     }
+
+
 
     public static function nssf($id, $period)
     {
-        $nssfAmt = 0.00;
         $total = static::gross($id, $period);
-        $employee = Employee::find($id);
-        if ($employee->social_security_applicable == '0') {
-            $nssfAmt = 0.00;
-        } else {
-            $nssf_amts = DB::table('x_social_security')->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
-            foreach ($nssf_amts as $nssf_amt) {
-                $nssfLowerEarning = $nssf_amt->nssf_lower_earning;
-                $to = $nssf_amt->nssf_upper_earning;
-                // Added by Dominick on 3/08/2023 to remove error of undefined variable $from
-                $from = $nssf_amt->nssf_lower_earning;
-                if ($total >= $from && $total <= $to) {
-                    $nssfAmt = (($nssf_amt->employee_contribution)/100) * $total;
-                }
-                else if($total > $to){
-                    $nssfAmt = $nssf_amt->max_employee_nssf;
-                }
-            }
-        }
-        return round($nssfAmt, 2);
+        $calculator = new KenyanPayrollCalculator();
+        $nssf = $calculator->calculateNSSF($total);
+        return round($nssf['total'], 2);
     }
 
+    public static function shif($id, $period)
+    {
+        $total = static::gross($id, $period);
+        $calculator = new KenyanPayrollCalculator();
+        $shif = $calculator->calculateSHIF($total);
+        return round($shif, 2);
+    }
+
+    // Keep the old nhif function for backward compatibility but make it use SHIF
     public static function nhif($id, $period)
     {
-        $nhifAmt = 0.00;
-        $total = static::gross($id, $period);
-        $employee = Employee::find($id);
-        if ($employee->hospital_insurance_applicable == '0') {
-            $nhifAmt = 0.00;
-        } else {
-            $nhif_amts = DB::table('x_hospital_insurance')->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
-            foreach ($nhif_amts as $nhif_amt) {
-                $from = $nhif_amt->income_from;
-                $to = $nhif_amt->income_to;
-                if ($total >= $from && $total <= $to) {
-                    $nhifAmt = $nhif_amt->hi_amount;
-                }
-            }
-        }
-        return round($nhifAmt, 2);
+        return static::shif($id, $period);
     }
 
-    //Housing Levy function added on31/08/2023 by Dominick
-    public static function housingLevy($id, $period){
-        $levies = DB::table('housing_levy')
-            ->select('*')
-            ->where('housing_levy.organization_id', Auth::user()->organization_id)->get();
-        
-        foreach($levies as $levy){
-            $per_levy = $levy->percentage;
-            $gross = self::gross($id, $period);
+    public static function housingLevy($id, $period)
+    {
+        $gross = self::gross($id, $period);
+        $calculator = new KenyanPayrollCalculator();
+        $housingLevy = $calculator->calculateHousingLevy($gross);
+        return $housingLevy;
+    }
 
-            return ($per_levy/100)*$gross;
-        }
 
+    /**
+     * Get personal relief amount using the calculator
+     */
+    public static function personalRelief($id, $period)
+    {
+        $calculator = new KenyanPayrollCalculator();
+        return $calculator->calculatePersonalRelief();
+    }
+
+    /**
+     * Get the actual personal relief amount for an employee
+     */
+    public static function getPersonalReliefAmount($employeeId, $period)
+    {
+        return static::personalRelief($employeeId, $period);
     }
 
     public static function deductions($id, $deduction_id, $period)
@@ -1581,27 +1352,6 @@ class Payroll extends Model
 
     }
 
-    /*public static function processedsalaries($id, $period)
-    {
-
-        $salary = 0.00;
-
-        $pays = DB::table('x_transact')
-            ->select('employee_id', DB::raw('COALESCE(sum(basic_pay),0.00) as total_pay'))
-            ->where('organization_id', Auth::user()->organization_id)
-            ->where('financial_month_year', '=', $period)
-            ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
-            ->get();
-
-        foreach ($pays as $pay) {
-            $salary = $pay->total_pay;
-        }
-
-        return number_format($salary, 2);
-
-    }*/
-
     public static function processedsalaries($id, $period)
     {
 
@@ -1635,25 +1385,6 @@ class Payroll extends Model
         return number_format($pension->employee_amount, 2);
 
     }
-
-   /* public static function processedgross($id, $period)
-    {
-
-        $gross = 0.00;
-
-        $pays = DB::table('x_transact')
-            ->select('employee_id', DB::raw('COALESCE(sum(taxable_income),0.00) as total_pay'))
-            ->where('organization_id', Auth::user()->organization_id)
-            ->where('financial_month_year', '=', $period)
-            ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
-            ->first();
-
-        $gross = $pays->total_pay;
-
-        return number_format($gross, 2);
-
-    }*/
 
     public static function processedgross($id, $period)
     {
@@ -2202,175 +1933,77 @@ class Payroll extends Model
 
     public static function payecalc($gross)
     {
-        try{
+        try {
             $paye = 0.00;
             $a = str_replace(',', '', $gross);
-//        $a=0.00;
             $total_pay = $a;
             $total_nssf = static::nssfcalc($gross);
-            $taxable = $total_pay - $total_nssf;
-            if ($taxable >= 12298 && $taxable < 23885) {
-                $paye = (1229.8 + ($taxable - 12298) * 15 / 100) - 1408.00;
-            } else if ($taxable >= 23885 && $taxable < 35472) {
-                $paye = ((1229.8 + ((11587) * 0.15)) + ($taxable - 23885) * 20 / 100) - 1408.00;
-            } else if ($taxable >= 35472 && $taxable < 47059) {
-                $paye = ((1229.8 + (11587 * 0.15) + ((11587) * 0.2)) + ($taxable - 35472) * 25 / 100) - 1408.00;
-            } else if ($taxable >= 47059) {
-                $paye = ((1229.8 + (11587 * 0.15) + (11587 * 0.2) + ((11587) * 0.25)) + ($taxable - 47059) * 30 / 100) - 1408.00;
-            } else {
+            $taxable = floatval($total_pay) - floatval($total_nssf);
+
+            $calculator = new KenyanPayrollCalculator();
+            $paye = $calculator->calculatePAYE($taxable);
+
+            if ($paye < 0) {
                 $paye = 0.00;
             }
+
             return round($paye, 2);
-        }catch (\Exception $e){
-
+        } catch (\Exception $e) {
         }
-
-        /*if($taxable>=13686 && $taxable<23884){
-    $paye = (1229.8+($taxable-12298)*15/100)-1408.00;
-    }else if($taxable>=23884 && $taxable<35470){
-    $paye = ((1229.8+((11586.92)*0.15))+($taxable-23884)*20/100)-1408.00;
-    }else if($taxable>=35470 && $taxable<47059){
-    $paye = ((1229.8+(11586.92*0.15)+((11586.92)*0.2))+($taxable-35470)*25/100)-1408.00;
-    }else if($taxable>=47059){
-    $paye = ((1229.8+(11586.92*0.15)+(11586.92*0.2)+((11586.92)*0.25))+($taxable-47059)*30/100)-1408.00;
-    }else{
-    $paye = 0.00;
-    }*/
-
-        /*if($taxable>=13686 && $taxable<23884){
-    $paye = (1118+($taxable-11180)*15/100)-1408;
-    }else if($taxable>=21715 && $taxable<32249){
-    $paye = (2698.03+($taxable-21715)*20/100)-1408;
-    }else if($taxable>=32249 && $taxable<42783){
-    $paye = (4804.73+($taxable-32249)*25/100)-1408;
-    }else if($taxable>=42783){
-    $paye = (7438.11+($taxable-42783)*30/100)-1408;
-    }else{
-    $paye = 0.00;
-    }*/
     }
 
     public static function nssfcalc($gross)
     {
-        $nssfAmt = 0.00;
-        $a = str_replace(',', '', $gross);
-        $total = $a;
-
-        $nssf_amts = DB::table('x_social_security')->whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
-//        dd($nssf_amts);
-        foreach ($nssf_amts as $nssf_amt) {
-            $from = $nssf_amt->income_from;
-            $to = $nssf_amt->income_to;
-            if ($total >= $from && $total <= $to) {
-                $nssfAmt = $nssf_amt->ss_amount_employee;
-            }
-        }
-        return round($nssfAmt, 2);
+        $calculator = new KenyanPayrollCalculator();
+        $nssfResult = $calculator->calculateNSSF($gross);
+        return round($nssfResult['total'], 2);
     }
 
     public static function nhifcalc($gross)
     {
-        $nhifAmt = 0.00;
-        $a = str_replace( ',', '', $gross);
-        $total = $a;
-
-        $nhif_amts = DB::table('x_hospital_insurance')->whereNull('organization_id')->orWhere('organization_id',Auth::user()->organization_id)->get();
-        foreach($nhif_amts as $nhif_amt){
-            $from=$nhif_amt->income_from;
-            $to=$nhif_amt->income_to;
-            if($total>=$from && $total<=$to){
-                $nhifAmt=$nhif_amt->hi_amount;
-            }
-        }
-        return round($nhifAmt,2);
+        $calculator = new KenyanPayrollCalculator();
+        return round($calculator->calculateSHIF($gross), 2);
     }
 
     public static function netcalc($gross)
     {
-        try {
-            $total_net = 0.00;
-            //$gross=0.00;
-            $total_net = $gross - static::payecalc($gross) - static::nssfcalc($gross) - static::nhifcalc($gross);
-            if ($total_net < 0) {
-                $total_net = 0;
-            } else {
-                $total_net = $gross - static::payecalc($gross) - static::nssfcalc($gross) - static::nhifcalc($gross);
-            }
-
-            return round($total_net, 2);
-        }catch (\Exception $e){
-
-        }
-
+        $calculator = new KenyanPayrollCalculator();
+        $paye = $calculator->calculatePAYE($gross - $calculator->calculateNSSF($gross)['total']);
+        $nssf = $calculator->calculateNSSF($gross)['total'];
+        $nhif = $calculator->calculateSHIF($gross);
+        $net = $gross - $paye - $nssf - $nhif;
+        return round($net, 2);
     }
 
     public static function payencalc($net)
     {
         $paye = 0.00;
         $a = str_replace(',', '', $net);
-
         $total_pay = $a;
         $total_nssf = static::nssfncalc($net);
         $taxable = $total_pay - $total_nssf;
 
-        if ($taxable >= 13686 && $taxable < 23884) {
-            $paye = (1229.8 + ($taxable - 12298) * 15 / 100) - 1408.00;
-        } else if ($taxable >= 23884 && $taxable < 35470) {
-            $paye = ((1229.8 + ((11586.92) * 0.15)) + ($taxable - 23884) * 20 / 100) - 1408.00;
-        } else if ($taxable >= 35470 && $taxable < 47059) {
-            $paye = ((1229.8 + (11586.92 * 0.15) + ((11586.92) * 0.2)) + ($taxable - 35470) * 25 / 100) - 1408.00;
-        } else if ($taxable >= 47059) {
-            $paye = ((1229.8 + (11586.92 * 0.15) + (11586.92 * 0.2) + ((11586.92) * 0.25)) + ($taxable - 47059) * 30 / 100) - 1408.00;
-        } else {
+        $calculator = new KenyanPayrollCalculator();
+        $paye = $calculator->calculatePAYE($taxable);
+
+        if ($paye < 0) {
             $paye = 0.00;
         }
 
-        /*if($taxable>=11180 && $taxable<21715){
-    $paye = (1118+($taxable-11180)*15/100)-1408;
-    }else if($taxable>=21715 && $taxable<32249){
-    $paye = (2698.03+($taxable-21715)*20/100)-1408;
-    }else if($taxable>=32249 && $taxable<42783){
-    $paye = (4804.73+($taxable-32249)*25/100)-1408;
-    }else if($taxable>=42783){
-    $paye = (7438.11+($taxable-42783)*30/100)-1408;
-    }else{
-    $paye = 0.00;
-    }*/
         return round($paye, 2);
     }
 
     public static function nssfncalc($net)
     {
-        $nssfAmt = 0.00;
-        $a = str_replace(',', '', $net);
-        $total = $a;
-
-        $nssf_amts = DB::table('social_security')->whereNull('employee.organization_id')->orWhere('employee.organization_id', Auth::user()->organization_id)->get();
-        foreach ($nssf_amts as $nssf_amt) {
-            $from = $nssf_amt->income_from;
-            $to = $nssf_amt->income_to;
-            if ($total >= $from && $total <= $to) {
-                $nssfAmt = $nssf_amt->ss_amount_employee;
-            }
-        }
-        return round($nssfAmt, 2);
+        $calculator = new KenyanPayrollCalculator();
+        $nssfResult = $calculator->calculateNSSF($net);
+        return round($nssfResult['total'], 2);
     }
 
     public static function nhifncalc($net)
     {
-        $nhifAmt = 0.00;
-        $a = str_replace(',', '', $net);
-        $total = $a;
-
-        $nhif_amts = DB::table('hospital_insurance')->whereNull('employee.organization_id')->orWhere('employee.organization_id', Auth::user()->organization_id)->get();
-        foreach ($nhif_amts as $nhif_amt) {
-            $from = $nhif_amt->income_from;
-            $to = $nhif_amt->income_to;
-            if ($total >= $from && $total <= $to) {
-                $nhifAmt = $nhif_amt->hi_amount;
-            }
-        }
-        return round($nhifAmt, 2);
+        $calculator = new KenyanPayrollCalculator();
+        return round($calculator->calculateSHIF($net), 2);
     }
 
     public static function grosscalc($net)
