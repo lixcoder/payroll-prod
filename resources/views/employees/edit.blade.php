@@ -23,6 +23,13 @@
                                     <form method="POST" action="{{{ url('employees/update/'.$employee->id) }}}"
                                           enctype="multipart/form-data" data-parsley-validate>
                                         @csrf
+                                        @if(count($errors)>0)
+                                            <div class="alert alert-danger">
+                                                @foreach ($errors->all() as $error)
+                                                    {{ $error }}<br>
+                                                @endforeach
+                                            </div>
+                                        @endif
                                         <div class="btn btn-default" id="progressBtn"
                                              style="position: absolute; width: 65px; height: 65px; left:47%; margin-top: -75px; border-radius: 50%; font-size: 15px; font-weight: bold; font-family:sans-serif; color: #fff; background: #1b01fa; border-color: transparent; padding-top:20px">
                                             <span id="cNo">
@@ -364,6 +371,9 @@
                                                                         value="{{$citizenship->id }}"<?= ($employee->citizenship_id == $citizenship->id) ? 'selected="selected"' : ''; ?>> {{ $citizenship->name }}</option>
                                                                 @endforeach
                                                             </select>
+                                                            @error('citizenship')
+                                                                <span class="text-danger">{{ $message }}</span>
+                                                            @enderror
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="username">Education Background</label>
@@ -375,6 +385,9 @@
                                                                         value="{{ $education->id }}"<?= ($employee->education_type_id == $education->id) ? 'selected="selected"' : ''; ?>> {{ $education->education_name }}</option>
                                                                 @endforeach
                                                             </select>
+                                                            @error('education')
+                                                                <span class="text-danger">{{ $message }}</span>
+                                                            @enderror
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="username">Gender <span
@@ -584,7 +597,9 @@
                                                                 @endforeach
 
                                                             </select>
-
+                                                            @error('branch_id')
+                                                                <span class="text-danger">{{ $message }}</span>
+                                                            @enderror
                                                         </div>
 
 
@@ -600,6 +615,9 @@
                                                                 @endforeach
 
                                                             </select>
+                                                            @error('department_id')
+                                                                <span class="text-danger">{{ $message }}</span>
+                                                            @enderror
 
                                                         </div>
 
@@ -631,6 +649,9 @@
                                                                 @endforeach
 
                                                             </select>
+                                                            @error('type_id')
+                                                                <span class="text-danger">{{ $message }}</span>
+                                                            @enderror
                                                         </div>
                                                         <div id="contract">
                                                             <div class="form-group">

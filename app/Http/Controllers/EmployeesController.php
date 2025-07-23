@@ -671,14 +671,47 @@ public function edit($id)
 public function update(Request $request, $id)
 {
     $employee = Employee::findOrFail($id);
+    
     $validator = Validator::make($request->all(), [
         'fname' => 'required|string|max:255',
+        'branch_id' => 'required|exists:branches,id',
+        'department_id' => 'required|exists:departments,id', 
+        'type_id' => 'required|exists:types,id',
+        'citizenship' => 'required|exists:citizenships,id',
+        'education' => 'required|exists:education_types,id',
         'pin' => 'nullable|unique:x_employee,pin,' . $id,
         'swift_code' => 'nullable|unique:x_employee,swift_code,' . $id,
         'email_office' => 'nullable|email|unique:x_employee,email_office,' . $id,
         'bank_account_number' => 'nullable|unique:x_employee,bank_account_number,' . $id,
+        'pay' => 'required|numeric|min:0',
+        'jtitle' => 'required|string|max:255',
+        'gender' => 'required|in:M,F',
+        'status' => 'required|string',
+        'dob' => 'required|date',
+        'djoined' => 'required|date',
+        'modep' => 'required|string',
+        'address' => 'required|string',
     ], [
         'fname.required' => 'The first name is required.',
+        'branch_id.required' => 'Please select a branch.',
+        'branch_id.exists' => 'The selected branch is invalid.',
+        'department_id.required' => 'Please select a department.',
+        'department_id.exists' => 'The selected department is invalid.',
+        'type_id.required' => 'Please select an employee type.',
+        'type_id.exists' => 'The selected employee type is invalid.',
+        'citizenship.required' => 'Please select citizenship.',
+        'citizenship.exists' => 'The selected citizenship is invalid.',
+        'education.required' => 'Please select education type.',
+        'education.exists' => 'The selected education type is invalid.',
+        'pay.required' => 'Basic pay is required.',
+        'pay.numeric' => 'Basic pay must be a number.',
+        'jtitle.required' => 'Job title is required.',
+        'gender.required' => 'Gender is required.',
+        'status.required' => 'Marital status is required.',
+        'dob.required' => 'Date of birth is required.',
+        'djoined.required' => 'Date joined is required.',
+        'modep.required' => 'Mode of payment is required.',
+        'address.required' => 'Address is required.',
         'pin.unique' => 'This PIN is already in use.',
         'swift_code.unique' => 'This SWIFT code is already in use.',
         'email_office.unique' => 'This email is already in use.',
@@ -689,6 +722,7 @@ public function update(Request $request, $id)
         return redirect()->back()->withErrors($validator)->withInput();
     }
 
+    // Handle image upload
     if ($request->hasFile('image')) {
         $file = $request->file('image');
         $name = time() . '-' . $file->getClientOriginalName();
@@ -698,6 +732,7 @@ public function update(Request $request, $id)
         $employee->photo = $request->get('photo');
     }
 
+    // Handle signature upload
     if ($request->hasFile('signature')) {
         $file = $request->file('signature');
         $name = time() . '-' . $file->getClientOriginalName();
@@ -707,6 +742,7 @@ public function update(Request $request, $id)
         $employee->signature = $request->get('sign');
     }
 
+    // Update employee fields with proper null coalescing for optional fields
     $employee->personal_file_number = $request->get('personal_file_number');
     $employee->first_name = $request->get('fname');
     $employee->last_name = $request->get('lname');
@@ -718,12 +754,19 @@ public function update(Request $request, $id)
     $employee->hospital_insurance_number = $request->get('hospital_insurance_number') ?? null;
     $employee->work_permit_number = $request->get('work_permit_number') ?? null;
     $employee->job_title = $request->get('jtitle');
-    $employee->education_type_id = $request->get('education') ?? null;
+    
+    // Required fields - these will be validated and cannot be null
+    $employee->education_type_id = $request->get('education');
     $employee->basic_pay = str_replace(',', '', $request->get('pay'));
     $employee->gender = $request->get('gender');
     $employee->marital_status = $request->get('status');
     $employee->yob = $request->get('dob');
-    $employee->citizenship_id = $request->get('citizenship') ?? null;
+    $employee->citizenship_id = $request->get('citizenship');
+    $employee->branch_id = $request->get('branch_id');
+    $employee->department_id = $request->get('department_id');
+    $employee->type_id = $request->get('type_id');
+    
+    // Optional fields
     $employee->mode_of_payment = $request->get('modep');
     $employee->bank_account_number = $request->get('bank_account_number') ?? null;
     $employee->bank_eft_code = $request->get('bank_eft_code') ?? null;
@@ -736,26 +779,29 @@ public function update(Request $request, $id)
     $employee->date_joined = date('Y-m-d', strtotime($request->get('djoined')));
     $employee->bank_id = $request->get('bank_id') ?? null;
     $employee->bank_branch_id = $request->get('bbranch_id') ?? null;
-    $employee->branch_id = $request->get('branch_id') ?? null;
-    $employee->department_id = $request->get('department_id') ?? null;
     $employee->job_group_id = $request->get('jgroup_id') ?? null;
-    $employee->type_id = $request->get('type_id') ?? null;
+    
+    // Boolean fields
     $employee->income_tax_applicable = $request->get('i_tax') ? '1' : '0';
     $employee->income_tax_relief_applicable = $request->get('i_tax_relief') ? '1' : '0';
     $employee->hospital_insurance_applicable = $request->get('a_nhif') ? '1' : '0';
     $employee->social_security_applicable = $request->get('a_nssf') ? '1' : '0';
+    $employee->in_employment = $request->get('active') ? 'Y' : 'N';
+    $employee->confirmed = $request->get('confirmed') ? 'Y' : 'N';
+    
+    // Other fields
     $employee->custom_field1 = $request->get('omode');
     $employee->organization_id = Auth::user()->organization_id;
     $employee->start_date = $request->get('startdate');
     $employee->end_date = $request->get('enddate');
-    $employee->in_employment = $request->get('active') ? 'Y' : 'N';
-    $employee->confirmed = $request->get('confirmed') ? 'Y' : 'N';
 
     $employee->update();
 
     Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'update', 'updated: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name);
 
     $insertedId = $employee->id;
+    
+    // Handle Next of Kin
     Nextofkin::where('employee_id', $id)->delete();
     if (isset($request->get('kin_first_name')[0])) {
         for ($i = 0; $i < count($request->get('kin_first_name')); $i++) {
@@ -772,14 +818,13 @@ public function update(Request $request, $id)
         }
     }
 
+    // Handle Documents
     Document::where('employee_id', $id)->delete();
     $files = $request->file('path');
     $j = 0;
-    if ($files === null) {
-        // No action
-    } else {
+    if ($files !== null) {
         foreach ($files as $file) {
-            if ($request->get('doc_name')[$j] != null || $request->get('doc_name')[$j] != '') {
+            if ($request->get('doc_name')[$j] != null && $request->get('doc_name')[$j] != '') {
                 $document = new Document;
                 $document->employee_id = $id;
                 if ($file) {
