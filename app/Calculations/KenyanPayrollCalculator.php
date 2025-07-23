@@ -43,7 +43,7 @@ class KenyanPayrollCalculator
         } catch (Exception $e) {
             // Fallback to hardcoded values if database is not available
             // $this->setFallbackRates();
-            throw new Exception("Failed to load rates from database: " . $e->getMessage());
+            throw new Exception('Error loading rates from database: ' . $e->getMessage());
         }
     }
 
