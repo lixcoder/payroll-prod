@@ -8128,74 +8128,74 @@ class ReportsController extends Controller
         if ($request->get('format') == "excel") {
             if ($request->get('allowance') == 'All') {
                 if ($request->get('type') == 'All') {
-                    $data = DB::table('transact_allowances')
-                        ->join('x_employee', 'transact_allowances.employee_id', '=', 'x_employee.id')
+                    $data = DB::table('x_transact_allowances')
+                        ->join('x_employee', 'x_transact_allowances.employee_id', '=', 'x_employee.id')
                         ->where('x_employee.organization_id', Auth::user()->organization_id)
-                        ->where('transact_allowances.financial_month_year', '=', $request->get('period'))
+                        ->where('x_transact_allowances.financial_month_year', '=', $request->get('period'))
                         ->get();
 
-                    $dataearning = DB::table('transact_earnings')
-                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'x_employee.id')
+                    $dataearning = DB::table('x_transact_earnings')
+                        ->join('x_employee', 'x_transact_earnings.employee_id', '=', 'x_employee.id')
                         ->where('x_employee.organization_id', Auth::user()->organization_id)
-                        ->where('transact_earnings.financial_month_year', '=', $request->get('period'))
+                        ->where('x_transact_earnings.financial_month_year', '=', $request->get('period'))
                         ->get();
 
-                    $dataovertime = DB::table('transact_overtimes')
-                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'x_employee.id')
+                    $dataovertime = DB::table('x_transact_overtimes')
+                        ->join('x_employee', 'x_transact_overtimes.employee_id', '=', 'x_employee.id')
                         ->where('x_employee.organization_id', Auth::user()->organization_id)
-                        ->where('transact_overtimes.financial_month_year', '=', $request->get('period'))
+                        ->where('x_transact_overtimes.financial_month_year', '=', $request->get('period'))
                         ->get();
 
-                    $total = DB::table('transact_allowances')
+                    $total = DB::table('x_transact_allowances')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum("allowance_amount");
 
-                    $totalearning = DB::table('transact_earnings')
+                    $totalearning = DB::table('x_transact_earnings')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum("earning_amount");
 
-                    $totalovertime = DB::table('transact_overtimes')
+                    $totalovertime = DB::table('x_transact_overtimes')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum("overtime_amount");
 
                 } else {
-                    $data = DB::table('transact_allowances')
-                        ->join('x_employee', 'transact_allowances.employee_id', '=', 'x_employee.id')
+                    $data = DB::table('x_transact_allowances')
+                        ->join('x_employee', 'x_transact_allowances.employee_id', '=', 'x_employee.id')
                         ->where('x_employee.organization_id', Auth::user()->organization_id)
-                        ->where('transact_allowances.financial_month_year', '=', $request->get('period'))
+                        ->where('x_transact_allowances.financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->get();
 
-                    $dataearning = DB::table('transact_earnings')
-                        ->join('x_employee', 'transact_earnings.employee_id', '=', 'x_employee.id')
+                    $dataearning = DB::table('x_transact_earnings')
+                        ->join('x_employee', 'x_transact_earnings.employee_id', '=', 'x_employee.id')
                         ->where('x_employee.organization_id', Auth::user()->organization_id)
-                        ->where('transact_earnings.financial_month_year', '=', $request->get('period'))
+                        ->where('x_transact_earnings.financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->get();
 
-                    $dataovertime = DB::table('transact_overtimes')
-                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'x_employee.id')
+                    $dataovertime = DB::table('x_transact_overtimes')
+                        ->join('x_employee', 'x_transact_overtimes.employee_id', '=', 'x_employee.id')
                         ->where('x_employee.organization_id', Auth::user()->organization_id)
-                        ->where('transact_overtimes.financial_month_year', '=', $request->get('period'))
+                        ->where('x_transact_overtimes.financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->get();
 
-                    $total = DB::table('transact_allowances')
+                    $total = DB::table('x_transact_allowances')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum("allowance_amount");
 
-                    $totalearning = DB::table('transact_earnings')
+                    $totalearning = DB::table('x_transact_earnings')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
                         ->sum("earning_amount");
 
-                    $totalovertime = DB::table('transact_overtimes')
+                    $totalovertime = DB::table('x_transact_overtimes')
                         ->where('organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))

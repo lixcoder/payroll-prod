@@ -36,6 +36,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Symfony\Component\Console\Input\Input as InputInput;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 class PayrollController extends Controller
 {
@@ -100,21 +101,41 @@ class PayrollController extends Controller
 
     public function dounlockpayroll()
     {
+        $period = Carbon::createFromFormat('m-Y', request('period'))->format('Y-m-d');
 
-        if (Lockpayroll::where('period', request('period'))->count() == 0) {
-
-            $unlock = new Lockpayroll;
-            $unlock->user_id = request('userid');
-            $unlock->authorized_by = Auth::user()->id;
-            $unlock->period = request('period');
-            $unlock->save();
-
-            $user = User::find(request('userid'));
-
-            return redirect('unlockpayroll/index')->with('notice', 'Payroll for period ' . request('period') . ' successfully unlocked to user ' . $user->name);
-        } else {
-            return redirect('unlockpayroll/index');
+        // Check if the period is valid
+        if (!$period) {
+            return redirect('unlockpayroll/index')->with('error', 'Invalid period format');
         }
+
+        // Check if the user ID is valid
+        $userId = request('userid');
+        if (!$userId) {
+            return redirect('unlockpayroll/index')->with('error', 'Invalid user ID');
+        }
+
+        // Check if the user exists
+        $user = User::find($userId);
+        if (!$user) {
+            return redirect('unlockpayroll/index')->with('error', 'User not found');
+        }
+
+        // Check if the payroll is already unlocked
+        if (Lockpayroll::where('period', $period)->where('user_id', $userId)->exists()) {
+            return redirect('unlockpayroll/index')->with('notice', 'Payroll for period ' . request('period') . ' already unlocked to user ' . $user->name);
+        }
+
+        // Unlock the payroll
+        $unlock = new Lockpayroll;
+        $unlock->user_id = $userId;
+        $unlock->authorized_by = Auth::user()->id;
+        $unlock->organization_id = Auth::user()->organization_id;
+        $unlock->period = $period;
+        if (!$unlock->save()) {
+            return redirect('unlockpayroll/index')->with('error', 'Failed to unlock payroll');
+        }
+
+        return redirect('unlockpayroll/index')->with('notice', 'Payroll for period ' . request('period') . ' successfully unlocked to user ' . $user->name);
     }
 
     public function createaccount()
@@ -959,26 +980,19 @@ class PayrollController extends Controller
         return $display;
         exit();
     }
-    
-    
+
+
     public function savesms(Request $request)
-	  { 
-         $smsupdate=$request->input('text');
-         $id=1;
-         DB::table('sms')
-            ->where('id', $id)
-            ->update([
-		'smsdetails' => $smsupdate,
-		'createdat' => now(),
-		'updatedat' => now(),
-                    ]);
-       
-      $smsdata = SmsModel::where('id', 1)->first();
-       return view('employees.sms', ['smsdata' => $smsdata]);
-	  }
+    {
+        $smsupdate = $request->input('text');
+        $sms = SmsModel::find(1);
+        $sms->smsdetails = $smsupdate;
+        $sms->save();
+        return view('employees.sms', ['smsdata' => $sms]);
+    }
     //send sms notification
-    
-    public function africastalkingfunction($employeephoneno,$employee_name, $net, $financial_month_year, $basic_pay, $total_deductions)
+
+    public function africastalkingfunction($employeephoneno, $employee_name, $net, $financial_month_year, $basic_pay, $total_deductions)
 	  {
        
 	    // Set your app credentials
@@ -986,11 +1000,15 @@ class PayrollController extends Controller
 	   // $apiKey = "eb6d8abb74babdf68637c28be2a9606364590a8de81feaca086043dacbf51dea";
 	    
 	    $username = config('services.africastalking.username');
-            $apiKey = config('services.africastalking.api_key');
-            
-            $smsdata = SmsModel::where('id', 1)->first();
-            $objectmessage= (object)$smsdata;
-            $Themessage= $objectmessage->smsdetails;
+        $apiKey = config('services.africastalking.api_key');
+
+        $smsdata = SmsModel::where('id', 1)->first();
+        if ($smsdata) {
+            $objectmessage = (object) $smsdata;
+            $Themessage = $objectmessage->smsdetails;
+        } else {
+            $Themessage = '';
+        }
 
 	    // Initialize the SDK
 	    $AT = new AfricasTalking($username, $apiKey);
@@ -998,25 +1016,23 @@ class PayrollController extends Controller
 	    // Get the SMS service
 	    $sms = $AT->sms();
 
-	    // Set the numbers you want to send to in international format
-	   // $recipients = "+254746717753, +254757388505";
-	    $recipients = $employeephoneno;
+        $recipients = $employeephoneno;
 
-	    // Set your message
-	  echo  $message = "Hi ".$employee_name.", ".$Themessage ." your total gross salary of ". $basic_pay . " Total deductions of ".        $total_deductions." and the Net pay of ".$net." for the month of ".$financial_month_year." has been successifully credited into your account.";
+        // Set your message
+        $message = "Hi " . $employee_name . ", " . $Themessage . " your total gross salary of " . $basic_pay . " Total deductions of " .        $total_deductions . " and the Net pay of " . $net . " for the month of " . $financial_month_year . " has been successifully credited into your account.";
 
 	    // Set your shortCode or senderId
 	    $from = "";
 
-	    try {
+        try {
 	      // Thats it, hit send and we'll take care of the rest
 	      $result = $sms->send([
 		'to' => $recipients,
 		'message' => $message,
 		'from' => $from
 	      ]);
-	      var_dump($result);
-	      $objectresult = (object) $result;
+            // dd($result);
+            $objectresult = (object) $result;
 	      echo $elements = count($objectresult->data->SMSMessageData->Recipients);
 	      for ($i = 0; $i < $elements; $i++) {
 		echo "<br>";
@@ -1072,21 +1088,7 @@ class PayrollController extends Controller
 	      }
 	    } catch (Exception $e) {
 	      echo "Error: " . $e->getMessage();
-	    }
-
-	  }
-
-
-    /**
-     * Store a newly created branch in storage.
-     *
-     * @return Response
-     */
-
-
-    public function store1(Request $request){
-        echo $request->input('period'); echo "<br><br><br>";
-        echo $request->input('id');
+        }
     }
 
 
@@ -1097,11 +1099,10 @@ class PayrollController extends Controller
         }
         set_time_limit(3000);
         $period = request('period');
-        $period = explode("-", $period);
 
-
-        $start = date('Y-m-01', strtotime("01-" . $period[0] . $period[1]));
-        $end = date('Y-m-t', strtotime("01-" . $period[0] . $period[1]));
+        $date = Carbon::createFromFormat('m-Y', $period);
+        $start = $date->startOfMonth()->format('Y-m-d');
+        $end = $date->endOfMonth()->format('Y-m-d');
 
         $employees = DB::table('x_employee')
             ->where('in_employment', '=', 'Y')
@@ -1116,18 +1117,12 @@ class PayrollController extends Controller
                     ->orWhere('organization_id', Auth::user()->organization_id);
             })->first();
 
-
-        // $jgroup = Jobgroup::where('job_group_name', 'Management')
-        //     ->where(function ($query) {
-        //         $query->whereNull('organization_id')
-        //             ->orWhere('organization_id', Auth::user()->organization_id);
-        //     })->first();
         $jgroup = Jobgroup::whereNull('organization_id')
                     ->orWhere('organization_id', Auth::user()->organization_id)
                     ->where('job_group_name', request()->type)
                     ->first();
 
-        if (request('type') == 'management') {
+        if (strtolower(request('type')) == 'management') {
 
             $employees = DB::table('x_employee')
                 ->where('in_employment', '=', 'Y')
@@ -1143,9 +1138,7 @@ class PayrollController extends Controller
                 ->whereDate('date_joined', '<=', $end)
                 ->get();
         }
-        
 
-         
 
         foreach ($employees as $employee) {
 
@@ -1155,7 +1148,7 @@ class PayrollController extends Controller
                 ->Where('financial_month_year', request('period'))
                 ->Where('employee_id', $employee->personal_file_number)
                 ->get();
-            if ($query == true) {
+            if ($query->count() > 0) {
 
                 foreach ($query as $q) {
                     $q->delete();
@@ -1167,10 +1160,10 @@ class PayrollController extends Controller
                     $payroll->basic_pay = Payroll::basicpay($employee->id, request('period'));
                     $payroll->earning_amount = Payroll::total_benefits($employee->id, request('period'));
                     $payroll->taxable_income = Payroll::taxablePay($employee->id, request('period'));
-                    $payroll->gross_tax = Payroll::totaltax($employee->id, request('period'));
+                $payroll->gross_tax = Payroll::totalTax($employee->id, request('period'));
                     $payroll->paye = Payroll::tax($employee->id, request('period'));
                     $payroll->insurance_relief = Payroll::insuranceRelief($employee->id, request('period'));
-                    $payroll->relief = 2400;
+                $payroll->relief = Payroll::personalRelief($employee->id, request('period'));
                     $payroll->nssf_amount = Payroll::nssf($employee->id, request('period'));
                     $payroll->nhif_amount = Payroll::nhif($employee->id, request('period'));
                     $payroll->housing_levy = Payroll::housingLevy($employee->id, request('period'));
@@ -1182,18 +1175,18 @@ class PayrollController extends Controller
                     $payroll->process_type = request('type');
                     $payroll->organization_id = Auth::user()->organization_id;
                     $payroll->save();
-                    
-                    $employee_name = $employee->first_name;
+
+                $employee_name = $employee->first_name;
                     $basic_pay = Payroll::basicpay($employee->id, request('period'));
                     $financial_month_year = request('period');
                     $earning_amount = Payroll::total_benefits($employee->id, request('period'));
                     $total_deductions = Payroll::total_deductions($employee->id, request('period'));
                     $net = Payroll::net($employee->id, request('period'));
                     $employeephoneno = $employee->telephone_mobile;
-                    $this->africastalkingfunction($employeephoneno, $employee_name, $net,$financial_month_year,$basic_pay,$total_deductions);
-                
-                    //Crons
-                    $email = new Email();
+                $this->africastalkingfunction($employeephoneno, $employee_name, $net, $financial_month_year, $basic_pay, $total_deductions);
+
+                //Crons
+                $email = new Email();
                     $email->employee_id = $employee->id;
                     $email->organization_id = Auth::user()->organization_id;
                     $email->save();
@@ -1209,10 +1202,10 @@ class PayrollController extends Controller
 
                 $payroll->earning_amount = Payroll::total_benefits($employee->id, request('period'));
                 $payroll->taxable_income = Payroll::gross($employee->id, request('period'));
-                $payroll->gross_tax = Payroll::totaltax($employee->id, request('period'));
+                $payroll->gross_tax = Payroll::totalTax($employee->id, request('period'));
                 $payroll->paye = Payroll::tax($employee->id, request('period'));                
                 $payroll->insurance_relief = Payroll::insuranceRelief($employee->id, request('period'));
-                $payroll->relief = 2400;
+                $payroll->relief = Payroll::personalRelief($employee->id, request('period'));
                 $payroll->nssf_amount = Payroll::nssf($employee->id, request('period'));
                 $payroll->nhif_amount = Payroll::nhif($employee->id, request('period'));
                 $payroll->housing_levy = Payroll::housingLevy($employee->id, request('period'));
@@ -1224,7 +1217,7 @@ class PayrollController extends Controller
                 $payroll->process_type = request('type');
                 $payroll->organization_id = Auth::user()->organization_id;
                 $payroll->save();
-                
+
                 $employeephoneno = $employee->telephone_mobile;
                 $employee_name = $employee->first_name;
                 $basic_pay = Payroll::basicpay($employee->id, request('period'));
@@ -1249,7 +1242,7 @@ class PayrollController extends Controller
 
         //DB::table('dailypays')->where('period',$period)->where('status',0)->update(array("status"=>1));
 
-        if (request('type') == 'management') {
+        if (strtolower(request('type')) == 'management') {
 
             $allws = DB::table('x_employee_allowances')
                 ->join('x_allowances', 'x_employee_allowances.allowance_id', '=', 'x_allowances.id')
@@ -1316,7 +1309,7 @@ class PayrollController extends Controller
                     ->where('instalments', '>', 0)
                     ->whereDate('date_joined', '<=', $end)
                     ->where('job_group_id', $jgroup->id)
-                    ->where('employee.organization_id', Auth::user()->organization_id)
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
                     ->decrement('instalments');
             }
 
@@ -2011,7 +2004,7 @@ class PayrollController extends Controller
                     );
                 }
 
-                DB::table('x_earnings')
+                DB::table('x_transact_earnings')
                     ->join('x_employee', 'x_earnings.employee_id', '=', 'x_employee.id')
                     ->where('x_employee.organization_id', Auth::user()->organization_id)
                     ->where('job_group_id', '!=', $jgroup->id)
@@ -2080,9 +2073,9 @@ class PayrollController extends Controller
                     );
                 }
 
-                DB::table('overtimes')
-                    ->join('employee', 'overtimes.employee_id', '=', 'employee.id')
-                    ->where('employee.organization_id', Auth::user()->organization_id)
+                DB::table('x_transact_overtimes')
+                    ->join('x_employee', 'x_overtimes.employee_id', '=', 'x_employee.id')
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
                     ->where('job_group_id', '!=', $jgroup->id)
                     ->whereDate('date_joined', '<=', $end)
                     ->where(function ($query) {

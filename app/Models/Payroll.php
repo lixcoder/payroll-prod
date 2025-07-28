@@ -1123,8 +1123,6 @@ class Payroll extends Model
         return round(max($tax, 0), 2);
     }
 
-
-
     public static function nssf($id, $period)
     {
         $total = static::gross($id, $period);
@@ -2452,22 +2450,6 @@ class Payroll extends Model
                 } else {
                     $paye = 0.00;
                 }
-
-                /*if($taxable>=11180 && $taxable<21715){
-    $paye = 1118+($taxable-11180)*15/100;
-    $paye = $paye;
-    }else if($taxable>=21715 && $taxable<32249){
-    $paye = 2698.03+($taxable-21715)*20/100;
-    $paye = $paye;
-    }else if($taxable>=32249 && $taxable<42783){
-    $paye = 4804.73+($taxable-32249)*25/100;
-    $paye = $paye;
-    }else if($taxable>=42783){
-    $paye = 7438.11+($taxable-42783)*30/100;
-    $paye = $paye;
-    }else{
-    $paye = 0.00;
-    }*/
             } else if ($emp->income_tax_applicable == '1' && $emp->income_tax_relief_applicable == '0') {
 
                 if ($taxable >= 13686 && $taxable < 23884) {
@@ -2481,22 +2463,6 @@ class Payroll extends Model
                 } else {
                     $paye = 0.00;
                 }
-
-                /*if($taxable>=11180 && $taxable<21715){
-    $paye = 1118+($taxable-11180)*15/100;
-    $paye = $paye;
-    }else if($taxable>=21715 && $taxable<32249){
-    $paye = 2698.03+($taxable-21715)*20/100;
-    $paye = $paye;
-    }else if($taxable>=32249 && $taxable<42783){
-    $paye = 4804.73+($taxable-32249)*25/100;
-    $paye = $paye;
-    }else if($taxable>=42783){
-    $paye = 7438.11+($taxable-42783)*30/100;
-    $paye = $paye;
-    }else{
-    $paye = 0.00;
-    }*/
             } else if ($emp->income_tax_applicable == '0' && $emp->income_tax_relief_applicable == '1') {
                 $paye = 0.00;
             }
