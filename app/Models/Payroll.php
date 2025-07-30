@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\PayeRate;
-
+use Illuminate\Support\Facades\Log;
 
 class Payroll extends Model
 {
@@ -87,41 +87,12 @@ class Payroll extends Model
 
     }
 
-    public static function insuranceRelief($id, $period){
-      return (15/100)* static::nhif($id, $period);      return 100.00;
-    }
-
     public static function basicpay($id, $period)
     {
 
         $pay = 0.00;
 
         $employee = Employee::find($id);
-        /*$part = explode("-", date('Y-n-d',strtotime($employee->date_joined)));
-    $start = $part[0]."-".$part[1]."-01";
-    $end  = date('Y-m-t', strtotime($start));
-
-    //return $period."\n".$part[1]."-".$part[0];
-
-    if($period == $part[1]."-".$part[0]){
-    if($part[1] == 2){
-    $datetime1 = strtotime($employee->date_joined);
-    $datetime2 = strtotime($end);
-
-    $secs = $datetime2 - $datetime1;// == <seconds between the two times>
-    $days = $secs / 86400;
-    $pay = ($employee->basic_pay/28) * ($days+1);
-    }else{
-    $datetime1 = strtotime($employee->date_joined);
-    $datetime2 = strtotime($end);
-
-    $secs = $datetime2 - $datetime1;// == <seconds between the two times>
-    $days = $secs / 86400;
-    $pay = ($employee->basic_pay/30) * ($days+1);
-    }
-    }else{
-     $pay = $employee->basic_pay;
-    }*/
         $pay = $employee->basic_pay;
          $numericvaluepay = floatval($pay);
          
@@ -363,33 +334,6 @@ class Payroll extends Model
 
         $other_ded = 0.00;
 
-        $month = '';
-        if ($part[0] == 01) {
-            $month = 'Jan';
-        } else if ($part[0] == 02) {
-            $month = 'Feb';
-        } else if ($part[0] == 03) {
-            $month = 'Mar';
-        } else if ($part[0] == 04) {
-            $month = 'Apr';
-        } else if ($part[0] == 05) {
-            $month = 'May';
-        } else if ($part[0] == 06) {
-            $month = 'Jun';
-        } else if ($part[0] == 07) {
-            $month = 'Jul';
-        } else if ($part[0] == 8) {
-            $month = 'Aug';
-        } else if ($part[0] == 9) {
-            $month = 'Sep';
-        } else if ($part[0] == 10) {
-            $month = 'Oct';
-        } else if ($part[0] == 11) {
-            $month = 'Nov';
-        } else if ($part[0] == 12) {
-            $month = 'Dec';
-        }
-
         $deds = DB::table('pensions')
             ->join('employee', 'pensions.employee_id', '=', 'employee.id')
             ->select(DB::raw('COALESCE(sum(employee_contribution),0.00) as total_contribution'))
@@ -411,33 +355,6 @@ class Payroll extends Model
         $end = date('Y-m-t', strtotime($start));
 
         $other_ded = 0.00;
-
-        $month = '';
-        if ($part[0] == 01) {
-            $month = 'Jan';
-        } else if ($part[0] == 02) {
-            $month = 'Feb';
-        } else if ($part[0] == 03) {
-            $month = 'Mar';
-        } else if ($part[0] == 04) {
-            $month = 'Apr';
-        } else if ($part[0] == 05) {
-            $month = 'May';
-        } else if ($part[0] == 06) {
-            $month = 'Jun';
-        } else if ($part[0] == 07) {
-            $month = 'Jul';
-        } else if ($part[0] == 8) {
-            $month = 'Aug';
-        } else if ($part[0] == 9) {
-            $month = 'Sep';
-        } else if ($part[0] == 10) {
-            $month = 'Oct';
-        } else if ($part[0] == 11) {
-            $month = 'Nov';
-        } else if ($part[0] == 12) {
-            $month = 'Dec';
-        }
 
         $deds = DB::table('pensions')
             ->join('x_employee', 'pensions.employee_id', '=', 'x_employee.id')
@@ -463,33 +380,6 @@ class Payroll extends Model
         $end = date('Y-m-t', strtotime($start));
 
         $other_ded = 0.00;
-
-        $month = '';
-        if ($part[0] == 01) {
-            $month = 'Jan';
-        } else if ($part[0] == 02) {
-            $month = 'Feb';
-        } else if ($part[0] == 03) {
-            $month = 'Mar';
-        } else if ($part[0] == 04) {
-            $month = 'Apr';
-        } else if ($part[0] == 05) {
-            $month = 'May';
-        } else if ($part[0] == 06) {
-            $month = 'Jun';
-        } else if ($part[0] == 07) {
-            $month = 'Jul';
-        } else if ($part[0] == 8) {
-            $month = 'Aug';
-        } else if ($part[0] == 9) {
-            $month = 'Sep';
-        } else if ($part[0] == 10) {
-            $month = 'Oct';
-        } else if ($part[0] == 11) {
-            $month = 'Nov';
-        } else if ($part[0] == 12) {
-            $month = 'Dec';
-        }
 
         $deds = DB::table('pensions')
             ->join('x_employee', 'pensions.employee_id', '=', 'x_employee.id')
@@ -554,33 +444,6 @@ class Payroll extends Model
 
         $other_ded = 0.00;
 
-        $month = '';
-        if ($part[0] == 01) {
-            $month = 'Jan';
-        } else if ($part[0] == 02) {
-            $month = 'Feb';
-        } else if ($part[0] == 03) {
-            $month = 'Mar';
-        } else if ($part[0] == 04) {
-            $month = 'Apr';
-        } else if ($part[0] == 05) {
-            $month = 'May';
-        } else if ($part[0] == 06) {
-            $month = 'Jun';
-        } else if ($part[0] == 07) {
-            $month = 'Jul';
-        } else if ($part[0] == 8) {
-            $month = 'Aug';
-        } else if ($part[0] == 9) {
-            $month = 'Sep';
-        } else if ($part[0] == 10) {
-            $month = 'Oct';
-        } else if ($part[0] == 11) {
-            $month = 'Nov';
-        } else if ($part[0] == 12) {
-            $month = 'Dec';
-        }
-
         $pension = DB::table('transact_pensions')
             ->join('employee', 'transact_pensions.employee_id', '=', 'employee.id')
             ->select(DB::raw('COALESCE(sum(employee_amount),0.00) as employee,COALESCE(sum(employer_amount),0.00) as employer'))
@@ -599,33 +462,6 @@ class Payroll extends Model
         $end = date('Y-m-t', strtotime($start));
 
         $other_ded = 0.00;
-
-        $month = '';
-        if ($part[0] == 01) {
-            $month = 'Jan';
-        } else if ($part[0] == 02) {
-            $month = 'Feb';
-        } else if ($part[0] == 03) {
-            $month = 'Mar';
-        } else if ($part[0] == 04) {
-            $month = 'Apr';
-        } else if ($part[0] == 05) {
-            $month = 'May';
-        } else if ($part[0] == 06) {
-            $month = 'Jun';
-        } else if ($part[0] == 07) {
-            $month = 'Jul';
-        } else if ($part[0] == 8) {
-            $month = 'Aug';
-        } else if ($part[0] == 9) {
-            $month = 'Sep';
-        } else if ($part[0] == 10) {
-            $month = 'Oct';
-        } else if ($part[0] == 11) {
-            $month = 'Nov';
-        } else if ($part[0] == 12) {
-            $month = 'Dec';
-        }
 
         $pension = DB::table('transact_pensions')
             ->join('employee', 'transact_pensions.employee_id', '=', 'employee.id')
@@ -912,11 +748,9 @@ class Payroll extends Model
 
     public static function overtimes($id, $overtime, $period)
     {
-//        dd($overtime);
         $part = explode("-", $period);
         $start = $part[1] . "-" . $part[0] . "-01";
         //$start = $part[0] . "-" . $part[1] . "-01";
-      //  dd($start);
         $end = date('Y-m-t', strtotime($start));
 
         $otime = 0.00;
@@ -1359,7 +1193,7 @@ class Payroll extends Model
             ->select('employee_id', 'basic_pay')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
-            ->where('employee_id', '=', $id)
+            ->where('employeeId', '=', $id)
             ->get();
 
         foreach ($pays as $pay) {
@@ -1393,7 +1227,7 @@ class Payroll extends Model
             ->select('employee_id', 'taxable_income')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
-            ->where('employee_id', '=', $id)
+            ->where('employeeId', '=', $id)
             ->first();
 
         if(isset($pays->taxable_income)){
@@ -1415,7 +1249,7 @@ class Payroll extends Model
             ->select('employee_id', 'gross_tax')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
-            ->where('employee_id', '=', $id)
+            ->where('employeeId', '=', $id)
             ->first();
 
         if(isset($pays->gross_tax)){
@@ -1437,39 +1271,14 @@ class Payroll extends Model
             ->select('employee_id', 'relief')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
-            ->where('employee_id', '=', $id)
+            ->where('employeeId', '=', $id)
             ->first();
 
         if(isset($pays->relief)){
             $relief = $pays->relief;
 
             return number_format($relief, 2);
-        }
-        else return 0.00;
-        
-
-    }
-    
-    public static function processedinsurancerelief($id, $period)
-    {
-
-        $relief = 0.00;
-
-        $pays = DB::table('x_transact')
-            ->select('employee_id', 'insurance_relief')
-            ->where('organization_id', Auth::user()->organization_id)
-            ->where('financial_month_year', '=', $period)
-            ->where('employee_id', '=', $id)
-            ->first();
-
-        if(isset($pays->insurance_relief)){
-            $relief = $pays->insurance_relief;
-
-            return number_format($relief, 2);
-        }
-        else return 0.00;
-        
-
+        } else return 0.00;
     }
 
     public static function processedhouseallowances($id, $period)
@@ -1521,7 +1330,7 @@ class Payroll extends Model
 
         $oallw = 0.00;
 
-        $total_oallws = DB::table('transact_allowances')
+        $total_oallws = DB::table('x_transact_allowances')
             ->select('employee_id', DB::raw('COALESCE(sum(allowance_amount),0.00) as total_allowances'))
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
@@ -1541,128 +1350,98 @@ class Payroll extends Model
 
     public static function processedreliefnames($id, $period)
     {
-
-        $rel = '';
-
-        $total_rels = DB::table('x_transact_reliefs')
-            ->select('employee_id', 'relief_name')
+        $reliefs = DB::table('x_transact_reliefs')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->get();
+            ->pluck('relief_name')
+            ->unique()
+            ->toArray();
 
-            
-            // ->groupBy('employee_id')
-
-        foreach ($total_rels as $total_rel) {
-            $rel = $total_rel->relief_name;
-        }
-
-        return $rel;
-
+        return implode(', ', $reliefs);
     }
 
     public static function processedreliefs($id, $period)
     {
-
-        $rel = 0.00;
-
-        $total_rels = DB::table('x_transact_reliefs')
-            ->select('employee_id', DB::raw('COALESCE(sum(relief_amount),0.00) as total_reliefs'))
+        $reliefs = DB::table('x_transact_reliefs')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
+            ->select('relief_name', DB::raw('SUM(relief_amount) as amount'))
+            ->groupBy('relief_name')
             ->get();
 
-        foreach ($total_rels as $total_rel) {
-            $rel = $total_rel->total_reliefs;
+        $result = [];
+        foreach ($reliefs as $relief) {
+            $result[$relief->relief_name] = number_format($relief->amount, 2);
         }
 
-        return number_format($rel, 2);
-
+        return $result;
     }
 
     public static function processedearningnames($id, $period)
     {
-
-        $earn = '';
-
-        $total_earns = DB::table('x_transact_earnings')
-            ->select('employee_id', 'earning_name')
+        $earnings = DB::table('x_transact_earnings')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->get();
+            ->pluck('earning_name')
+            ->unique()
+            ->toArray();
 
-        foreach ($total_earns as $total_earn) {
-            $earn = $total_earn->earning_name;
-        }
-
-        return $earn;
-
+        return implode(', ', $earnings);
     }
 
     public static function processedearnings($id, $period)
     {
-
-        $earn = 0.00;
-
-        $total_earns = DB::table('x_transact_earnings')
-            ->select('employee_id', DB::raw('COALESCE(sum(earning_amount),0.00) as total_earnings'))
+        $earnings = DB::table('x_transact_earnings')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
+            ->select('earning_name', DB::raw('SUM(earning_amount) as amount'))
+            ->groupBy('earning_name')
             ->get();
 
-        foreach ($total_earns as $total_earn) {
-            $earn = $total_earn->total_earnings;
+        $result = [];
+        foreach ($earnings as $earning) {
+            $result[$earning->earning_name] = number_format($earning->amount, 2);
         }
 
-        return number_format($earn, 2);
-
+        return $result;
     }
 
     public static function processedovertimenames($id, $period)
     {
-
-        $otime = '';
-
-        $total_overtimes = DB::table('x_transact_overtimes')
-            ->select('employee_id', 'overtime_type')
+        $overtimes = DB::table('x_transact_overtimes')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->get();
+            ->pluck('overtime_type')
+            ->unique()
+            ->toArray();
 
-        foreach ($total_overtimes as $total_overtime) {
-            $otime = $total_overtime->overtime_type;
-        }
-
-        return $otime;
-
+        return implode(', ', $overtimes);
     }
 
     public static function processedovertimes($id, $period)
     {
-
-        $otime = 0.00;
-
-        $total_overtimes = DB::table('x_transact_overtimes')
-            ->select('employee_id', DB::raw('COALESCE(sum(overtime_period*overtime_amount),0.00) as overtimes'))
+        $overtimes = DB::table('x_transact_overtimes')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
+            ->select(
+                'overtime_type',
+                DB::raw('SUM(overtime_period * overtime_amount) as amount')
+            )
+            ->groupBy('overtime_type')
             ->get();
 
-        foreach ($total_overtimes as $total_overtime) {
-            $otime = $total_overtime->overtimes;
+        $result = [];
+        foreach ($overtimes as $overtime) {
+            $result['Overtime ' . $overtime->overtime_type] = number_format($overtime->amount, 2);
         }
 
-        return number_format($otime, 2);
-
+        return $result;
     }
 
     public static function processedpaye($id, $period)
@@ -1674,7 +1453,7 @@ class Payroll extends Model
             ->select('employee_id', DB::raw('COALESCE(sum(paye),0.00) as paye'))
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
-            ->where('employee_id', '=', $id)
+            ->where('employeeId', '=', $id)
             ->groupBy('employee_id')
             ->first();
 
@@ -1690,90 +1469,68 @@ class Payroll extends Model
 
     public static function processedallowancenames($id, $period)
     {
-
-        $tallw = '';
-
-        $total_tallws = DB::table('x_transact_allowances')
-            ->select('employee_id', 'allowance_name')
+        $allowances = DB::table('x_transact_allowances')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->get();
+            ->pluck('allowance_name')
+            ->unique()
+            ->toArray();
 
-            
-            // ->groupBy('allowance_name')
-
-        foreach ($total_tallws as $total_tallw) {
-            $tallw = $total_tallw->allowance_name;
-        }
-
-        return $tallw;
-
+        return implode(', ', $allowances);
     }
 
     public static function processedallowances($id, $period)
     {
-
-        $tallw = 0.00;
-
-        $total_tallws = DB::table('x_transact_allowances')
-            ->select('*')
+        $allowances = DB::table('x_transact_allowances')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
+            ->select('allowance_name', DB::raw('SUM(allowance_amount) as amount'))
+            ->groupBy('allowance_name')
             ->get();
 
-        foreach ($total_tallws as $total_tallw) {
-            $tallw = $total_tallw->total_allowances;
+        $result = [];
+        foreach ($allowances as $allowance) {
+            $result[$allowance->allowance_name] = number_format($allowance->amount, 2);
         }
 
-        return number_format($tallw, 2);
+        Log::info('Processed Allowances : ' . json_encode($result));
 
+        return $result;
     }
 
     public static function processednontaxnames($id, $period)
     {
-
-        $tnontax = '';
-
-        $total_nontaxes = DB::table('x_transact_nontaxables')
-            ->select('employee_id', 'nontaxable_name')
+        $nontaxables = DB::table('x_transact_nontaxables')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->get();
+            ->pluck('nontaxable_name')
+            ->unique()
+            ->toArray();
 
-            
-            // ->groupBy('nontaxable_name')
-
-        foreach ($total_nontaxes as $total_nontax) {
-            $tnontax = $total_nontax->nontaxable_name;
-        }
-
-        return $tnontax;
-
+        return implode(', ', $nontaxables);
     }
 
     public static function processednontaxables($id, $period)
     {
-
-        $tnontax = 0.00;
-
-        $total_nontaxes = DB::table('x_transact_nontaxables')
-            ->select('employee_id', DB::raw('COALESCE(sum(nontaxable_amount),0.00) as total_nontaxables'))
+        $nontaxables = DB::table('x_transact_nontaxables')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
+            ->select('nontaxable_name', DB::raw('SUM(nontaxable_amount) as amount'))
             ->groupBy('nontaxable_name')
             ->get();
 
-        foreach ($total_nontaxes as $total_nontax) {
-            $tnontax = $total_nontax->total_nontaxables;
+        $result = [];
+        foreach ($nontaxables as $nontaxable) {
+            $result[$nontaxable->nontaxable_name] = number_format($nontaxable->amount, 2);
         }
 
-        return number_format($tnontax, 2);
-
+        return $result;
     }
+
 
     public static function processedNssf($id, $period)
     {
@@ -1784,7 +1541,7 @@ class Payroll extends Model
             ->select('*')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
-            ->where('employee_id', '=', $id)
+            ->where('employeeId', '=', $id)
             ->get();
 
         foreach ($total_nssfs as $total_nssf) {
@@ -1804,7 +1561,7 @@ class Payroll extends Model
             ->select('*')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
-            ->where('employee_id', '=', $id)
+            ->where('employeeId', '=', $id)
             ->first();
 
         if(isset($total_nhifs->nhif_amount)){
@@ -1826,7 +1583,7 @@ class Payroll extends Model
             ->select('housing_levy')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
-            ->where('employee_id', '=', $id)
+            ->where('employeeId', '=', $id)
             ->first();
 
         if(isset($total_levies->housing_levy)){
@@ -1841,45 +1598,35 @@ class Payroll extends Model
 
     public static function processeddeductionnames($id, $period)
     {
-
-        $deductions = '';
-
-        $total_deds = DB::table('x_transact_deductions')
-            ->select('employee_id', 'deduction_name')
+        $deductions = DB::table('x_transact_deductions')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->get();
+            ->pluck('deduction_name')
+            ->unique()
+            ->toArray();
 
-            // ->groupBy('deduction_name')
-        foreach ($total_deds as $total_ded) {
-            $deductions = $total_ded->deduction_name;
-        }
-
-        return $deductions;
-
+        return implode(', ', $deductions);
     }
 
     public static function processedDeductions($id, $period)
     {
-
-        $deductions = 0.00;
-
-        $total_deds = DB::table('x_transact_deductions')
-            ->select('employee_id', DB::raw('COALESCE(sum(deduction_amount),0.00) as total_deductions'))
+        $deductions = DB::table('x_transact_deductions')
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
+            ->select('deduction_name', DB::raw('SUM(deduction_amount) as amount'))
             ->groupBy('deduction_name')
             ->get();
 
-        foreach ($total_deds as $total_ded) {
-            $deductions = $total_ded->total_deductions;
+        $result = [];
+        foreach ($deductions as $deduction) {
+            $result[$deduction->deduction_name] = number_format($deduction->amount, 2);
         }
 
-        return number_format($deductions, 2);
-
+        return $result;
     }
+
 
     public static function processedtotaldeds($id, $period)
     {
@@ -1887,11 +1634,10 @@ class Payroll extends Model
         $deductions = 0.00;
 
         $total_deds = DB::table('x_transact')
-            ->select('employee_id', DB::raw('COALESCE(sum(total_deductions),0.00) as total_deductions'))
+            ->select(DB::raw('COALESCE(sum(total_deductions),0.00) as total_deductions'))
             ->where('organization_id', Auth::user()->organization_id)
             ->where('financial_month_year', '=', $period)
             ->where('employee_id', '=', $id)
-            ->groupBy('employee_id')
             ->get();
 
         foreach ($total_deds as $total_ded) {
@@ -1907,18 +1653,11 @@ class Payroll extends Model
 
         $net = 0.00;
 
-        // $total_nets = DB::table('x_transact')
-        //     ->select('employee_id', DB::raw('COALESCE(sum(net),0.00) as total_net'))
-        //     ->where('organization_id', Auth::user()->organization_id)
-        //     ->where('financial_month_year', '=', $period)
-        //     ->where('employee_id', '=', $id)
-        //     ->groupBy('employee_id')
-        //     ->get();
         $total_nets = DB::table('x_transact')
         ->select('*')
         ->where('organization_id', Auth::user()->organization_id)
         ->where('financial_month_year', '=', $period)
-        ->where('employee_id', '=', $id)
+            ->where('employeeId', '=', $id)
         ->get();
 
         foreach ($total_nets as $total_net) {
@@ -1927,6 +1666,24 @@ class Payroll extends Model
 
         return number_format($net, 2);
 
+    }
+
+    public static function processedgrossincome($id, $period)
+    {
+        $gross = 0.00;
+
+        $total_grosses = DB::table('x_transact')
+            ->select('basic_pay', 'earning_amount')
+            ->where('organization_id', Auth::user()->organization_id)
+            ->where('financial_month_year', '=', $period)
+            ->where('employeeId', '=', $id)
+            ->get();
+
+        foreach ($total_grosses as $row) {
+            $gross = floatval($row->basic_pay) + floatval($row->earning_amount);
+        }
+
+        return number_format($gross, 2);
     }
 
     public static function payecalc($gross)

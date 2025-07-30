@@ -138,7 +138,7 @@
             @endif
         </tr>
         <tr>
-            <td>Nhif Number:</td>
+            <td>Shif Number:</td>
             @if($emailData['hospital_insurance_number'] != null)
                 <td>{{$emailData['hospital_insurance_number']}}</td>
             @else
@@ -151,7 +151,7 @@
         </tr>
         <tr>
             <td>Basic Pay:</td>
-            <td align='right'>{{ App\Models\Payroll::processedsalaries($payroll['employee_id'],$payroll['financial_month_year']) }}</td>
+            <td align='right'>{{ App\Models\Payroll::processedsalaries($payroll['employeeId'],$payroll['financial_month_year']) }}</td>
         </tr>
         @if(App\Models\Payroll::processedearningnames($emailData['id'],$payroll['financial_month_year']) != null)
             <tr>
@@ -174,7 +174,7 @@
         <tr>
             <td><strong>GROSS PAY: </strong></td>
             <td align='right'>
-                <strong>{{ App\Models\Payroll::processedgross($payroll['employee_id'],$payroll['financial_month_year']) }}</strong>
+                <strong>{{ App\Models\Payroll::processedgross($payroll['employeeId'],$payroll['financial_month_year']) }}</strong>
             </td>
         </tr>
         @if(App\Models\Payroll::processednontaxnames($payroll['employee_id'],$payroll['financial_month_year']) != null)
@@ -198,15 +198,15 @@
         </tr>
         <tr>
             <td>Paye:</td>
-            <td align='right'>{{ App\Models\Payroll::processedpaye($payroll['employee_id'],$payroll['financial_month_year']) }}</td>
+            <td align='right'>{{ App\Models\Payroll::processedpaye($payroll['employeeId'],$payroll['financial_month_year']) }}</td>
         </tr>
         <tr>
             <td>Nssf:</td>
-            <td align='right'>{{ App\Models\Payroll::processedNssf($payroll['employee_id'],$payroll['financial_month_year']) }}</td>
+            <td align='right'>{{ App\Models\Payroll::processedNssf($payroll['employeeId'],$payroll['financial_month_year']) }}</td>
         </tr>
         <tr>
-            <td>Nhif:</td>
-            <td align='right'>{{ App\Models\Payroll::processedNhif($payroll['employee_id'],$payroll['financial_month_year']) }}</td>
+            <td>Shif:</td>
+            <td align='right'>{{ App\Models\Payroll::processedNhif($payroll['employeeId'],$payroll['financial_month_year']) }}</td>
         </tr>
         @if(App\Models\Payroll::processeddeductionnames($payroll['employee_id'],$payroll['financial_month_year'])  != null)
             <tr>
@@ -225,13 +225,13 @@
             <td><strong>TOTAL DEDUCTIONS
                     : </strong></td>
             <td align='right'>
-                <strong>{{ App\Models\Payroll::processedtotaldeds($payroll['employee_id'],$payroll['financial_month_year']) }}</strong>
+                <strong>{{ App\Models\Payroll::processedtotaldeds($payroll['employeeId'],$payroll['financial_month_year']) }}</strong>
             </td>
         </tr>
         <tr>
             <td><strong>NET PAY: </strong></td>
             <td align='right'>
-                <strong>{{ App\Models\Payroll::processednet($payroll['employee_id'],$payroll['financial_month_year']) }}</strong>
+                <strong>{{ App\Models\Payroll::processednet($payroll['employeeId'],$payroll['financial_month_year']) }}</strong>
             </td>
         </tr>
     </table>

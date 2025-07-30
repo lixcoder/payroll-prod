@@ -106,11 +106,15 @@ function asMoney($value)
 
 
             <td style="width:150px">
-
-                <img src="{{public_path().'/uploads/logo/'.$organization->logo}}" alt="logo" width="80%">
-
-
-            </td>
+    @if($organization->logo && file_exists(public_path('uploads/logo/'.$organization->logo)))
+        <img src="{{public_path('uploads/logo/'.$organization->logo)}}" alt="logo" width="80%">
+    @else
+        {{-- Display a placeholder or organization name if no logo --}}
+        <div style="width:80%; text-align:center;">
+            {{ $organization->name }}
+        </div>
+    @endif
+</td>
 
             <td>
                 <strong>
@@ -181,10 +185,8 @@ function asMoney($value)
             <td>{{ $organization->swift_code}}</td>
         </tr>
         <tr>
-            @foreach($currencies as $currency)
-                <td width='80'><strong>Currency : </strong></td>
-                <td>{{$currency->shortname}}</td></tr>
-        @endforeach
+            <td width='80'><strong>Currency : </strong></td>
+            <td>{{$currencies->shortname}}</td>
         </tr>
         <tr>
             <td width='80'><strong>Period:</strong></td>

@@ -96,10 +96,10 @@
                 <table>
                     <tr>
                         <td style="width:70px">
-                            <!--<img src="{{asset('/uploads/logo/'.$organization->logo)}}" alt="{{asset('/uploads/logo/sycum.jpeg')}}"
+                            <!--<img src="{{asset('/uploads/logo/'.$organization->logo)}}" alt="logo"
                                  style="height: 40px;">-->
 
-                            <img src="{{asset('/uploads/logo/sycum.jpeg')}}" alt="{{asset('/uploads/logo/sycum.jpeg')}}"
+                            <img src="{{asset('/uploads/logo/sycum.jpeg')}}" alt="logo"
                                  style="height: 40px;">     
                         </td>
                         <td><strong>{{strtoupper($organization->name)}}</strong><br>{{ $organization->phone}},
@@ -170,19 +170,21 @@
                     </tr>
 
                     @if(App\Models\Payroll::processedearningnames($emp->id,$period) != null)
-                        <tr>
-                            <td>{{ App\Models\Payroll::processedearningnames($emp->id,$period) }}:</td>
-                            <td align='right'>{{ App\Models\Payroll::processedearnings($emp->id,$period) }}</td>
-                        </tr>
-                    @else
+                        @foreach(App\Models\Payroll::processedearnings($emp->id,$period) as $name => $amount)
+                            <tr>
+                                <td>{{ $name }}:</td>
+                                <td align='right'>{{ $amount }}</td>
+                            </tr>
+                        @endforeach
                     @endif
 
                     @if(App\Models\Payroll::processedovertimenames($emp->id,$period) != null)
-                        <tr>
-                            <td>{{ App\Models\Payroll::processedovertimenames($emp->id,$period) }}:</td>
-                            <td align='right'>{{ App\Models\Payroll::processedovertimes($emp->id,$period) }}</td>
-                        </tr>
-                    @else
+                        @foreach(App\Models\Payroll::processedovertimes($emp->id,$period) as $name => $amount)
+                            <tr>
+                                <td>{{ $name }}:</td>
+                                <td align='right'>{{ $amount }}</td>
+                            </tr>
+                        @endforeach
                     @endif
 
                     <tr>
@@ -190,16 +192,17 @@
                         <td></td>
                     </tr>
                     @if(App\Models\Payroll::processedallowancenames($emp->id,$period) != null)
-                        <tr>
-                            <td>{{ App\Models\Payroll::processedallowancenames($emp->id,$period) }}:</td>
-                            <td align='right'>{{ App\Models\Payroll::processedallowances($emp->id,$period) }}</td>
-                        </tr>
-                    @else
+                        @foreach(App\Models\Payroll::processedallowances($emp->id,$period) as $name => $amount)
+                            <tr>
+                                <td>{{ $name }}:</td>
+                                <td align='right'>{{ $amount }}</td>
+                            </tr>
+                        @endforeach
                     @endif
                     <tr>
-                        <td><strong>NSSF: </strong></td>
+                        <td><strong>Gross Pay: </strong></td>
                         <td align='right'>
-                            <strong>{{ App\Models\Payroll::processedNssf($emp->personal_file_number,$period) }}</strong>
+                            <strong>{{ App\Models\Payroll::processedgrossincome($emp->personal_file_number,$period) }}</strong>
                         </td>
                     </tr>
                     <tr>
@@ -209,19 +212,21 @@
                         </td>
                     </tr>
                     @if(App\Models\Payroll::processednontaxnames($emp->id,$period) != null)
-                        <tr>
-                            <td>{{ App\Models\Payroll::processednontaxnames($emp->id,$period) }}:</td>
-                            <td align='right'>{{ App\Models\Payroll::processednontaxables($emp->id,$period) }}</td>
-                        </tr>
-                    @else
+                        @foreach(App\Models\Payroll::processednontaxables($emp->id,$period) as $name => $amount)
+                            <tr>
+                                <td>{{ $name }}:</td>
+                                <td align='right'>{{ $amount }}</td>
+                            </tr>
+                        @endforeach
                     @endif
 
                     @if(App\Models\Payroll::processedreliefnames($emp->id,$period) != null)
-                        <tr>
-                            <td>{{ App\Models\Payroll::processedreliefnames($emp->id,$period) }}:</td>
-                            <td align='right'>{{ App\Models\Payroll::processedreliefs($emp->id,$period) }}</td>
-                        </tr>
-                    @else
+                        @foreach(App\Models\Payroll::processedreliefs($emp->id,$period) as $name => $amount)
+                            <tr>
+                                <td>{{ $name }}:</td>
+                                <td align='right'>{{ $amount }}</td>
+                            </tr>
+                        @endforeach
                     @endif
                     
                     <tr>
@@ -233,11 +238,6 @@
                         <td>Personal Relief:</td>
                         <td align='right'>{{ App\Models\Payroll::processedpersonalrelief($emp->personal_file_number,$period) }}</td>
                     </tr>
-                    
-                    <tr>
-                        <td>Insurance Relief:</td>
-                        <td align='right'>{{ App\Models\Payroll::processedinsurancerelief($emp->personal_file_number,$period) }}</td>
-                    </tr>
 
                     <tr>
                         <td><strong>DEDUCTIONS</strong>
@@ -247,9 +247,16 @@
                         <td>Paye:</td>
                         <td align='right'>{{ App\Models\Payroll::processedpaye($emp->personal_file_number,$period) }}</td>
                     </tr>
+
+                    <tr>
+                        <td>Nssf:</td>
+                        <td align='right'>
+                            {{ App\Models\Payroll::processedNssf($emp->personal_file_number,$period) }}
+                        </td>
+                    </tr>
                     
                     <tr>
-                        <td>Nhif:</td>
+                        <td>Shif:</td>
                         <td align='right'>{{ App\Models\Payroll::processedNhif($emp->personal_file_number,$period) }}</td>
                     </tr>
                     <tr>
@@ -257,12 +264,13 @@
                         <td align='right'>{{ App\Models\Payroll::processedLevy($emp->personal_file_number,$period) }}</td>
                     </tr>
 
-                    @if(App\Models\Payroll::processeddeductionnames($emp->id,$period)  != null)
-                        <tr>
-                            <td>{{ Ap\Models\Payroll::processeddeductionnames($emp->id,$period) }}:</td>
-                            <td align='right'>{{ App\Models\Payroll::processedDeductions($emp->id,$period) }}</td>
-                        </tr>
-                    @else
+                    @if(App\Models\Payroll::processeddeductionnames($emp->id,$period) != null)
+                        @foreach(App\Models\Payroll::processedDeductions($emp->id,$period) as $name => $amount)
+                            <tr>
+                                <td>{{ $name }}:</td>
+                                <td align='right'>{{ $amount }}</td>
+                            </tr>
+                        @endforeach
                     @endif
                     <tr>
                         <td>Pension Contribution
@@ -275,7 +283,7 @@
                         <td><strong>TOTAL DEDUCTIONS
                                 : </strong></td>
                         <td align='right'>
-                            <strong>{{ App\Models\Payroll::processedtotaldeds($emp->personal_file_number,$period) }}</strong>
+                            <strong>{{ App\Models\Payroll::processedtotaldeds($emp->id,$period) }}</strong>
                         </td>
                     </tr>
 
