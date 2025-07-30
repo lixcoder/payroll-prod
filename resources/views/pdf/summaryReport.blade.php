@@ -117,13 +117,15 @@ function asMoney($value)
         <tr>
 
              <td style="width:150px">
-                @if($organization->logo != NULL)
-                    <img src="{{public_path().'/uploads/logo/'.$organization->logo}}" alt="logo"
-                         style="height: 40px;">
-                @endif
-
-
-            </td>
+    @if($organization->logo && file_exists(public_path('uploads/logo/'.$organization->logo)))
+        <img src="{{public_path('uploads/logo/'.$organization->logo)}}" alt="logo" width="80%">
+    @else
+        {{-- Display a placeholder or organization name if no logo --}}
+        <div style="width:80%; text-align:center;">
+            {{ $organization->name }}
+        </div>
+    @endif
+</td>
            
 
             <td>

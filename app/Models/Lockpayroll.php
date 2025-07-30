@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Models;
+
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Lockpayroll extends Model {
@@ -21,20 +23,38 @@ public static $messages = array(
 	protected $fillable = [];
 
 public static function checkAvailable($period){
- $count = Lockpayroll::where('period',$period)->count();
- return $count;
+		$period = Carbon::createFromFormat('m-Y', $period)->format('Y-m-d');
+
+		$lock = Lockpayroll::where('period', $period)->first();
+		if ($lock && $lock->user_id && $lock->authorized_by) {
+			return 1;
+		} else {
+			return 0;
+		}
 }
 
 public static function getUser($period){
- $lock = Lockpayroll::where('period',$period)->first();
- $user = User::find($lock->authorized_by);
- return $user->name;
+		$period = Carbon::createFromFormat('m-Y', $period)->format('Y-m-d');
+
+		$lock = Lockpayroll::where('period', $period)->first();
+		if ($lock && $lock->authorized_by) {
+			$user = User::find($lock->authorized_by);
+			return $user->name;
+		} else {
+			return '';
+		}
 }
 
 public static function getEmployee($period){
- $lock = Lockpayroll::where('period',$period)->first();
- $user = User::find($lock->user_id);
- return $user->name;
+		$period = Carbon::createFromFormat('m-Y', $period)->format('Y-m-d');
+
+		$lock = Lockpayroll::where('period', $period)->first();
+		if ($lock && $lock->user_id) {
+			$user = User::find($lock->user_id);
+			return $user->name;
+		} else {
+			return '';
+		}
 }
 
 }

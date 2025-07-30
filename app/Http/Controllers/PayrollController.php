@@ -36,6 +36,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Symfony\Component\Console\Input\Input as InputInput;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 class PayrollController extends Controller
 {
@@ -100,21 +101,41 @@ class PayrollController extends Controller
 
     public function dounlockpayroll()
     {
+        $period = Carbon::createFromFormat('m-Y', request('period'))->format('Y-m-d');
 
-        if (Lockpayroll::where('period', request('period'))->count() == 0) {
-
-            $unlock = new Lockpayroll;
-            $unlock->user_id = request('userid');
-            $unlock->authorized_by = Auth::user()->id;
-            $unlock->period = request('period');
-            $unlock->save();
-
-            $user = User::find(request('userid'));
-
-            return redirect('unlockpayroll/index')->with('notice', 'Payroll for period ' . request('period') . ' successfully unlocked to user ' . $user->name);
-        } else {
-            return redirect('unlockpayroll/index');
+        // Check if the period is valid
+        if (!$period) {
+            return redirect('unlockpayroll/index')->with('error', 'Invalid period format');
         }
+
+        // Check if the user ID is valid
+        $userId = request('userid');
+        if (!$userId) {
+            return redirect('unlockpayroll/index')->with('error', 'Invalid user ID');
+        }
+
+        // Check if the user exists
+        $user = User::find($userId);
+        if (!$user) {
+            return redirect('unlockpayroll/index')->with('error', 'User not found');
+        }
+
+        // Check if the payroll is already unlocked
+        if (Lockpayroll::where('period', $period)->where('user_id', $userId)->exists()) {
+            return redirect('unlockpayroll/index')->with('notice', 'Payroll for period ' . request('period') . ' already unlocked to user ' . $user->name);
+        }
+
+        // Unlock the payroll
+        $unlock = new Lockpayroll;
+        $unlock->user_id = $userId;
+        $unlock->authorized_by = Auth::user()->id;
+        $unlock->organization_id = Auth::user()->organization_id;
+        $unlock->period = $period;
+        if (!$unlock->save()) {
+            return redirect('unlockpayroll/index')->with('error', 'Failed to unlock payroll');
+        }
+
+        return redirect('unlockpayroll/index')->with('notice', 'Payroll for period ' . request('period') . ' successfully unlocked to user ' . $user->name);
     }
 
     public function createaccount()
@@ -959,26 +980,19 @@ class PayrollController extends Controller
         return $display;
         exit();
     }
-    
-    
+
+
     public function savesms(Request $request)
-	  { 
-         $smsupdate=$request->input('text');
-         $id=1;
-         DB::table('sms')
-            ->where('id', $id)
-            ->update([
-		'smsdetails' => $smsupdate,
-		'createdat' => now(),
-		'updatedat' => now(),
-                    ]);
-       
-      $smsdata = SmsModel::where('id', 1)->first();
-       return view('employees.sms', ['smsdata' => $smsdata]);
-	  }
+    {
+        $smsupdate = $request->input('text');
+        $sms = SmsModel::findOrNew(1);
+        $sms->smsdetails = $smsupdate;
+        $sms->save();
+        return view('employees.sms', ['smsdata' => $sms]);
+    }
     //send sms notification
-    
-    public function africastalkingfunction($employeephoneno,$employee_name, $net, $financial_month_year, $basic_pay, $total_deductions)
+
+    public function africastalkingfunction($employeephoneno, $employee_name, $net, $financial_month_year, $basic_pay, $total_deductions)
 	  {
        
 	    // Set your app credentials
@@ -986,11 +1000,15 @@ class PayrollController extends Controller
 	   // $apiKey = "eb6d8abb74babdf68637c28be2a9606364590a8de81feaca086043dacbf51dea";
 	    
 	    $username = config('services.africastalking.username');
-            $apiKey = config('services.africastalking.api_key');
-            
-            $smsdata = SmsModel::where('id', 1)->first();
-            $objectmessage= (object)$smsdata;
-            $Themessage= $objectmessage->smsdetails;
+        $apiKey = config('services.africastalking.api_key');
+
+        $smsdata = SmsModel::where('id', 1)->first();
+        if ($smsdata) {
+            $objectmessage = (object) $smsdata;
+            $Themessage = $objectmessage->smsdetails;
+        } else {
+            $Themessage = '';
+        }
 
 	    // Initialize the SDK
 	    $AT = new AfricasTalking($username, $apiKey);
@@ -998,25 +1016,23 @@ class PayrollController extends Controller
 	    // Get the SMS service
 	    $sms = $AT->sms();
 
-	    // Set the numbers you want to send to in international format
-	   // $recipients = "+254746717753, +254757388505";
-	    $recipients = $employeephoneno;
+        $recipients = $employeephoneno;
 
-	    // Set your message
-	  echo  $message = "Hi ".$employee_name.", ".$Themessage ." your total gross salary of ". $basic_pay . " Total deductions of ".        $total_deductions." and the Net pay of ".$net." for the month of ".$financial_month_year." has been successifully credited into your account.";
+        // Set your message
+        $message = "Hi " . $employee_name . ", " . $Themessage . " your total gross salary of " . $basic_pay . " Total deductions of " .        $total_deductions . " and the Net pay of " . $net . " for the month of " . $financial_month_year . " has been successifully credited into your account.";
 
 	    // Set your shortCode or senderId
 	    $from = "";
 
-	    try {
+        try {
 	      // Thats it, hit send and we'll take care of the rest
 	      $result = $sms->send([
 		'to' => $recipients,
 		'message' => $message,
 		'from' => $from
 	      ]);
-	      var_dump($result);
-	      $objectresult = (object) $result;
+            // dd($result);
+            $objectresult = (object) $result;
 	      echo $elements = count($objectresult->data->SMSMessageData->Recipients);
 	      for ($i = 0; $i < $elements; $i++) {
 		echo "<br>";
@@ -1072,1057 +1088,886 @@ class PayrollController extends Controller
 	      }
 	    } catch (Exception $e) {
 	      echo "Error: " . $e->getMessage();
-	    }
-
-	  }
-
-
-    /**
-     * Store a newly created branch in storage.
-     *
-     * @return Response
-     */
-
-
-    public function store1(Request $request){
-        echo $request->input('period'); echo "<br><br><br>";
-        echo $request->input('id');
+        }
     }
 
 
     public function store()
     {
-        if(!(License::checkSubscription(Auth::user()->organization_id))){
-            return View::make('employees.employeelimit');
+        try {
+            // Check subscription
+            if (!(License::checkSubscription(Auth::user()->organization_id))) {
+                Log::warning('Payroll processing failed: Subscription limit reached', [
+                    'organization_id' => Auth::user()->organization_id,
+                    'user_id' => Auth::user()->id
+                ]);
+                return View::make('employees.employeelimit');
+            }
+
+            set_time_limit(3000);
+            $period = request('period');
+            $type = request('type');
+            $organizationId = Auth::user()->organization_id;
+
+            Log::info('Starting payroll processing', [
+                'period' => $period,
+                'type' => $type,
+                'organization_id' => $organizationId,
+                'user_id' => Auth::user()->id
+            ]);
+
+            // Parse period and get date range
+            $date = Carbon::createFromFormat('m-Y', $period);
+            $start = $date->startOfMonth()->format('Y-m-d');
+            $end = $date->endOfMonth()->format('Y-m-d');
+
+            Log::info('Date range calculated', [
+                'period' => $period,
+                'start_date' => $start,
+                'end_date' => $end
+            ]);
+
+            // Get job group
+            $jgroup = $this->getJobGroup($type);
+            if (!$jgroup) {
+                Log::error('Job group not found', ['type' => $type, 'organization_id' => $organizationId]);
+                return Redirect::route('payroll.index')->withErrors(['Job group not found for type: ' . $type]);
+            }
+
+            Log::info('Job group found', ['job_group_id' => $jgroup->id, 'job_group_name' => $jgroup->job_group_name]);
+
+            // Get employees
+            $employees = $this->getEmployees($end, $jgroup, $type);
+            Log::info('Employees retrieved', ['employee_count' => $employees->count()]);
+
+            if ($employees->isEmpty()) {
+                Log::warning('No employees found for processing', [
+                    'period' => $period,
+                    'type' => $type,
+                    'organization_id' => $organizationId
+                ]);
+                return Redirect::route('payroll.index')->withFlashMessage('No employees found for processing!');
+            }
+
+            // Process main payroll records
+            $this->processMainPayroll($employees, $period);
+
+            // Process transaction tables - PASS THE PROCESSED EMPLOYEES
+            $this->processTransactionTables($start, $end, $jgroup, strtolower($type) == 'management', $employees);
+
+            Log::info('Payroll processing completed successfully', [
+                'period' => $period,
+                'type' => $type,
+                'organization_id' => $organizationId,
+                'employees_processed' => $employees->count()
+            ]);
+
+            Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'process', 'processed payroll for ' . $period, NULL);
+
+            return Redirect::route('payroll.index')->withFlashMessage('Payroll successfully processed!');
+        } catch (Exception $e) {
+            Log::error('Payroll processing failed with exception', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'period' => $period ?? 'unknown',
+                'organization_id' => Auth::user()->organization_id ?? 'unknown'
+            ]);
+
+            return Redirect::route('payroll.index')->withErrors(['An error occurred during payroll processing. Please try again.']);
         }
-        set_time_limit(3000);
-        $period = request('period');
-        $period = explode("-", $period);
+    }
 
 
-        $start = date('Y-m-01', strtotime("01-" . $period[0] . $period[1]));
-        $end = date('Y-m-t', strtotime("01-" . $period[0] . $period[1]));
+    private function getJobGroup($type)
+    {
+        try {
+            $jgroup = Jobgroup::whereNull('organization_id')
+                ->orWhere('organization_id', Auth::user()->organization_id)
+                ->where('job_group_name', $type)
+                ->first();
 
-        $employees = DB::table('x_employee')
-            ->where('in_employment', '=', 'Y')
-            ->where('organization_id', Auth::user()->organization_id)
-            ->whereDate('date_joined', '<=', $end)
-            ->get();
+            Log::info('Job group query executed', [
+                'type' => $type,
+                'found' => $jgroup ? true : false,
+                'organization_id' => Auth::user()->organization_id
+            ]);
 
+            return $jgroup;
+        } catch (Exception $e) {
+            Log::error('Error retrieving job group', [
+                'type' => $type,
+                'error' => $e->getMessage(),
+                'organization_id' => Auth::user()->organization_id
+            ]);
+            return null;
+        }
+    }
 
-        $department = Department::where('name', 'Management')
-            ->where(function ($query) {
-                $query->whereNull('organization_id')
-                    ->orWhere('organization_id', Auth::user()->organization_id);
-            })->first();
-
-
-        // $jgroup = Jobgroup::where('job_group_name', 'Management')
-        //     ->where(function ($query) {
-        //         $query->whereNull('organization_id')
-        //             ->orWhere('organization_id', Auth::user()->organization_id);
-        //     })->first();
-        $jgroup = Jobgroup::whereNull('organization_id')
-                    ->orWhere('organization_id', Auth::user()->organization_id)
-                    ->where('job_group_name', request()->type)
-                    ->first();
-
-        if (request('type') == 'management') {
-
-            $employees = DB::table('x_employee')
+    private function getEmployees($end, $jgroup, $type)
+    {
+        try {
+            $query = DB::table('x_employee')
                 ->where('in_employment', '=', 'Y')
                 ->where('organization_id', Auth::user()->organization_id)
-                ->where('job_group_id', $jgroup->id)
-                ->whereDate('date_joined', '<=', $end)
-                ->get();
-        } else {
-            $employees = DB::table('x_employee')
-                ->where('in_employment', '=', 'Y')
-                ->where('organization_id', Auth::user()->organization_id)
-                ->where('job_group_id', $jgroup->id)
-                ->whereDate('date_joined', '<=', $end)
-                ->get();
-        }
-        
+                ->whereDate('date_joined', '<=', $end);
 
-         
+            if (strtolower($type) == 'management') {
+                $query->where('job_group_id', $jgroup->id);
+            } else {
+                $query->where('job_group_id', $jgroup->id);
+            }
+
+            $employees = $query->get();
+
+            Log::info('Employee query executed', [
+                'type' => $type,
+                'job_group_id' => $jgroup->id,
+                'end_date' => $end,
+                'employee_count' => $employees->count(),
+                'organization_id' => Auth::user()->organization_id
+            ]);
+
+            return $employees;
+        } catch (Exception $e) {
+            Log::error('Error retrieving employees', [
+                'type' => $type,
+                'job_group_id' => $jgroup->id,
+                'error' => $e->getMessage(),
+                'organization_id' => Auth::user()->organization_id
+            ]);
+            return collect();
+        }
+    }
+
+
+    private function processMainPayroll($employees, $period)
+    {
+        $processedCount = 0;
+        $errorCount = 0;
+
+        Log::info('Starting main payroll processing', [
+            'employee_count' => $employees->count(),
+            'period' => $period
+        ]);
 
         foreach ($employees as $employee) {
+            try {
+                $organizationId = Auth::user()->organization_id;
 
-            $organization_id = Auth::user()->organization_id;
-            $query = Payroll::select('*')
-                ->where('organization_id', $organization_id)
-                ->Where('financial_month_year', request('period'))
-                ->Where('employee_id', $employee->personal_file_number)
+                // Check for existing payroll records
+                $existingPayroll = Payroll::where('organization_id', $organizationId)
+                    ->where('financial_month_year', $period)
+                    ->where('employee_id', $employee->id)
                 ->get();
-            if ($query == true) {
 
-                foreach ($query as $q) {
-                    $q->delete();
+                Log::debug('Checking existing payroll', [
+                    'employee_id' => $employee->id,
+                    'existing_count' => $existingPayroll->count()
+                ]);
+
+                // Delete existing records if any
+                if ($existingPayroll->count() > 0) {
+                    foreach ($existingPayroll as $payroll) {
+                        $payroll->delete();
                 }
-                    $payroll = new Payroll;
-                    $payroll->employee_id = $employee->personal_file_number;
-                    $payroll->employeeId = $employee->id;
-                    $payroll->user_id = Auth::user()->id;
-                    $payroll->basic_pay = Payroll::basicpay($employee->id, request('period'));
-                    $payroll->earning_amount = Payroll::total_benefits($employee->id, request('period'));
-                    $payroll->taxable_income = Payroll::taxablePay($employee->id, request('period'));
-                    $payroll->gross_tax = Payroll::totaltax($employee->id, request('period'));
-                    $payroll->paye = Payroll::tax($employee->id, request('period'));
-                    $payroll->insurance_relief = Payroll::insuranceRelief($employee->id, request('period'));
-                    $payroll->relief = 2400;
-                    $payroll->nssf_amount = Payroll::nssf($employee->id, request('period'));
-                    $payroll->nhif_amount = Payroll::nhif($employee->id, request('period'));
-                    $payroll->housing_levy = Payroll::housingLevy($employee->id, request('period'));
-                    $payroll->other_deductions = Payroll::deductionall($employee->id, request('period'));
-                    $payroll->total_deductions = Payroll::total_deductions($employee->id, request('period'));
-                    $payroll->net = Payroll::net($employee->id, request('period'));
-                    $payroll->financial_month_year = request('period');
-                    $payroll->account_id = request('account');
-                    $payroll->process_type = request('type');
-                    $payroll->organization_id = Auth::user()->organization_id;
-                    $payroll->save();
-                    
-                    $employee_name = $employee->first_name;
-                    $basic_pay = Payroll::basicpay($employee->id, request('period'));
-                    $financial_month_year = request('period');
-                    $earning_amount = Payroll::total_benefits($employee->id, request('period'));
-                    $total_deductions = Payroll::total_deductions($employee->id, request('period'));
-                    $net = Payroll::net($employee->id, request('period'));
-                    $employeephoneno = $employee->telephone_mobile;
-                    $this->africastalkingfunction($employeephoneno, $employee_name, $net,$financial_month_year,$basic_pay,$total_deductions);
-                
-                    //Crons
-                    $email = new Email();
-                    $email->employee_id = $employee->id;
-                    $email->organization_id = Auth::user()->organization_id;
-                    $email->save();
-                
-            } else {
+                    Log::info('Deleted existing payroll records', [
+                        'employee_id' => $employee->id,
+                        'deleted_count' => $existingPayroll->count()
+                    ]);
+            }
+
+                // Create new payroll record
                 $payroll = new Payroll;
-                $payroll->employee_id = $employee->personal_file_number;
-                $payroll->employeeId = $employee->id;
-
+                $payroll->employee_id = $employee->id;
+                $payroll->employeeId = $employee->personal_file_number;
                 $payroll->user_id = Auth::user()->id;
-
-                $payroll->basic_pay = Payroll::basicpay($employee->id, request('period'));
-
-                $payroll->earning_amount = Payroll::total_benefits($employee->id, request('period'));
-                $payroll->taxable_income = Payroll::gross($employee->id, request('period'));
-                $payroll->gross_tax = Payroll::totaltax($employee->id, request('period'));
-                $payroll->paye = Payroll::tax($employee->id, request('period'));                
-                $payroll->insurance_relief = Payroll::insuranceRelief($employee->id, request('period'));
-                $payroll->relief = 2400;
-                $payroll->nssf_amount = Payroll::nssf($employee->id, request('period'));
-                $payroll->nhif_amount = Payroll::nhif($employee->id, request('period'));
-                $payroll->housing_levy = Payroll::housingLevy($employee->id, request('period'));
-                $payroll->other_deductions = Payroll::deductionall($employee->id, request('period'));
-                $payroll->total_deductions = Payroll::total_deductions($employee->id, request('period'));
-                $payroll->net = Payroll::net($employee->id, request('period'));
-                $payroll->financial_month_year = request('period');
+                $payroll->basic_pay = Payroll::basicpay($employee->id, $period);
+                $payroll->earning_amount = Payroll::total_benefits($employee->id, $period);
+                $payroll->taxable_income = Payroll::taxablePay($employee->id, $period);
+                $payroll->gross_tax = Payroll::totalTax($employee->id, $period);
+                $payroll->paye = Payroll::tax($employee->id, $period);
+                $payroll->relief = Payroll::personalRelief($employee->id, $period);
+                $payroll->nssf_amount = Payroll::nssf($employee->id, $period);
+                $payroll->nhif_amount = Payroll::nhif($employee->id, $period);
+                $payroll->housing_levy = Payroll::housingLevy($employee->id, $period);
+                $payroll->other_deductions = Payroll::deductionall($employee->id, $period);
+                $payroll->total_deductions = Payroll::total_deductions($employee->id, $period);
+                $payroll->net = Payroll::net($employee->id, $period);
+                $payroll->financial_month_year = $period;
                 $payroll->account_id = request('account');
                 $payroll->process_type = request('type');
-                $payroll->organization_id = Auth::user()->organization_id;
+                $payroll->organization_id = $organizationId;
+
                 $payroll->save();
-                
-                $employeephoneno = $employee->telephone_mobile;
-                $employee_name = $employee->first_name;
-                $basic_pay = Payroll::basicpay($employee->id, request('period'));
-                $financial_month_year = request('period');
-                $total_deductions = Payroll::total_deductions($employee->id, request('period'));
-                $net = Payroll::net($employee->id, request('period'));
-                $this->africastalkingfunction($employeephoneno, $employee_name, $net, $financial_month_year, $basic_pay, $total_deductions);
-                //Crons
+
+                Log::debug('Payroll record created', [
+                    'employee_id' => $employee->id,
+                    'payroll_id' => $payroll->id,
+                    'net_pay' => $payroll->net
+                ]);
+
+                // Send SMS notification
+                $this->sendSMSNotification($employee, $payroll, $period);
+
+                // Create email record
                 $email = new Email();
                 $email->employee_id = $employee->id;
-                $email->organization_id = Auth::user()->organization_id;
+                $email->organization_id = $organizationId;
                 $email->save();
+
+                $processedCount++;
+            } catch (Exception $e) {
+                $errorCount++;
+                Log::error('Error processing payroll for employee', [
+                    'employee_id' => $employee->id,
+                    'employee_name' => $employee->first_name ?? 'Unknown',
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
             }
         }
 
+        Log::info('Main payroll processing completed', [
+            'total_employees' => $employees->count(),
+            'processed_successfully' => $processedCount,
+            'errors' => $errorCount
+        ]);
+    }
 
-        //        $part = explode("-", $period);
-        $part = $period;
-        //        dd($part);
-        $start = $part[1] . "-" . $part[0] . "-01";
-        $end = date('Y-m-t', strtotime($start));
+    private function sendSMSNotification($employee, $payroll, $period)
+    {
+        try {
+            $employeePhoneNo = $employee->telephone_mobile;
+            $employeeName = $employee->first_name;
+            $basicPay = $payroll->basic_pay;
+            $totalDeductions = $payroll->total_deductions;
+            $net = $payroll->net;
 
-        //DB::table('dailypays')->where('period',$period)->where('status',0)->update(array("status"=>1));
+            $this->africastalkingfunction($employeePhoneNo, $employeeName, $net, $period, $basicPay, $totalDeductions);
 
-        if (request('type') == 'management') {
+            Log::debug('SMS notification sent', [
+                'employee_id' => $employee->id,
+                'phone' => $employeePhoneNo
+            ]);
+        } catch (Exception $e) {
+            Log::warning('Failed to send SMS notification', [
+                'employee_id' => $employee->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
 
-            $allws = DB::table('x_employee_allowances')
+    private function processTransactionTables($start, $end, $jgroup, $isManagement, $employees)
+    {
+        Log::info('Starting transaction tables processing', [
+            'is_management' => $isManagement,
+            'job_group_id' => $jgroup->id,
+            'start_date' => $start,
+            'end_date' => $end,
+            'employee_count' => $employees->count()
+        ]);
+
+        // Get array of employee IDs for filtering
+        $employeeIds = $employees->pluck('id')->toArray();
+
+        // Process each transaction type with employee IDs
+        $this->processAllowances($start, $end, $jgroup, $isManagement, $employeeIds);
+        $this->processNonTaxables($start, $end, $jgroup, $isManagement, $employeeIds);
+        $this->processDeductions($start, $end, $jgroup, $isManagement, $employeeIds);
+        $this->processPensions($start, $end, $jgroup, $isManagement, $employeeIds);
+        $this->processEarnings($start, $end, $jgroup, $isManagement, $employeeIds);
+        $this->processOvertimes($start, $end, $jgroup, $isManagement, $employeeIds);
+        $this->processReliefs($start, $end, $jgroup, $isManagement, $employeeIds);
+
+        Log::info('Transaction tables processing completed');
+    }
+
+    private function processAllowances($start, $end, $jgroup, $isManagement, $employeeIds)
+    {
+        try {
+            Log::info('Processing allowances', [
+                'is_management' => $isManagement,
+                'job_group_id' => $jgroup->id,
+                'employee_ids' => $employeeIds
+            ]);
+
+            $query = DB::table('x_employee_allowances')
                 ->join('x_allowances', 'x_employee_allowances.allowance_id', '=', 'x_allowances.id')
                 ->join('x_employee', 'x_employee_allowances.employee_id', '=', 'x_employee.id')
                 ->where('instalments', '>', 0)
                 ->where('in_employment', 'Y')
                 ->whereDate('date_joined', '<=', $end)
                 ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('last_day_month', '>=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->select('x_employee.id as eid', 'x_employee_allowances.id as id', 'allowance_name', 'allowance_id', 'allowance_amount')
-                ->get();
+                ->whereIn('x_employee.id', $employeeIds);
 
-            $count_a = DB::table('x_employee_allowances')
-                ->join('x_allowances', 'x_employee_allowances.allowance_id', '=', 'x_allowances.id')
-                ->join('x_employee', 'x_employee_allowances.employee_id', '=', 'x_employee.id')
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', $jgroup->id);
+            $query->where(function ($q) use ($start) {
+                $q->where(function ($subQ) use ($start) {
+                    $subQ->where('formular', '=', 'Recurring')
+                        ->where('first_day_month', '<=', $start);
                 })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('last_day_month', '>=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->select('x_employee.id as eid', 'x_employee_allowances.id as id', 'allowance_name', 'allowance_id', 'allowance_amount')
-                ->count();
+                    ->orWhere(function ($subQ) use ($start) {
+                        $subQ->where('first_day_month', '<=', $start)
+                            ->where('last_day_month', '>=', $start);
+                    });
+            });
 
-            if ($count_a > 0) {
+            $allws = $query->select('x_employee.id as eid', 'x_employee_allowances.id as id', 'allowance_name', 'allowance_id', 'allowance_amount')->get();
+
+            Log::info('Allowances query executed', [
+                'allowances_found' => $allws->count(),
+                'is_management' => $isManagement
+            ]);
+
+            if ($allws->count() > 0) {
+                // Delete existing allowance transactions for this period
+                $deletedCount = DB::table('x_transact_allowances')
+                    ->where('organization_id', Auth::user()->organization_id)
+                    ->where('financial_month_year', request('period'))
+                    ->where('process_type', request('type'))
+                    ->whereIn('employee_id', $employeeIds) // Only delete for processed employees
+                    ->delete();
+
+                Log::info('Deleted existing allowance transactions', ['deleted_count' => $deletedCount]);
+
+                $insertedCount = 0;
                 foreach ($allws as $allw) {
-                    DB::table('x_transact_allowances')->insert(
-                        [
-                            'employee_id' => $allw->eid,
-                            'employee_allowance_id' => $allw->id,
-                            'organization_id' => Auth::user()->organization_id,
-                            'allowance_name' => $allw->allowance_name,
-                            'allowance_id' => $allw->allowance_id,
-                            'allowance_amount' => $allw->allowance_amount,
-                            'financial_month_year' => request('period'),
-                            'process_type' => request('type'),
-                        ]
-                    );
+                    DB::table('x_transact_allowances')->insert([
+                        'employee_id' => $allw->eid,
+                        'employee_allowance_id' => $allw->id,
+                        'organization_id' => Auth::user()->organization_id,
+                        'allowance_name' => $allw->allowance_name,
+                        'allowance_id' => $allw->allowance_id,
+                        'allowance_amount' => $allw->allowance_amount,
+                        'financial_month_year' => request('period'),
+                        'process_type' => request('type'),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    $insertedCount++;
                 }
 
-                DB::table('x_employee_allowances')
+                Log::info('Allowance transactions inserted', ['inserted_count' => $insertedCount]);
+
+                // Decrement instalments for one-time and instalment allowances
+                $decrementQuery = DB::table('x_employee_allowances')
                     ->join('x_employee', 'x_employee_allowances.employee_id', '=', 'x_employee.id')
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
+                    ->whereDate('date_joined', '<=', $end)
+                    ->whereIn('x_employee.id', $employeeIds) // Only for processed employees
                     ->where(function ($query) {
                         $query->where('formular', '=', 'One Time')
                             ->orWhere('formular', '=', 'Instalments');
                     })
-                    ->where('instalments', '>', 0)
-                    ->whereDate('date_joined', '<=', $end)
-                    ->where('job_group_id', $jgroup->id)
-                    ->where('employee.organization_id', Auth::user()->organization_id)
-                    ->decrement('instalments');
+                    ->where('instalments', '>', 0);
+
+                $decrementedCount = $decrementQuery->decrement('instalments');
+                Log::info('Allowance instalments decremented', ['decremented_count' => $decrementedCount]);
             }
+        } catch (Exception $e) {
+            Log::error('Error processing allowances', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'is_management' => $isManagement
+            ]);
+        }
+    }
 
+    private function processNonTaxables($start, $end, $jgroup, $isManagement, $employeeIds)
+    {
+        try {
+            Log::info('Processing non-taxables', [
+                'is_management' => $isManagement,
+                'job_group_id' => $jgroup->id,
+                'employee_ids' => $employeeIds
+            ]);
 
-            $nontaxes = DB::table('x_employeenontaxables')
+            $query = DB::table('x_employeenontaxables')
                 ->join('x_nontaxables', 'x_employeenontaxables.nontaxable_id', '=', 'x_nontaxables.id')
                 ->join('x_employee', 'x_employeenontaxables.employee_id', '=', 'x_employee.id')
                 ->where('instalments', '>', 0)
                 ->where('in_employment', 'Y')
                 ->whereDate('date_joined', '<=', $end)
                 ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('last_day_month', '>=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->select('x_employee.id as eid', 'x_employeenontaxables.id as id', 'name', 'nontaxable_id', 'nontaxable_amount')
-                ->get();
+                ->whereIn('x_employee.id', $employeeIds);
 
-            $count_ntax = DB::table('x_employeenontaxables')
-                ->join('x_nontaxables', 'x_employeenontaxables.nontaxable_id', '=', 'x_nontaxables.id')
-                ->join('x_employee', 'x_employeenontaxables.employee_id', '=', 'x_employee.id')
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', $jgroup->id);
+            $query->where(function ($q) use ($start) {
+                $q->where(function ($subQ) use ($start) {
+                    $subQ->where('formular', '=', 'Recurring')
+                        ->where('first_day_month', '<=', $start);
                 })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('last_day_month', '>=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->select('x_employee.id as eid', 'x_employeenontaxables.id as id', 'name', 'nontaxable_id', 'nontaxable_amount')
-                ->count();
+                    ->orWhere(function ($subQ) use ($start) {
+                        $subQ->where('first_day_month', '<=', $start)
+                            ->where('last_day_month', '>=', $start);
+                    });
+            });
 
-            if ($count_ntax > 0) {
+            $nontaxes = $query->select('x_employee.id as eid', 'x_employeenontaxables.id as id', 'name', 'nontaxable_id', 'nontaxable_amount')->get();
+
+            Log::info('Non-taxables query executed', [
+                'nontaxables_found' => $nontaxes->count(),
+                'is_management' => $isManagement
+            ]);
+
+            if ($nontaxes->count() > 0) {
+                // Delete existing nontaxable transactions for this period
+                $deletedCount = DB::table('x_transact_nontaxables')
+                    ->where('organization_id', Auth::user()->organization_id)
+                    ->where('financial_month_year', request('period'))
+                    ->where('process_type', request('type'))
+                    ->whereIn('employee_id', $employeeIds) // Only delete for processed employees
+                    ->delete();
+
+                Log::info('Deleted existing nontaxable transactions', ['deleted_count' => $deletedCount]);
+
+                $insertedCount = 0;
                 foreach ($nontaxes as $nontax) {
-                    DB::table('x_transact_nontaxables')->insert(
-                        [
-                            'employee_id' => $nontax->eid,
-                            'organization_id' => Auth::user()->organization_id,
-                            'employee_nontaxable_id' => $nontax->id,
-                            'nontaxable_name' => $nontax->name,
-                            'nontaxable_id' => $nontax->nontaxable_id,
-                            'nontaxable_amount' => $nontax->nontaxable_amount,
-                            'financial_month_year' => request('period'),
-                            'process_type' => request('type'),
-                        ]
-                    );
+                    DB::table('x_transact_nontaxables')->insert([
+                        'employee_id' => $nontax->eid,
+                        'organization_id' => Auth::user()->organization_id,
+                        'employee_nontaxable_id' => $nontax->id,
+                        'nontaxable_name' => $nontax->name,
+                        'nontaxable_id' => $nontax->nontaxable_id,
+                        'nontaxable_amount' => $nontax->nontaxable_amount,
+                        'financial_month_year' => request('period'),
+                        'process_type' => request('type'),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    $insertedCount++;
                 }
 
-                DB::table('x_employeenontaxables')
+                Log::info('Nontaxable transactions inserted', ['inserted_count' => $insertedCount]);
+
+                // Decrement instalments
+                $decrementQuery = DB::table('x_employeenontaxables')
                     ->join('x_employee', 'x_employeenontaxables.employee_id', '=', 'x_employee.id')
                     ->where('x_employee.organization_id', Auth::user()->organization_id)
-                    ->where('job_group_id', $jgroup->id)
                     ->whereDate('date_joined', '<=', $end)
+                    ->whereIn('x_employee.id', $employeeIds) // Only for processed employees
                     ->where(function ($query) {
                         $query->where('formular', '=', 'One Time')
                             ->orWhere('formular', '=', 'Instalments');
                     })
-                    ->where('instalments', '>', 0)
-                    ->decrement('instalments');
+                    ->where('instalments', '>', 0);
+
+                $decrementedCount = $decrementQuery->decrement('instalments');
+                Log::info('Nontaxable instalments decremented', ['decremented_count' => $decrementedCount]);
             }
+        } catch (Exception $e) {
+            Log::error('Error processing non-taxables', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'is_management' => $isManagement
+            ]);
+        }
+    }
 
-            $deds = DB::table('x_employee_deductions')
+    private function processDeductions($start, $end, $jgroup, $isManagement, $employeeIds)
+    {
+        try {
+            Log::info('Processing deductions', [
+                'is_management' => $isManagement,
+                'job_group_id' => $jgroup->id,
+                'employee_ids' => $employeeIds
+            ]);
+
+            $query = DB::table('x_employee_deductions')
                 ->join('x_deductions', 'x_employee_deductions.deduction_id', '=', 'x_deductions.id')
                 ->join('x_employee', 'x_employee_deductions.employee_id', '=', 'x_employee.id')
                 ->where('instalments', '>', 0)
                 ->where('in_employment', 'Y')
                 ->whereDate('date_joined', '<=', $end)
                 ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('last_day_month', '>=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->select('x_employee.id as eid', 'x_employee_deductions.id as id', 'deduction_name', 'deduction_id', 'formular', 'instalments', 'deduction_amount')
-                ->get();
+                ->whereIn('x_employee.id', $employeeIds);
 
-            $count = DB::table('x_employee_deductions')
-                ->join('x_deductions', 'x_employee_deductions.deduction_id', '=', 'x_deductions.id')
-                ->join('x_employee', 'x_employee_deductions.employee_id', '=', 'x_employee.id')
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', $jgroup->id);
+            $query->where(function ($q) use ($start) {
+                $q->where(function ($subQ) use ($start) {
+                    $subQ->where('formular', '=', 'Recurring')
+                        ->where('first_day_month', '<=', $start);
                 })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('last_day_month', '>=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->select('x_employee.id as eid', 'x_employee_deductions.id as id', 'deduction_name', 'deduction_id', 'formular', 'instalments', 'deduction_amount')
-                ->count();
+                    ->orWhere(function ($subQ) use ($start) {
+                        $subQ->where('first_day_month', '<=', $start)
+                            ->where('last_day_month', '>=', $start);
+                    });
+            });
 
-            if ($count > 0) {
+            $deds = $query->select('x_employee.id as eid', 'x_employee_deductions.id as id', 'deduction_name', 'deduction_id', 'formular', 'instalments', 'deduction_amount')->get();
+
+            Log::info('Deductions query executed', [
+                'deductions_found' => $deds->count(),
+                'is_management' => $isManagement
+            ]);
+
+            if ($deds->count() > 0) {
+                // Delete existing deduction transactions for this period
+                $deletedCount = DB::table('x_transact_deductions')
+                    ->where('organization_id', Auth::user()->organization_id)
+                    ->where('financial_month_year', request('period'))
+                    ->where('process_type', request('type'))
+                    ->whereIn('employee_id', $employeeIds) // Only delete for processed employees
+                    ->delete();
+
+                Log::info('Deleted existing deduction transactions', ['deleted_count' => $deletedCount]);
+
+                $insertedCount = 0;
                 foreach ($deds as $ded) {
-                    DB::table('x_transact_deductions')->insert(
-                        [
-                            'employee_id' => $ded->eid,
-                            'organization_id' => Auth::user()->organization_id,
-                            'employee_deduction_id' => $ded->id,
-                            'deduction_name' => $ded->deduction_name,
-                            'deduction_id' => $ded->deduction_id,
-                            'deduction_amount' => $ded->deduction_amount,
-                            'financial_month_year' => request('period'),
-                            'process_type' => request('type')
-                        ]
-                    );
+                    DB::table('x_transact_deductions')->insert([
+                        'employee_id' => $ded->eid,
+                        'organization_id' => Auth::user()->organization_id,
+                        'employee_deduction_id' => $ded->id,
+                        'deduction_name' => $ded->deduction_name,
+                        'deduction_id' => $ded->deduction_id,
+                        'deduction_amount' => $ded->deduction_amount,
+                        'financial_month_year' => request('period'),
+                        'process_type' => request('type'),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    $insertedCount++;
                 }
 
-                DB::table('x_employee_deductions')
+                Log::info('Deduction transactions inserted', ['inserted_count' => $insertedCount]);
+
+                // Decrement instalments
+                $decrementQuery = DB::table('x_employee_deductions')
                     ->join('x_employee', 'x_employee_deductions.employee_id', '=', 'x_employee.id')
                     ->where('x_employee.organization_id', Auth::user()->organization_id)
-                    ->where('job_group_id', $jgroup->id)
                     ->whereDate('date_joined', '<=', $end)
+                    ->whereIn('x_employee.id', $employeeIds) // Only for processed employees
                     ->where(function ($query) {
                         $query->where('formular', '=', 'One Time')
                             ->orWhere('formular', '=', 'Instalments');
                     })
-                    ->where('instalments', '>', 0)
-                    ->decrement('instalments');
+                    ->where('instalments', '>', 0);
+
+                $decrementedCount = $decrementQuery->decrement('instalments');
+                Log::info('Deduction instalments decremented', ['decremented_count' => $decrementedCount]);
             }
+        } catch (Exception $e) {
+            Log::error('Error processing deductions', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'is_management' => $isManagement
+            ]);
+        }
+    }
 
+    private function processPensions($start, $end, $jgroup, $isManagement, $employeeIds)
+    {
+        try {
+            Log::info('Processing pensions', [
+                'is_management' => $isManagement,
+                'employee_ids' => $employeeIds
+            ]);
 
-            $part = explode("-", request('period'));
-            $month = '';
-            if ($part[0] == 01) {
-                $month = 'Jan';
-            } else if ($part[0] == 02) {
-                $month = 'Feb';
-            } else if ($part[0] == 03) {
-                $month = 'Mar';
-            } else if ($part[0] == 04) {
-                $month = 'Apr';
-            } else if ($part[0] == 05) {
-                $month = 'May';
-            } else if ($part[0] == 06) {
-                $month = 'Jun';
-            } else if ($part[0] == 07) {
-                $month = 'Jul';
-            } else if ($part[0] == 8) {
-                $month = 'Aug';
-            } else if ($part[0] == 9) {
-                $month = 'Sep';
-            } else if ($part[0] == 10) {
-                $month = 'Oct';
-            } else if ($part[0] == 11) {
-                $month = 'Nov';
-            } else if ($part[0] == 12) {
-                $month = 'Dec';
-            }
+            $pensionTable = 'pensions';
 
-            $cp = DB::table('x_transact_pensions')
-                ->join('x_employee', 'x_transact_pensions.employee_id', '=', 'x_employee.id')
+            $query = DB::table($pensionTable)
+                ->join('x_employee', $pensionTable . '.employee_id', '=', 'x_employee.id')
                 ->where('in_employment', 'Y')
                 ->whereDate('date_joined', '<=', $end)
                 ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->count();
+                ->whereIn('x_employee.id', $employeeIds);
 
-            $pensions = DB::table('x_transact_pensions')
-                ->join('x_employee', 'x_transact_pensions.employee_id', '=', 'x_employee.id')
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->get();
+            $pensions = $query->get();
 
-            if ($cp > 0) {
+            Log::info('Pensions query executed', [
+                'pensions_found' => $pensions->count(),
+                'table_used' => $pensionTable,
+                'is_management' => $isManagement
+            ]);
+
+            if ($pensions->count() > 0) {
+                // Delete existing pension transactions for this period
+                $deletedCount = DB::table('x_transact_pensions')
+                    ->where('organization_id', Auth::user()->organization_id)
+                    ->where('financial_month_year', request('period'))
+                    ->whereIn('employee_id', $employeeIds) // Only delete for processed employees
+                    ->delete();
+
+                Log::info('Deleted existing pension transactions', ['deleted_count' => $deletedCount]);
+
+                $part = explode("-", request('period'));
+                $insertedCount = 0;
 
                 foreach ($pensions as $pension) {
-                    DB::table('x_transact_pensions')->insert(
-                        [
-                            'employee_id' => $pension->employee_id,
-                            'organization_id' => Auth::user()->organization_id,
-                            'employee_amount' => $pension->employee_contribution,
-                            'employer_amount' => $pension->employer_contribution,
-                            'employee_percentage' => $pension->employee_percentage,
-                            'employer_percentage' => $pension->employer_percentage,
-                            'financial_month_year' => request('period'),
-                            'month' => $part[0],
-                            'year' => $part[1]
-                        ]
-                    );
+                    DB::table('x_transact_pensions')->insert([
+                        'employee_id' => $pension->employee_id,
+                        'organization_id' => Auth::user()->organization_id,
+                        'employee_amount' => $pension->employee_contribution,
+                        'employer_amount' => $pension->employer_contribution,
+                        'employee_percentage' => $pension->employee_percentage,
+                        'employer_percentage' => $pension->employer_percentage,
+                        'financial_month_year' => request('period'),
+                        'month' => $part[0],
+                        'year' => $part[1],
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    $insertedCount++;
                 }
+
+                Log::info('Pension transactions inserted', ['inserted_count' => $insertedCount]);
             }
+        } catch (Exception $e) {
+            Log::error('Error processing pensions', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'is_management' => $isManagement
+            ]);
+        }
+    }
 
+    private function processEarnings($start, $end, $jgroup, $isManagement, $employeeIds)
+    {
+        try {
+            Log::info('Processing earnings', [
+                'is_management' => $isManagement,
+                'job_group_id' => $jgroup->id,
+                'employee_ids' => $employeeIds
+            ]);
 
-            $earns = DB::table('x_earnings')
+            $query = DB::table('x_earnings')
                 ->join('x_employee', 'x_earnings.employee_id', '=', 'x_employee.id')
                 ->join('x_earningsettings', 'x_earnings.earning_id', '=', 'x_earningsettings.id')
                 ->where('instalments', '>', 0)
                 ->where('in_employment', 'Y')
                 ->whereDate('date_joined', '<=', $end)
-                ->where('job_group_id', $jgroup->id)
                 ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('last_day_month', '>=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->select('x_earnings.employee_id', 'x_earnings.id as id', 'earning_name', 'earnings_amount', 'formular', 'instalments')
-                ->get();
+                ->whereIn('x_employee.id', $employeeIds);
 
-            $ct = DB::table('x_earnings')
-                ->join('x_employee', 'x_earnings.employee_id', '=', 'x_employee.id')
-                ->join('x_earningsettings', 'x_earnings.earning_id', '=', 'x_earningsettings.id')
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', $jgroup->id);
+            $query->where(function ($q) use ($start) {
+                $q->where(function ($subQ) use ($start) {
+                    $subQ->where('formular', '=', 'Recurring')
+                        ->where('first_day_month', '<=', $start);
                 })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('last_day_month', '>=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->select('x_earnings.employee_id', 'x_earnings.id as id', 'earning_name', 'earnings_amount', 'formular', 'instalments')
-                ->count();
+                    ->orWhere(function ($subQ) use ($start) {
+                        $subQ->where('first_day_month', '<=', $start)
+                            ->where('last_day_month', '>=', $start);
+                    });
+            });
 
-            if ($ct > 0) {
+            $earns = $query->select('x_earnings.employee_id', 'x_earnings.id as id', 'earning_name', 'earnings_amount', 'formular', 'instalments')->get();
+
+            Log::info('Earnings query executed', [
+                'earnings_found' => $earns->count(),
+                'is_management' => $isManagement
+            ]);
+
+            if ($earns->count() > 0) {
+                // Delete existing earning transactions for this period
+                $deletedCount = DB::table('x_transact_earnings')
+                    ->where('organization_id', Auth::user()->organization_id)
+                    ->where('financial_month_year', request('period'))
+                    ->where('process_type', request('type'))
+                    ->whereIn('employee_id', $employeeIds) // Only delete for processed employees
+                    ->delete();
+
+                Log::info('Deleted existing earning transactions', ['deleted_count' => $deletedCount]);
+
+                $insertedCount = 0;
                 foreach ($earns as $earn) {
-                    DB::table('x_transact_earnings')->insert(
-                        [
-                            'employee_id' => $earn->employee_id,
-                            'earning_id' => $earn->id,
-                            'organization_id' => Auth::user()->organization_id,
-                            'earning_name' => $earn->earning_name,
-                            'earning_amount' => $earn->earnings_amount,
-                            'financial_month_year' => request('period'),
-                            'process_type' => request('type')
-                        ]
-                    );
+                    DB::table('x_transact_earnings')->insert([
+                        'employee_id' => $earn->employee_id,
+                        'earning_id' => $earn->id,
+                        'organization_id' => Auth::user()->organization_id,
+                        'earning_name' => $earn->earning_name,
+                        'earning_amount' => $earn->earnings_amount,
+                        'financial_month_year' => request('period'),
+                        'process_type' => request('type'),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    $insertedCount++;
                 }
 
-                DB::table('x_earnings')
+                Log::info('Earning transactions inserted', ['inserted_count' => $insertedCount]);
+
+                // Decrement instalments
+                $decrementQuery = DB::table('x_earnings')
                     ->join('x_employee', 'x_earnings.employee_id', '=', 'x_employee.id')
                     ->where('x_employee.organization_id', Auth::user()->organization_id)
-                    ->where('job_group_id', $jgroup->id)
                     ->whereDate('date_joined', '<=', $end)
+                    ->whereIn('x_employee.id', $employeeIds) // Only for processed employees
                     ->where(function ($query) {
                         $query->where('formular', '=', 'One Time')
                             ->orWhere('formular', '=', 'Instalments');
                     })
-                    ->where('instalments', '>', 0)
-                    ->decrement('instalments');
+                    ->where('instalments', '>', 0);
+
+                $decrementedCount = $decrementQuery->decrement('instalments');
+                Log::info('Earning instalments decremented', ['decremented_count' => $decrementedCount]);
             }
+        } catch (Exception $e) {
+            Log::error('Error processing earnings', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'is_management' => $isManagement
+            ]);
+        }
+    }
 
-            $overtimes = DB::table('x_overtimes')
-                ->join('x_employee', 'x_overtimes.employee_id', '=', 'x_employee.id')
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('job_group_id', $jgroup->id)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('last_day_month', '>=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->select('x_overtimes.employee_id', 'x_overtimes.id', 'x_overtimes.type', 'x_overtimes.period', 'x_overtimes.amount')
-                ->get();
+    private function processOvertimes($start, $end, $jgroup, $isManagement, $employeeIds)
+    {
+        try {
+            Log::info('Processing overtimes', [
+                'is_management' => $isManagement,
+                'job_group_id' => $jgroup->id,
+                'employee_ids' => $employeeIds
+            ]);
 
-            $co = DB::table('x_overtimes')
+            $query = DB::table('x_overtimes')
                 ->join('x_employee', 'x_overtimes.employee_id', '=', 'x_employee.id')
                 ->where('instalments', '>', 0)
                 ->where('in_employment', 'Y')
                 ->whereDate('date_joined', '<=', $end)
                 ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('last_day_month', '>=', $start)
-                        ->where('job_group_id', $jgroup->id);
-                })
-                ->select('x_overtimes.employee_id', 'x_overtimes.id', 'x_overtimes.type', 'x_overtimes.period', 'x_overtimes.amount')
-                ->count();
+                ->whereIn('x_employee.id', $employeeIds);
 
-            if ($co > 0) {
+            $query->where(function ($q) use ($start) {
+                $q->where(function ($subQ) use ($start) {
+                    $subQ->where('formular', '=', 'Recurring')
+                        ->where('first_day_month', '<=', $start);
+                })
+                    ->orWhere(function ($subQ) use ($start) {
+                        $subQ->where('first_day_month', '<=', $start)
+                            ->where('last_day_month', '>=', $start);
+                    });
+            });
 
+            $overtimes = $query->select('x_overtimes.employee_id', 'x_overtimes.id', 'x_overtimes.type', 'x_overtimes.period', 'x_overtimes.amount')->get();
+
+            Log::info('Overtimes query executed', [
+                'overtimes_found' => $overtimes->count(),
+                'is_management' => $isManagement
+            ]);
+
+            if ($overtimes->count() > 0) {
+                // Delete existing overtime transactions for this period
+                $deletedCount = DB::table('x_transact_overtimes')
+                    ->where('organization_id', Auth::user()->organization_id)
+                    ->where('financial_month_year', request('period'))
+                    ->where('process_type', request('type'))
+                    ->whereIn('employee_id', $employeeIds) // Only delete for processed employees
+                    ->delete();
+
+                Log::info('Deleted existing overtime transactions', ['deleted_count' => $deletedCount]);
+
+                $insertedCount = 0;
                 foreach ($overtimes as $overtime) {
-                    DB::table('x_transact_overtimes')->insert(
-                        [
-                            'employee_id' => $overtime->employee_id,
-                            'organization_id' => Auth::user()->organization_id,
-                            'overtime_type' => $overtime->type,
-                            'overtime_id' => $overtime->id,
-                            'overtime_period' => $overtime->period,
-                            'overtime_amount' => $overtime->amount,
-                            'financial_month_year' => request('period'),
-                            'process_type' => request('type')
-                        ]
-                    );
+                    DB::table('x_transact_overtimes')->insert([
+                        'employee_id' => $overtime->employee_id,
+                        'organization_id' => Auth::user()->organization_id,
+                        'overtime_type' => $overtime->type,
+                        'overtime_id' => $overtime->id,
+                        'overtime_period' => $overtime->period,
+                        'overtime_amount' => $overtime->amount,
+                        'financial_month_year' => request('period'),
+                        'process_type' => request('type'),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    $insertedCount++;
                 }
 
-                DB::table('x_overtimes')
+                Log::info('Overtime transactions inserted', ['inserted_count' => $insertedCount]);
+
+                // Decrement instalments
+                $decrementQuery = DB::table('x_overtimes')
                     ->join('x_employee', 'x_overtimes.employee_id', '=', 'x_employee.id')
                     ->where('x_employee.organization_id', Auth::user()->organization_id)
-                    ->where('job_group_id', $jgroup->id)
                     ->whereDate('date_joined', '<=', $end)
+                    ->whereIn('x_employee.id', $employeeIds) // Only for processed employees
                     ->where(function ($query) {
                         $query->where('formular', '=', 'One Time')
                             ->orWhere('formular', '=', 'Instalments');
                     })
-                    ->where('instalments', '>', 0)
-                    ->decrement('instalments');
+                    ->where('instalments', '>', 0);
+
+                $decrementedCount = $decrementQuery->decrement('instalments');
+                Log::info('Overtime instalments decremented', ['decremented_count' => $decrementedCount]);
             }
-
-            $rels = DB::table('x_employee_relief')
-                ->join('x_relief', 'x_employee_relief.relief_id', '=', 'x_relief.id')
-                ->join('x_employee', 'x_employee_relief.employee_id', '=', 'x_employee.id')
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('job_group_id', $jgroup->id)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->select('x_employee.id as eid', 'x_employee_relief.id as id', 'relief_name', 'relief_id', 'relief_amount')
-                ->get();
-
-            foreach ($rels as $rel) {
-                DB::table('x_transact_reliefs')->insert(
-                    [
-                        'employee_id' => $rel->eid,
-                        'organization_id' => Auth::user()->organization_id,
-                        'employee_relief_id' => $rel->id,
-                        'relief_name' => $rel->relief_name,
-                        'relief_id' => $rel->relief_id,
-                        'relief_amount' => $rel->relief_amount,
-                        'financial_month_year' => request('period'),
-                        'process_type' => request('type')
-                    ]
-                );
-            }
-        } else {
-            $allws = DB::table('x_employee_allowances')
-                ->join('x_allowances', 'x_employee_allowances.allowance_id', '=', 'x_allowances.id')
-                ->join('x_employee', 'x_employee_allowances.employee_id', '=', 'x_employee.id')
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('first_day_month', '<=', $start);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('last_day_month', '>=', $start);
-                })
-                ->select('x_employee.id as eid', 'x_employee_allowances.id as id', 'allowance_name', 'allowance_id', 'allowance_amount')
-                ->get();
-            $count_a = DB::table('x_employee_allowances')
-                ->join('x_allowances', 'x_employee_allowances.allowance_id', '=', 'x_allowances.id')
-                ->join('x_employee', 'x_employee_allowances.employee_id', '=', 'x_employee.id')
-                ->where('instalments', '>', 0)
-                ->whereDate('date_joined', '<=', $end)
-                ->where('job_group_id', '!=', $jgroup->id)
-                ->where('in_employment', 'Y')
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('first_day_month', '<=', $start);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('last_day_month', '>=', $start);
-                })
-                ->select('x_employee.id as eid', 'x_employee_allowances.id as id', 'allowance_name', 'allowance_id', 'allowance_amount')
-                ->count();
-
-            if ($count_a > 0) {
-                foreach ($allws as $allw) {
-                    DB::table('x_transact_allowances')->insert(
-                        [
-                            'employee_id' => $allw->eid,
-                            'employee_allowance_id' => $allw->id,
-                            'organization_id' => Auth::user()->organization_id,
-                            'allowance_name' => $allw->allowance_name,
-                            'allowance_id' => $allw->allowance_id,
-                            'allowance_amount' => $allw->allowance_amount,
-                            'financial_month_year' => request('period'),
-                            'process_type' => request('type'),
-                        ]
-                    );
-                }
-
-                DB::table('x_employee_allowances')
-                    ->join('x_employee', 'x_employee_allowances.employee_id', '=', 'x_employee.id')
-                    ->whereDate('date_joined', '<=', $end)
-                    ->where(function ($query) {
-                        $query->where('formular', '=', 'One Time')
-                            ->orWhere('formular', '=', 'Instalments');
-                    })
-                    ->where('instalments', '>', 0)
-                    ->where('job_group_id', '!=', $jgroup->id)
-                    ->where('x_employee.organization_id', Auth::user()->organization_id)
-                    ->decrement('instalments');
-            }
-
-
-            $nontaxes = DB::table('x_employeenontaxables')
-                ->join('x_nontaxables', 'x_employeenontaxables.nontaxable_id', '=', 'x_nontaxables.id')
-                ->join('x_employee', 'x_employeenontaxables.employee_id', '=', 'x_employee.id')
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('first_day_month', '<=', $start);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('last_day_month', '>=', $start);
-                })
-                ->select('x_employee.id as eid', 'x_employeenontaxables.id as id', 'name', 'nontaxable_id', 'nontaxable_amount')
-                ->get();
-
-            $count_ntax = DB::table('x_employeenontaxables')
-                ->join('x_nontaxables', 'x_employeenontaxables.nontaxable_id', '=', 'x_nontaxables.id')
-                ->join('x_employee', 'x_employeenontaxables.employee_id', '=', 'x_employee.id')
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('first_day_month', '<=', $start);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('last_day_month', '>=', $start);
-                })
-                ->select('x_employee.id as eid', 'x_employeenontaxables.id as id', 'name', 'nontaxable_id', 'nontaxable_amount')
-                ->count();
-
-            if ($count_ntax > 0) {
-                foreach ($nontaxes as $nontax) {
-                    DB::table('x_transact_nontaxables')->insert(
-                        [
-                            'employee_id' => $nontax->eid,
-                            'organization_id' => Auth::user()->organization_id,
-                            'employee_nontaxable_id' => $nontax->id,
-                            'nontaxable_name' => $nontax->name,
-                            'nontaxable_id' => $nontax->nontaxable_id,
-                            'nontaxable_amount' => $nontax->nontaxable_amount,
-                            'financial_month_year' => request('period'),
-                            'process_type' => request('type'),
-                        ]
-                    );
-                }
-
-                DB::table('x_employeenontaxables')
-                    ->join('x_employee', 'x_employeenontaxables.employee_id', '=', 'x_employee.id')
-                    ->where('x_employee.organization_id', Auth::user()->organization_id)
-                    ->where('job_group_id', '!=', $jgroup->id)
-                    ->whereDate('date_joined', '<=', $end)
-                    ->where(function ($query) {
-                        $query->where('formular', '=', 'One Time')
-                            ->orWhere('formular', '=', 'Instalments');
-                    })
-                    ->where('instalments', '>', 0)
-                    ->decrement('instalments');
-            }
-
-            $deds = DB::table('x_employee_deductions')
-                ->join('x_deductions', 'x_employee_deductions.deduction_id', '=', 'x_deductions.id')
-                ->join('x_employee', 'x_employee_deductions.employee_id', '=', 'x_employee.id')
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('first_day_month', '<=', $start);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('last_day_month', '>=', $start);
-                })
-                ->select('x_employee.id as eid', 'x_employee_deductions.id as id', 'deduction_name', 'deduction_id', 'formular', 'instalments', 'deduction_amount')
-                ->get();
-
-            $count = DB::table('x_employee_deductions')
-                ->join('x_deductions', 'x_employee_deductions.deduction_id', '=', 'x_deductions.id')
-                ->join('x_employee', 'x_employee_deductions.employee_id', '=', 'x_employee.id')
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where('job_group_id', '!=', $jgroup->id)
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('first_day_month', '<=', $start);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('last_day_month', '>=', $start);
-                })
-                ->select('x_employee.id as eid', 'x_employee_deductions.id as id', 'deduction_name', 'deduction_id', 'formular', 'instalments', 'deduction_amount')
-                ->count();
-
-            if ($count > 0) {
-                foreach ($deds as $ded) {
-                    DB::table('x_transact_deductions')->insert(
-                        [
-                            'employee_id' => $ded->eid,
-                            'organization_id' => Auth::user()->organization_id,
-                            'employee_deduction_id' => $ded->id,
-                            'deduction_name' => $ded->deduction_name,
-                            'deduction_id' => $ded->deduction_id,
-                            'deduction_amount' => $ded->deduction_amount,
-                            'financial_month_year' => request('period'),
-                            'process_type' => request('type')
-                        ]
-                    );
-                }
-
-                DB::table('x_employee_deductions')
-                    ->join('x_employee', 'x_employee_deductions.employee_id', '=', 'x_employee.id')
-                    ->where('x_employee.organization_id', Auth::user()->organization_id)
-                    ->where('job_group_id', '!=', $jgroup->id)
-                    ->whereDate('date_joined', '<=', $end)
-                    ->where(function ($query) {
-                        $query->where('formular', '=', 'One Time')
-                            ->orWhere('formular', '=', 'Instalments');
-                    })
-                    ->where('instalments', '>', 0)
-                    ->decrement('instalments');
-            }
-
-            $part = explode("-", request('period'));
-            $month = '';
-            if ($part[0] == 01) {
-                $month = 'Jan';
-            } else if ($part[0] == 02) {
-                $month = 'Feb';
-            } else if ($part[0] == 03) {
-                $month = 'Mar';
-            } else if ($part[0] == 04) {
-                $month = 'Apr';
-            } else if ($part[0] == 05) {
-                $month = 'May';
-            } else if ($part[0] == 06) {
-                $month = 'Jun';
-            } else if ($part[0] == 07) {
-                $month = 'Jul';
-            } else if ($part[0] == 8) {
-                $month = 'Aug';
-            } else if ($part[0] == 9) {
-                $month = 'Sep';
-            } else if ($part[0] == 10) {
-                $month = 'Oct';
-            } else if ($part[0] == 11) {
-                $month = 'Nov';
-            } else if ($part[0] == 12) {
-                $month = 'Dec';
-            }
-
-            $cp = DB::table('pensions')
-                ->join('x_employee', 'pensions.employee_id', '=', 'x_employee.id')
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->count();
-
-            $pensions = DB::table('pensions')
-                ->join('x_employee', 'pensions.employee_id', '=', 'x_employee.id')
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->get();
-
-            if ($cp > 0) {
-
-                foreach ($pensions as $pension) {
-                    DB::table('x_transact_pensions')->insert(
-                        [
-                            'employee_id' => $pension->employee_id,
-                            'organization_id' => Auth::user()->organization_id,
-                            'employee_amount' => $pension->employee_contribution,
-                            'employer_amount' => $pension->employer_contribution,
-                            'employee_percentage' => $pension->employee_percentage,
-                            'employer_percentage' => $pension->employer_percentage,
-                            'financial_month_year' => request('period'),
-                            'month' => $part[0],
-                            'year' => $part[1]
-                        ]
-                    );
-                }
-            }
-
-
-            $earns = DB::table('x_earnings')
-                ->join('x_employee', 'x_earnings.employee_id', '=', 'x_employee.id')
-                ->join('x_earningsettings', 'x_earnings.earning_id', '=', 'x_earningsettings.id')
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('first_day_month', '<=', $start);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('last_day_month', '>=', $start);
-                })
-                ->select('x_earnings.employee_id', 'x_earnings.id as id', 'earning_name', 'earnings_amount', 'formular', 'instalments')
-                ->get();
-
-            $ct = DB::table('x_earnings')
-                ->join('x_employee', 'x_earnings.employee_id', '=', 'x_employee.id')
-                ->join('x_earningsettings', 'x_earnings.earning_id', '=', 'x_earningsettings.id')
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('first_day_month', '<=', $start);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('last_day_month', '>=', $start);
-                })
-                ->select('x_earnings.employee_id', 'x_earnings.id as id', 'earning_name', 'earnings_amount', 'formular', 'instalments')
-                ->count();
-
-            if ($ct > 0) {
-                foreach ($earns as $earn) {
-                    DB::table('x_transact_earnings')->insert(
-                        [
-                            'employee_id' => $earn->employee_id,
-                            'earning_id' => $earn->id,
-                            'organization_id' => Auth::user()->organization_id,
-                            'earning_name' => $earn->earning_name,
-                            'earning_amount' => $earn->earnings_amount,
-                            'financial_month_year' => request('period'),
-                            'process_type' => request('type')
-                        ]
-                    );
-                }
-
-                DB::table('x_earnings')
-                    ->join('x_employee', 'x_earnings.employee_id', '=', 'x_employee.id')
-                    ->where('x_employee.organization_id', Auth::user()->organization_id)
-                    ->where('job_group_id', '!=', $jgroup->id)
-                    ->whereDate('date_joined', '<=', $end)
-                    ->where(function ($query) {
-                        $query->where('formular', '=', 'One Time')
-                            ->orWhere('formular', '=', 'Instalments');
-                    })
-                    ->where('instalments', '>', 0)
-                    ->decrement('instalments');
-            }
-
-            $overtimes = DB::table('x_overtimes')
-                ->join('x_employee', 'x_overtimes.employee_id', '=', 'x_employee.id')
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('first_day_month', '<=', $start);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('last_day_month', '>=', $start);
-                })
-                ->select('x_overtimes.employee_id', 'x_overtimes.id', 'x_overtimes.type', 'x_overtimes.period', 'x_overtimes.amount')
-                ->get();
-
-            $co = DB::table('x_overtimes')
-                ->join('x_employee', 'x_overtimes.employee_id', '=', 'x_employee.id')
-                ->where('instalments', '>', 0)
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('job_group_id', '!=', $jgroup->id)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->where(function ($query) use ($start, $jgroup) {
-                    $query->where('formular', '=', 'Recurring')
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('first_day_month', '<=', $start);
-                })
-                ->orWhere(function ($query) use ($start, $jgroup) {
-                    $query->where('first_day_month', '<=', $start)
-                        ->where('job_group_id', '!=', $jgroup->id)
-                        ->where('last_day_month', '>=', $start);
-                })
-                ->select('x_overtimes.employee_id', 'x_overtimes.id', 'x_overtimes.type', 'x_overtimes.period', 'x_overtimes.amount')
-                ->count();
-
-            if ($co > 0) {
-
-                foreach ($overtimes as $overtime) {
-                    DB::table('x_transact_overtimes')->insert(
-                        [
-                            'employee_id' => $overtime->employee_id,
-                            'organization_id' => Auth::user()->organization_id,
-                            'overtime_type' => $overtime->type,
-                            'overtime_id' => $overtime->id,
-                            'overtime_period' => $overtime->period,
-                            'overtime_amount' => $overtime->amount,
-                            'financial_month_year' => request('period'),
-                            'process_type' => request('type')
-                        ]
-                    );
-                }
-
-                DB::table('overtimes')
-                    ->join('employee', 'overtimes.employee_id', '=', 'employee.id')
-                    ->where('employee.organization_id', Auth::user()->organization_id)
-                    ->where('job_group_id', '!=', $jgroup->id)
-                    ->whereDate('date_joined', '<=', $end)
-                    ->where(function ($query) {
-                        $query->where('formular', '=', 'One Time')
-                            ->orWhere('formular', '=', 'Instalments');
-                    })
-                    ->where('instalments', '>', 0)
-                    ->decrement('instalments');
-            }
-
-            $rels = DB::table('x_employee_relief')
-                ->join('x_relief', 'x_employee_relief.relief_id', '=', 'x_relief.id')
-                ->join('x_employee', 'x_employee_relief.employee_id', '=', 'x_employee.id')
-                ->where('in_employment', 'Y')
-                ->whereDate('date_joined', '<=', $end)
-                ->where('job_group_id', '!=', $jgroup->id)
-                ->where('x_employee.organization_id', Auth::user()->organization_id)
-                ->select('x_employee.id as eid', 'x_employee_relief.id as id', 'relief_name', 'relief_id', 'relief_amount')
-                ->get();
-
-            foreach ($rels as $rel) {
-                DB::table('x_transact_reliefs')->insert(
-                    [
-                        'employee_id' => $rel->eid,
-                        'organization_id' => Auth::user()->organization_id,
-                        'employee_relief_id' => $rel->id,
-                        'relief_name' => $rel->relief_name,
-                        'relief_id' => $rel->relief_id,
-                        'relief_amount' => $rel->relief_amount,
-                        'financial_month_year' => request('period'),
-                        'process_type' => request('type')
-                    ]
-                );
-            }
+        } catch (Exception $e) {
+            Log::error('Error processing overtimes', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'is_management' => $isManagement
+            ]);
         }
+    }
 
-        $period = request('period');
-        Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'process', 'processed payroll for ' . $period,NULL, Auth::user()->organization_id);
+    private function processReliefs($start, $end, $jgroup, $isManagement, $employeeIds)
+    {
+        try {
+            Log::info('Processing reliefs', [
+                'is_management' => $isManagement,
+                'job_group_id' => $jgroup->id,
+                'employee_ids' => $employeeIds
+            ]);
 
-        return Redirect::route('payroll.index')->withFlashMessage('Payroll successfully processed!');
+            $query = DB::table('x_employee_relief')
+                ->join('x_relief', 'x_employee_relief.relief_id', '=', 'x_relief.id')
+                ->join('x_employee', 'x_employee_relief.employee_id', '=', 'x_employee.id')
+                ->where('in_employment', 'Y')
+                ->whereDate('date_joined', '<=', $end)
+                ->where('x_employee.organization_id', Auth::user()->organization_id)
+                ->whereIn('x_employee.id', $employeeIds);
+
+            $rels = $query->select('x_employee.id as eid', 'x_employee_relief.id as id', 'relief_name', 'relief_id', 'relief_amount')->get();
+
+            Log::info('Reliefs query executed', [
+                'reliefs_found' => $rels->count(),
+                'is_management' => $isManagement
+            ]);
+
+            if ($rels->count() > 0) {
+                // Delete existing relief transactions for this period
+                $deletedCount = DB::table('x_transact_reliefs')
+                    ->where('organization_id', Auth::user()->organization_id)
+                    ->where('financial_month_year', request('period'))
+                    ->where('process_type', request('type'))
+                    ->whereIn('employee_id', $employeeIds) // Only delete for processed employees
+                    ->delete();
+
+                Log::info('Deleted existing relief transactions', ['deleted_count' => $deletedCount]);
+
+                $insertedCount = 0;
+                foreach ($rels as $rel) {
+                    DB::table('x_transact_reliefs')->insert([
+                        'employee_id' => $rel->eid,
+                        'organization_id' => Auth::user()->organization_id,
+                        'employee_relief_id' => $rel->id,
+                        'relief_name' => $rel->relief_name,
+                        'relief_id' => $rel->relief_id,
+                        'relief_amount' => $rel->relief_amount,
+                        'financial_month_year' => request('period'),
+                        'process_type' => request('type'),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    $insertedCount++;
+                }
+
+                Log::info('Relief transactions inserted', ['inserted_count' => $insertedCount]);
+
+                // Decrement instalments for reliefs
+                $decrementQuery = DB::table('x_employee_relief')
+                    ->join('x_employee', 'x_employee_relief.employee_id', '=', 'x_employee.id')
+                    ->where('x_employee.organization_id', Auth::user()->organization_id)
+                    ->whereDate('date_joined', '<=', $end)
+                    ->whereIn('x_employee.id', $employeeIds) // Only for processed employees
+                    ->where('instalments', '>', 0);
+
+                $decrementedCount = $decrementQuery->decrement('instalments');
+                Log::info('Relief instalments decremented', ['decremented_count' => $decrementedCount]);
+            }
+        } catch (Exception $e) {
+            Log::error('Error processing reliefs', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'is_management' => $isManagement
+            ]);
+        }
     }
 
 

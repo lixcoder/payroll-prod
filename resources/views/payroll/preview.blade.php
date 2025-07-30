@@ -100,7 +100,6 @@ function asMoney($value)
                                     </h3>
                                 </div>
                                 <div class="card-body">
-                                    <!-- Commented for Testing on 01/09/2023 by Dominick -->
                                     <form method="POST" action="{{{ URL::to('payroll/store') }}}" accept-charset="UTF-8">
                                     
                                         @csrf

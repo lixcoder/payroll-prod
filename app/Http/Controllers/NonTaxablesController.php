@@ -19,7 +19,7 @@ class NonTaxablesController extends BaseController {
     {
         $nontaxables = Nontaxable::whereNull('organization_id')->orWhere('organization_id',Auth::user()->organization_id)->get();
 
-        Audit::logaudit('Nontaxables', 'view', 'viewed non taxable income list ');
+        Audit::logaudit(now(), 'Nontaxables', 'view', 'viewed non taxable income list ');
 
         return View::make('nontaxables.index', compact('nontaxables'));
     }

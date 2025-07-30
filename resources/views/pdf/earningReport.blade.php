@@ -87,10 +87,14 @@ function asMoney($value)
 
 
             <td style="width:150px">
-
-                <img src="{{public_path().'/uploads/logo/'.$organization->logo}}" alt="logo" width="80%">
-
-
+                @if($organization->logo && file_exists(public_path('uploads/logo/'.$organization->logo)))
+                    <img src="{{public_path('uploads/logo/'.$organization->logo)}}" alt="logo" width="80%">
+                @else
+                    {{-- Display a placeholder or organization name if no logo --}}
+                    <div style="width:80%; text-align:center;">
+                        {{ $organization->name }}
+                    </div>
+                @endif
             </td>
 
             <td>
@@ -127,14 +131,16 @@ function asMoney($value)
 
 <div class="content" style='margin-top:-70px;'>
     @if($type == 'All')
-        <div style="margin-bottom:20px">{{'<strong>Period</strong> : '.$period}}
-            <div align="center"><strong>Earning Report</strong></div>
-        </div>
-    @else
-        <div style="margin-bottom:20px">{{'<strong>Period</strong> : '.$period}}
-            <div align="center"><strong>Earning Report for {{$type}}</strong></div>
-        </div>
-    @endif
+    <div style="margin-bottom:20px">
+        <strong>Period</strong>: {{$period}}
+        <div align="center"><strong>Earning Report</strong></div>
+    </div>
+@else
+    <div style="margin-bottom:20px">
+        <strong>Period</strong>: {{$period}}
+        <div align="center"><strong>Earning Report for {{$type}}</strong></div>
+    </div>
+@endif
     <table class="table table-bordered" border='1' cellspacing='0' cellpadding='0'>
 
         <tr>
@@ -148,7 +154,7 @@ function asMoney($value)
             @else
             @endif
             @foreach($currencies as $currency)
-                <td><strong>Amount ({{$currency->shortname}}) </strong></td>
+                <td><strong>Amount ({{$currencies->shortname}}) </strong></td>
             @endforeach
         </tr>
         <?php $i = 1; ?>

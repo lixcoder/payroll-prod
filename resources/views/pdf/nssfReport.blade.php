@@ -85,10 +85,15 @@ function asMoney($value)
 
         <tr>
             <td style="width:150px">
-{{--                <img src="{{asset('uploads/logo/'.$organization->logo)}}" alt="logo" width="80%">--}}
-                <img src="{{asset('uploads/logo/'.Auth::user()->organization->logo)}}" alt="logo" width="80%">
-            </td>
-
+    @if($organization->logo && file_exists(public_path('uploads/logo/'.$organization->logo)))
+        <img src="{{public_path('uploads/logo/'.$organization->logo)}}" alt="logo" width="80%">
+    @else
+        {{-- Display a placeholder or organization name if no logo --}}
+        <div style="width:80%; text-align:center;">
+            {{ $organization->name }}
+        </div>
+    @endif
+</td>
             <td>
                 <strong>
                     {{ strtoupper($organization->name)}}

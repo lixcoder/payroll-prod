@@ -20,7 +20,7 @@
 				   @csrf
 
 				  <label for="text">Type your data:</label> <br>
-				  <textarea id="text" name="text" rows="4" cols="50">{{$smsdata->smsdetails}}</textarea>
+				  <textarea id="text" name="text" rows="4" cols="50">{{$smsdata->smsdetails ?? ''}}</textarea>
 
 				  <br>
 

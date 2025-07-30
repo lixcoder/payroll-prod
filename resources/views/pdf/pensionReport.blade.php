@@ -84,10 +84,15 @@ function asMoney($value)
     <table>
         <tr>
             <td style="width:150px">
-
-                <img src="{{public_path().'/uploads/logo/'.$organization->logo}}" alt="logo" width="80%">
-
-            </td>
+    @if($organization->logo && file_exists(public_path('uploads/logo/'.$organization->logo)))
+        <img src="{{public_path('uploads/logo/'.$organization->logo)}}" alt="logo" width="80%">
+    @else
+        {{-- Display a placeholder or organization name if no logo --}}
+        <div style="width:80%; text-align:center;">
+            {{ $organization->name }}
+        </div>
+    @endif
+</td>
 
             <td>
                 <strong>
@@ -142,16 +147,16 @@ function asMoney($value)
             @else
             @endif
             @foreach($currencies as $currency)
-                <td><strong>Employee Contribution ({{$currency->shortname}}) </strong></td>
+                <td><strong>Employee Contribution ({{$currencies->shortname}}) </strong></td>
             @endforeach
             <td><strong>Employee Percentage (%) </strong></td>
             @foreach($currencies as $currency)
-                <td><strong>Employer Contribution ({{$currency->shortname}}) </strong></td>
+                <td><strong>Employer Contribution ({{$currencies->shortname}}) </strong></td>
             @endforeach
             <td><strong>Employer Percentage (%) </strong></td>
             <td><strong>Interest </strong></td>
             @foreach($currencies as $currency)
-                <td><strong>Monthly Contribution ({{$currency->shortname}}) </strong></td>
+                <td><strong>Monthly Contribution ({{$currencies->shortname}}) </strong></td>
             @endforeach
             <td><strong>Comments </strong></td>
         </tr>

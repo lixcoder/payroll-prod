@@ -16,7 +16,7 @@ function asMoney($value)
                 <div class="page-body">
                     <div class="row">
                         <div class="col-lg-12">
-                            <h3>Earnings</h3>
+                            <h3>Unlock Payroll</h3>
                             <hr>
                         </div>
                         <div class="col-lg-12">
@@ -25,14 +25,14 @@ function asMoney($value)
                                     Processed Payrolls
                                 </div>
                                 <div class="card-body">
-                                    @if (Session::has('flash_message'))
+                                    @if (Session::has('notice'))
                                         <div class="alert alert-success">
-                                            {{ Session::get('flash_message') }}
+                                            {{ Session::get('notice') }}
                                         </div>
                                     @endif
-                                    @if (Session::has('delete_message'))
+                                    @if (Session::has('error'))
                                         <div class="alert alert-danger">
-                                            {{ Session::get('delete_message') }}
+                                            {{ Session::get('error') }}
                                         </div>
                                     @endif
                                     <table id="users"
@@ -59,7 +59,7 @@ function asMoney($value)
 
                                                 <td> {{ $i }}</td>
 
-                                                <td>{{ $transact->financial_month_year }}</td>
+                                                <td>{{ \Carbon\Carbon::createFromFormat('m-Y', $transact->financial_month_year)->format('Y-m-d') }}</td>
 
                                                 <td>{{ App\Models\Transact::getUser($transact->user_id) }}</td>
                                                 @if(App\Models\Lockpayroll::checkAvailable($transact->financial_month_year) == 0)
