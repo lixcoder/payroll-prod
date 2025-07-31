@@ -20,7 +20,7 @@
 
                                             <div class="form-group">
                                                 <label for="username">Period <span style="color:red">*</span></label>
-                                                <select class="form-control selectable" name="type" id="period">
+                                                <select class="form-control selectable" name="period" id="period">
                                                     <option value="">Select Period</option>
                                                     <option value="day">As at date</option>
                                                     <option value="month">Month</option>

@@ -220,7 +220,7 @@ function asMoney($value)
             <td><strong>Gross Pay </strong></td>
             <td><strong>Paye</strong></td>
             <td><strong>Nssf Amount</strong></td>
-            <td><strong>Nhif Amount</strong></td>
+            <td><strong>Shif Amount</strong></td>
             <td><strong>Other Deductions</strong></td>
             <td><strong>Total Deductions </strong></td>
             <td><strong>Net Pay </strong></td>
