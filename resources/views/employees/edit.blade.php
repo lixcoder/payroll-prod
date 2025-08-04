@@ -317,8 +317,8 @@
                                                                     style="color:red">*</span></label>
                                                             <div class="right-inner-addon ">
                                                                 <i class="glyphicon glyphicon-calendar"></i>
-                                                                <input class="form-control datepicker1" readonly="readonly"
-                                                                       placeholder="" type="text" name="dob" id="dob"
+                                                                <input class="form-control datepicker1"
+                                                                       placeholder="" type="date" name="dob" id="dob"
                                                                        value="{{{ $employee->yob }}}">
                                                             </div>
                                                         </div>
@@ -508,8 +508,14 @@
                                                             </div>
 
                                                         </div>
-
-                                                        <div class="form-group">
+                                                        <!-- Mpesa Entry -->
+                                                        <div class="form-group" style="display: none;">
+                                                            <label for="mpesa_number">Mpesa Number</label>
+                                                            <input class="form-control" placeholder="" type="number"
+                                                                name="mpesa_number" id="mpesa_number"
+                                                                value="{{{ old('mpesa_number') }}}">
+                                                        </div>
+                                                        <div class="form-group" style="display: none;">
                                                             <label for="username">Bank</label>
                                                             <select id="bank_id" name="bank_id" class="form-control">
                                                                 <option></option>
@@ -524,7 +530,7 @@
                                                         </div>
 
 
-                                                        <div class="form-group">
+                                                        <div class="form-group" style="display: none;">
                                                             <label for="username">Bank Branch</label>
                                                             <select id="bbranch_id" name="bbranch_id" class="form-control">
                                                                 <option></option>
@@ -539,21 +545,21 @@
                                                     </div>
                                                     <div class="col-lg-4">
 
-                                                        <div class="form-group">
+                                                        <div class="form-group" style="display: none;">
                                                             <label for="username">Bank Account Number</label>
                                                             <input class="form-control" placeholder="" type="text"
                                                                    name="bank_account_number" id="bank_account_number"
                                                                    value="{{{ $employee->bank_account_number }}}">
                                                         </div>
 
-                                                        <div class="form-group">
+                                                        <div class="form-group" style="display: none;">
                                                             <label for="username">Sort Code</label>
                                                             <input class="form-control" placeholder="" type="text"
                                                                    name="bank_eft_code" id="bank_eft_code"
                                                                    value="{{{ $employee->bank_eft_code }}}">
                                                         </div>
 
-                                                        <div class="form-group">
+                                                        <div class="form-group" style="display: none;">
                                                             <label for="username">Swift Code</label>
                                                             <input class="form-control" placeholder="" type="text"
                                                                    name="swift_code" id="swift_code"
@@ -711,8 +717,8 @@
                                                                     style="color:red">*</span></label>
                                                             <div class="right-inner-addon ">
                                                                 <i class="glyphicon glyphicon-calendar"></i>
-                                                                <input class="form-control datepicker" readonly="readonly"
-                                                                       placeholder="" type="text" name="djoined"
+                                                                <input class="form-control datepicker"
+                                                                       placeholder="" type="date" name="djoined"
                                                                        id="djoined"
                                                                        value="{{{ date('d-M-Y',strtotime($employee->date_joined)) }}}">
                                                             </div>
@@ -954,6 +960,54 @@
     <script src="{{asset('datepicker/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{asset('datepicker/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<!-- This helps with the payment details -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modeSelect = document.getElementById("modep");
+
+            const bankFields = [
+                "bank_id",
+                "bbranch_id",
+                "bank_account_number",
+                "bank_eft_code",
+                "swift_code"
+            ];
+            const mpesaFields = [
+                "mpesa_number"
+            ];
+
+
+            const newMode = document.getElementById("newmode");
+
+            function showHideFields() {
+                const selected = modeSelect.value;
+
+                // Show "Insert Mode of Payment" only if 'Others' is selected
+                newMode.style.display = (selected === "Others") ? "block" : "none";
+
+                // Show bank fields only if 'Bank' is selected
+                bankFields.forEach(function (id) {
+                    const field = document.getElementById(id);
+                    if (field) {
+                        field.closest(".form-group").style.display = (selected === "Bank") ? "block" : "none";
+                    }
+                });
+
+                // Show mpesa fields only if 'Mpesa' is selected
+                mpesaFields.forEach(function (id) {
+                    const field = document.getElementById(id);
+                    if (field) {
+                        field.closest(".form-group").style.display = (selected === "Mpesa") ? "block" : "none";
+                    }
+                });
+            }
+
+            modeSelect.addEventListener("change", showHideFields);
+            showHideFields(); // run once when the page loads
+        });
+    </script>
+
     <script>
         function nexts(id) {
             if (id === 1) {

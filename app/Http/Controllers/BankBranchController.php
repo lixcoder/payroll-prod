@@ -78,8 +78,7 @@ class BankBranchController extends Controller {
 
 		Audit::logaudit(date('Y-m-d'), Auth::user()->username, 'create', 'created: '.$bbranch->bank_branch_name);
 
-		// return Redirect::route('bank_branch.index')->withFlashMessage('Bank Branch successfully created!');
-		return Redirect::back()->withErrors('Bank Branch successfully created!');
+		return Redirect::route('bank_branch.index')->withErrors('Bank Branch successfully updated!');
 	}
 
 	/*
@@ -134,7 +133,8 @@ class BankBranchController extends Controller {
 
 		Audit::logaudit(date('Y-m-d'), Auth::user()->username, 'update', 'updated: '.$bbranch->bank_branch_name);
 
-		return Redirect::route('bank_branch.index')->withFlashMessage('Bank Branch successfully updated!');
+		// return Redirect::route('bank_branch.index')->withFlashMessage('Bank Branch successfully updated!');
+		return Redirect::route('bank_branch.index')->withErrors('Bank Branch successfully updated!');
 	}
 
 	/*

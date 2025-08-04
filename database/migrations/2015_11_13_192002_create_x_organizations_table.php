@@ -32,7 +32,7 @@ class CreateXOrganizationsTable extends Migration {
 			$table->string('license_type')->nullable()->default('evaluation');
 			$table->string('license_code')->nullable();
 			$table->string('license_key')->nullable();
-            $table->string('annual_support_key');
+            $table->string('annual_support_key')->nullable();
 			$table->bigInteger('licensed')->nullable()->default(100);
             $table->date('installation_date')->default(date('Y-m-d'));
             $table->date('license_due_date')->default(date('Y-m-d'));

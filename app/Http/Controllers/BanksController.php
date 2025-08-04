@@ -97,6 +97,17 @@ class BanksController extends Controller {
 
         return View::make('banks.edit', compact('bank'));
     }
+    
+    public function getBranches($bankId)
+    {
+        $branches = DB::table('bank_branches')
+                    ->where('bank_id', $bankId)
+                    ->select('id', 'bank_branch_name')
+                    ->get();
+
+        return response()->json($branches);
+    }
+
 
     /*
      * Update the specified branch in storage.

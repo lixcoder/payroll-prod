@@ -453,6 +453,8 @@
                                                         </button>
                                                     </div>
                                                 </div>
+
+                <!-- Payment Details page  -->
                                                 <div id="page3" class="row" style="display: none">
                                                     <div class="col-sm-12">
                                                         <small class="text-danger" id="emptyErr21"
@@ -476,42 +478,45 @@
                                                         <input class="form-control" placeholder="" type="text"
                                                                name="omode" id="omode" value="{{{ old('omode') }}}">
                                                     </div>
-                                                    <div class="form-group col-sm-4">
+                                                    <!-- Mpesa Entry -->
+                                                    <div class="form-group col-sm-4" style="display: none;">
+                                                        <label for="mpesa_number">Mpesa Number</label>
+                                                        <input class="form-control" placeholder="" type="number"
+                                                               name="mpesa_number" id="mpesa_number"
+                                                               value="{{{ old('mpesa_number') }}}" required>
+                                                    </div>
+                                                    <!-- BANK SELECT -->
+                                                    <div class="form-group col-sm-4" style="display: none;">
                                                         <label for="bank_id">Banks</label>
                                                         <select name="bank_id" id="bank_id" class="form-control">
-                                                            <option></option>
+                                                            <option value="">-- Select bank --</option>
                                                             <option value="cnew">Create New</option>
                                                             @foreach($banks as $bank)
-                                                                <option
-                                                                    value="{{ $bank->id }}"> {{ $bank->bank_name }}</option>
+                                                                <option value="{{ $bank->id }}">{{ $bank->bank_name }}</option>
                                                             @endforeach
-
                                                         </select>
-
                                                     </div>
-                                                    <div class="form-group col-sm-4">
+
+                                                    <!-- BRANCH SELECT -->
+                                                    <div class="form-group col-sm-4" style="display: none;">
                                                         <label for="bbranch_id">Bank Branch</label>
-                                                        <select name="bbranch_id" id="bbranch_id" class="form-control">
-                                                            @foreach($bbranches as $bank)
-                                                                <option
-                                                                    value="{{ $bank->id }}"> {{ $bank->bank_branch_name }}</option>
-                                                            @endforeach
+                                                        <select name="bank_branch_id" id="bbranch_id" class="form-control">
+                                                            <option value="">-- Select branch --</option>
                                                         </select>
-
                                                     </div>
-                                                    <div class="form-group col-sm-4">
+                                                    <div class="form-group col-sm-4" style="display: none;">
                                                         <label for="bank_account_number">Bank Account Number</label>
                                                         <input class="form-control" placeholder="" type="text"
                                                                name="bank_account_number" id="bank_account_number"
                                                                value="{{{ old('bank_account_number') }}}">
                                                     </div>
-                                                    <div class="form-group col-sm-4">
+                                                    <div class="form-group col-sm-4" style="display: none;">
                                                         <label for="bank_eft_code">Sort Code</label>
                                                         <input class="form-control" placeholder="" type="text"
                                                                name="bank_eft_code" id="bank_eft_code"
                                                                value="{{{ old('bank_eft_code') }}}">
                                                     </div>
-                                                    <div class="form-group col-sm-4">
+                                                    <div class="form-group col-sm-4" style="display: none;">
                                                         <label for="swift_code">Swift Code</label>
                                                         <input class="form-control" placeholder="" type="text"
                                                                name="swift_code" id="swift_code"
@@ -843,6 +848,85 @@
     <script src="{{asset('datepicker/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{asset('datepicker/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<!-- This helps with the bank branch details -->
+    <script>
+        $(document).ready(function () {
+            $('#bank_id').on('change', function () {
+                var bankId = $(this).val();
+                $('#bbranch_id').html('<option>Loading...</option>');
+
+                if (!bankId) {
+                    $('#bbranch_id').html('<option value="">-- Select branch --</option>');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/get-bank-branches/' + bankId,
+                    method: 'GET',
+                    success: function (branches) {
+                        var options = '<option value="">-- Select branch --</option>';
+                        branches.forEach(function (branch) {
+                            options += '<option value="' + branch.id + '">' + branch.bank_branch_name + '</option>';
+                        });
+                        $('#bbranch_id').html(options);
+                    },
+                    error: function () {
+                        $('#bbranch_id').html('<option value="">-- Error loading branches --</option>');
+                    }
+                });
+            });
+        });
+    </script>
+
+<!-- This helps with the payment details -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modeSelect = document.getElementById("modep");
+
+            const bankFields = [
+                "bank_id",
+                "bbranch_id",
+                "bank_account_number",
+                "bank_eft_code",
+                "swift_code"
+            ];
+            const mpesaFields = [
+                "mpesa_number"
+            ];
+
+
+            const newMode = document.getElementById("newmode");
+
+            function showHideFields() {
+                const selected = modeSelect.value;
+
+                // Show "Insert Mode of Payment" only if 'Others' is selected
+                newMode.style.display = (selected === "Others") ? "block" : "none";
+
+                // Show bank fields only if 'Bank' is selected
+                bankFields.forEach(function (id) {
+                    const field = document.getElementById(id);
+                    if (field) {
+                        field.closest(".form-group").style.display = (selected === "Bank") ? "block" : "none";
+                    }
+                });
+
+                // Show mpesa fields only if 'Mpesa' is selected
+                mpesaFields.forEach(function (id) {
+                    const field = document.getElementById(id);
+                    if (field) {
+                        field.closest(".form-group").style.display = (selected === "Mpesa") ? "block" : "none";
+                    }
+                });
+            }
+
+            modeSelect.addEventListener("change", showHideFields);
+            showHideFields(); // run once when the page loads
+        });
+    </script>
+
+
     <script>
         $(document).ready(function () {
             $('#idNum').hide();
