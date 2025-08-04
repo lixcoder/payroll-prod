@@ -7548,7 +7548,6 @@ class ReportsController extends Controller
         } else {
             if ($request->get('earning') == 'All') {
                 $period = $request->get("period");
-                dd($period);
                 $type = $request->get("earning");
                 if ($request->get('type') == 'All') {
 
@@ -7579,7 +7578,6 @@ class ReportsController extends Controller
                         ->sum("earning_amount");
                 }
 
-                // dd($earnings);
                 $currencies = Currency::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->first();
 
 

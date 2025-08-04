@@ -1,353 +1,311 @@
 <?php
-
-
-function asMoney($value)
-{
+function asMoney($value) {
     return number_format($value, 2);
 }
-
 ?>
 <html>
 <head>
-
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
     <style type="text/css">
-
-        table {
-            max-width: 100%;
-            background-color: transparent;
-        }
-
-        th {
-            text-align: left;
-        }
-
-        .table {
-            width: 100%;
-            margin-bottom: 50px;
-        }
-
-        hr {
-            margin-top: 1px;
-            margin-bottom: 2px;
-            border: 0;
-            border-top: 2px dotted #eee;
-        }
-
-        .hr1 {
-            display: block;
-            height: 1px;
-            width: 300px;
-            border: 0;
-            border-top: 1px solid #000;
-            padding: 0;
-        }
-
-        .hr2 {
-            display: block;
-            height: 1px;
-            width: 100px;
-            margin-top: -100px;
-            border: 0;
-            border-top: 1px solid #000;
-            padding: 0;
-        }
-
-        .hr3 {
-            display: block;
-            height: 1px;
-            width: 100px;
-            margin-top: -100px;
-            border: 0;
-            border-top: 1px solid #000;
-            padding: 0;
+        * {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
         }
 
         body {
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            font-size: 12px;
-            line-height: 1.428571429;
-            color: #333;
-            background-color: #fff;
+            margin: 0;
+            padding: 0;
         }
 
-
-        @page {
-            margin: 170px 30px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0 20px;
         }
 
-        .header {
-            position: top;
-            left: 0px;
-            top: -150px;
-            right: 0px;
-            height: 150px;
+        th, td {
+            padding: 8px 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
             text-align: center;
         }
 
-        .content {
-            margin-top: -100px;
-            margin-bottom: -150px
+        .header {
+            position: relative;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .header-text {
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .logo {
+            max-width: 120px;
+            max-height: 80px;
+            margin-right: 20px;
+        }
+
+        .title-section {
+            text-align: center;
+            margin: 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .report-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .period-info {
+            margin-bottom: 5px;
+            font-style: italic;
         }
 
         .footer {
             position: fixed;
-            left: 0px;
-            bottom: -180px;
-            right: 0px;
-            height: 50px;
+            bottom: -40px;
+            left: 0;
+            right: 0;
+            height: 30px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 5px;
         }
 
-        .footer .page:after {
-            content: counter(page, upper-roman);
+        .content {
+            padding: 0 10px;
         }
 
+        .amount-cell {
+            text-align: right;
+            font-family: monospace;
+        }
 
+        .total-row {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+
+        .signature-table {
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .signature-line {
+            border-top: 1px solid #000;
+            width: 100%;
+        }
+
+        .signature-label {
+            text-align: center;
+            padding-top: 5px;
+        }
+
+        @page {
+            margin: 100px 25px 70px 25px;
+        }
+
+        .page-number:after {
+            content: "Page " counter(page);
+        }
     </style>
-
 </head>
 <body>
-
-<div class="header" style='margin-top:-150px;'>
-    <div class="footer">
-        <p class="page">Page <?php $PAGE_NUM ?></p>
-    </div>
-    <table>
-        <tr>
-
-             <td style="width:150px">
-    @if($organization->logo && file_exists(public_path('uploads/logo/'.$organization->logo)))
-        <img src="{{public_path('uploads/logo/'.$organization->logo)}}" alt="logo" width="80%">
-    @else
-        {{-- Display a placeholder or organization name if no logo --}}
-        <div style="width:80%; text-align:center;">
-            {{ $organization->name }}
+    <div class="header">
+        <div class="header-content">
+            @if($organization->logo && file_exists(public_path('uploads/logo/'.$organization->logo)))
+                <img class="logo" src="{{ public_path('uploads/logo/'.$organization->logo) }}" alt="logo">
+            @endif
+            <div class="header-text">
+                <strong style="font-size: 16px;">{{ strtoupper($organization->name) }}</strong><br>
+                {{ $organization->address }}<br>
+                Phone: {{ $organization->phone }} | 
+                Email: {{ $organization->email }}<br>
+                {{ $organization->website }}
+            </div>
         </div>
-    @endif
-</td>
-           
+    </div>
 
-            <td>
-                <strong>
-                    {{ strtoupper($organization->name)}}
-                </strong>
-                {{ $organization->phone}}<br>
-                {{ $organization->email}}<br>
-                {{ $organization->website}}<br>
-                {{ $organization->address}}
-
-
-            </td>
-
-
-        </tr>
-
-
-        <tr>
-
-            <hr>
-        </tr>
-
-
-    </table>
-</div>
-
-
-
-<div class="content" style='margin-top:-50px;'>
-    <table>
-        <?php if($selBranch == 'All' && $selDept == 'All'){?>
-        <tr>
-            <td width='50'><strong>Branch:</strong></td>
-            <td>All</td>
-        </tr>
-        <tr>
-            <td width='50'><strong>Department:</strong></td>
-            <td>All</td>
-        </tr>
-        <?php }else if($selBranch == 'All'){?>
-        <tr>
-            <td width='50'><strong>Branch:</strong></td>
-            <td>All</td>
-        </tr>
-        <tr>
-            <td width='50'><strong>Department:</strong></td>
-            <td>{{$sels->name}}</td>
-        </tr>
-        <?php }else if($selDept == 'All'){?>
-        <tr>
-            <td width='50'><strong>Branch:</strong></td>
-            <td>{{$sels->name}}</td>
-        </tr>
-        <tr>
-            <td width='50'><strong>Department:</strong></td>
-            <td>All</td>
-        </tr>
-        <?php }else if($selDept != 'Áll' && $selBranch != 'All'){?>
-        <tr>
-            <td width='50'><strong>Branch:</strong></td>
-            <td>{{$selBr->name}}</td>
-        </tr>
-        <tr>
-            <td width='50'><strong>Department:</strong></td>
-            <td>{{$selDt->name}}</td>
-        </tr>
-        <?php } ?>
-        <tr>
-            <td width='50'>
-                <strong>Currency:</strong></td>
-            @foreach($currencies as $currency)
-                <td>{{$currency->shortname}}</td>
-            @endforeach
-        </tr>
-        <tr>
-            <td width='50'><strong>Period:</strong></td>
-            <td>{{$period}}</td>
-        </tr>
-    </table>
-    <div style="margin-bottom:20px" align="center"><strong>PAYROLL SUMMARY</strong></div>
-
-    <table class="table table-bordered" border='1' cellspacing='0' cellpadding='0'>
-
-        <tr>
-
-            <td width='20'><strong># </strong></td>
-            <td><strong>Payroll Number </strong></td>
-            <td><strong>Employee Name </strong></td>
-            <td><strong>Basic Pay </strong></td>
-            <td><strong>Allowance </strong></td>
-            <td><strong>Gross Pay </strong></td>
-            <td><strong>Paye</strong></td>
-            <td><strong>Nssf Amount</strong></td>
-            <td><strong>Shif Amount</strong></td>
-            <td><strong>Other Deductions</strong></td>
-            <td><strong>Total Deductions </strong></td>
-            <td><strong>Net Pay </strong></td>
-        </tr>
-        <?php $i = 1; ?>
-        @foreach($sums as $sum)
+    <div class="content">
+        <table>
+            <?php if($selBranch == 'All' && $selDept == 'All'){?>
+                <tr>
+                    <td width='120'><strong>Branch:</strong></td>
+                    <td>All</td>
+                </tr>
+                <tr>
+                    <td><strong>Department:</strong></td>
+                    <td>All</td>
+                </tr>
+            <?php }else if($selBranch == 'All'){?>
+                <tr>
+                    <td><strong>Branch:</strong></td>
+                    <td>All</td>
+                </tr>
+                <tr>
+                    <td><strong>Department:</strong></td>
+                    <td>{{$sels->name}}</td>
+                </tr>
+            <?php }else if($selDept == 'All'){?>
+                <tr>
+                    <td><strong>Branch:</strong></td>
+                    <td>{{$sels->name}}</td>
+                </tr>
+                <tr>
+                    <td><strong>Department:</strong></td>
+                    <td>All</td>
+                </tr>
+            <?php }else if($selDept != 'Áll' && $selBranch != 'All'){?>
+                <tr>
+                    <td><strong>Branch:</strong></td>
+                    <td>{{$selBr->name}}</td>
+                </tr>
+                <tr>
+                    <td><strong>Department:</strong></td>
+                    <td>{{$selDt->name}}</td>
+                </tr>
+            <?php } ?>
             <tr>
-
-
-                <td td width='20'>{{$i}}</td>
-                <td> {{ $sum->personal_file_number }}</td>
-                @if($sum->middle_name != null || $sum->middle_name != '')
-                    <td> {{$sum->first_name.' '.$sum->middle_name.' '.$sum->last_name}}</td>
-                @else
-                    <td> {{$sum->first_name.' '.$sum->last_name}}</td>
-                @endif
-                <td align="right"> {{ asMoney($sum->basic_pay) }}</td>
-                <td align="right"> {{ asMoney($sum->earning_amount) }}</td>
-                <td align="right"> {{ asMoney($sum->taxable_income) }}</td>
-                <td align="right"> {{ asMoney($sum->paye) }}</td>
-                <td align="right"> {{ asMoney($sum->nssf_amount) }}</td>
-                <td align="right"> {{ asMoney($sum->nhif_amount) }}</td>
-                <td align="right"> {{ asMoney($sum->other_deductions) }}</td>
-                <td align="right"> {{ asMoney($sum->total_deductions) }}</td>
-                <td align="right"> {{ asMoney($sum->net ) }}</td>
+                <td><strong>Currency:</strong></td>
+                <td>{{$currencies->first()->shortname ?? ''}}</td>
             </tr>
-            <?php $i++; ?>
+            <tr>
+                <td><strong>Period:</strong></td>
+                <td>{{$period}}</td>
+            </tr>
+        </table>
 
-        @endforeach
+        <div class="title-section">
+            <div class="report-title">PAYROLL SUMMARY REPORT</div>
+        </div>
 
-        <tr>
-            <td colspan='3' align="right"><strong>Total: </strong></td>
+        <table>
+            <thead>
+                <tr>
+                    <th width="30">#</th>
+                    <th>Payroll Number</th>
+                    <th>Employee Name</th>
+                    <th class="amount-cell">Basic Pay</th>
+                    <th class="amount-cell">Allowance</th>
+                    <th class="amount-cell">Gross Pay</th>
+                    <th class="amount-cell">PAYE</th>
+                    <th class="amount-cell">NSSF</th>
+                    <th class="amount-cell">NHIF</th>
+                    <th class="amount-cell">Other Deductions</th>
+                    <th class="amount-cell">Total Deductions</th>
+                    <th class="amount-cell">Net Pay</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php $i = 1; ?>
+                @foreach($sums as $sum)
+                    <tr>
+                        <td>{{ $i }}</td>
+                        <td>{{ $sum->personal_file_number }}</td>
+                        <td>
+                            @if($sum->middle_name)
+                                {{ $sum->first_name.' '.$sum->middle_name.' '.$sum->last_name }}
+                            @else
+                                {{ $sum->first_name.' '.$sum->last_name }}
+                            @endif
+                        </td>
+                        <td class="amount-cell">{{ asMoney($sum->basic_pay) }}</td>
+                        <td class="amount-cell">{{ asMoney($sum->earning_amount) }}</td>
+                        <td class="amount-cell">{{ asMoney($sum->taxable_income) }}</td>
+                        <td class="amount-cell">{{ asMoney($sum->paye) }}</td>
+                        <td class="amount-cell">{{ asMoney($sum->nssf_amount) }}</td>
+                        <td class="amount-cell">{{ asMoney($sum->nhif_amount) }}</td>
+                        <td class="amount-cell">{{ asMoney($sum->other_deductions) }}</td>
+                        <td class="amount-cell">{{ asMoney($sum->total_deductions) }}</td>
+                        <td class="amount-cell">{{ asMoney($sum->net) }}</td>
+                    </tr>
+                    <?php $i++; ?>
+                @endforeach
 
-            <td align="right" width="69">{{ asMoney($total_pay ) }}</td>
-            <td align="right" width="72">{{ asMoney($total_earning ) }}</td>
-            <td align="right" width="73">{{ asMoney($total_gross ) }}</td>
-            <td align="right" width="69">{{ asMoney($total_paye ) }}</td>
-            <td align="right" width="62">{{ asMoney($total_nssf ) }}</td>
-            <td align="right" width="63">{{ asMoney($total_nhif ) }}</td>
-            <td align="right" width="77">{{ asMoney($total_others ) }}</td>
-            <td align="right" width="78">{{ asMoney($total_deds ) }}</td>
-            <td align="right" width="68">{{ asMoney($total_net ) }}</td>
-        </tr>
+                <tr class="total-row">
+                    <td colspan="3" align="right"><strong>Total:</strong></td>
+                    <td class="amount-cell"><strong>{{ asMoney($total_pay) }}</strong></td>
+                    <td class="amount-cell"><strong>{{ asMoney($total_earning) }}</strong></td>
+                    <td class="amount-cell"><strong>{{ asMoney($total_gross) }}</strong></td>
+                    <td class="amount-cell"><strong>{{ asMoney($total_paye) }}</strong></td>
+                    <td class="amount-cell"><strong>{{ asMoney($total_nssf) }}</strong></td>
+                    <td class="amount-cell"><strong>{{ asMoney($total_nhif) }}</strong></td>
+                    <td class="amount-cell"><strong>{{ asMoney($total_others) }}</strong></td>
+                    <td class="amount-cell"><strong>{{ asMoney($total_deds) }}</strong></td>
+                    <td class="amount-cell"><strong>{{ asMoney($total_net) }}</strong></td>
+                </tr>
 
+                <tr class="total-row">
+                    <td colspan="11" align="right"><strong>Total Net:</strong></td>
+                    <td class="amount-cell"><strong>{{ asMoney($total_net) }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
 
-        <tr>
-            <td align="right" colspan='11'><strong>Total net:</strong></td>
-            <td align="right" width="68">{{ asMoney($total_net ) }}</td>
-        </tr>
+        <table class="signature-table">
+            <tr>
+                <td width="120"><strong>Prepared By:</strong></td>
+                <td><div class="signature-line"></div></td>
+                <td width="150"><div class="signature-line"></div></td>
+                <td width="150"><div class="signature-line"></div></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td class="signature-label"><strong>Name</strong></td>
+                <td class="signature-label"><strong>Signature</strong></td>
+                <td class="signature-label"><strong>Date</strong></td>
+            </tr>
+            <tr><td colspan="4" height="20"></td></tr>
+            
+            <tr>
+                <td><strong>Approved By:</strong></td>
+                <td><div class="signature-line"></div></td>
+                <td><div class="signature-line"></div></td>
+                <td><div class="signature-line"></div></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td class="signature-label"><strong>Name</strong></td>
+                <td class="signature-label"><strong>Signature</strong></td>
+                <td class="signature-label"><strong>Date</strong></td>
+            </tr>
+            <tr><td colspan="4" height="20"></td></tr>
+            
+            <tr>
+                <td><strong>Authorized By:</strong></td>
+                <td><div class="signature-line"></div></td>
+                <td><div class="signature-line"></div></td>
+                <td><div class="signature-line"></div></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td class="signature-label"><strong>Name</strong></td>
+                <td class="signature-label"><strong>Signature</strong></td>
+                <td class="signature-label"><strong>Date</strong></td>
+            </tr>
+        </table>
+    </div>
 
-    </table>
-
-    <br><br>
-    <table>
-        <tr>
-            <td width="100"><strong>Prepared By:</strong></td>
-            <td width="300">
-                <hr class="hr1">
-            </td>
-            <td width="150">
-                <hr class="hr1" style="width:150px">
-            </td>
-            <td width="150">
-                <hr class="hr1" style="width:150px">
-            </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td align="center"><strong>Name</strong></td>
-            <td align="center"><strong>Signature</strong></td>
-            <td align="center"><strong>Date</strong></td>
-        </tr>
-        <tr>
-            <td height="20"></td>
-        </tr>
-        <tr>
-            <td width="100"><strong>Approved By:</strong></td>
-            <td width="300">
-                <hr class="hr1">
-            </td>
-            <td width="150">
-                <hr class="hr1" style="width:150px">
-            </td>
-            <td width="150">
-                <hr class="hr1" style="width:150px">
-            </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td align="center"><strong>Name</strong></td>
-            <td align="center"><strong>Signature</strong></td>
-            <td align="center"><strong>Date</strong></td>
-        </tr>
-        <tr>
-            <td height="20"></td>
-        </tr>
-        <tr>
-            <td width="100"><strong>Authorized By:</strong></td>
-            <td width="300">
-                <hr class="hr1">
-            </td>
-            <td width="150">
-                <hr class="hr1" style="width:150px">
-            </td>
-            <td width="150">
-                <hr class="hr1" style="width:150px">
-            </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td align="center"><strong>Name</strong></td>
-            <td align="center"><strong>Signature</strong></td>
-            <td align="center"><strong>Date</strong></td>
-        </tr>
-    </table>
-
-
-    <br><br>
-
-
-</div>
-
-    
-
-
+    <div class="footer">
+        <div class="page-number"></div>
+        <div>Printed on: {{ date('Y-m-d H:i:s') }}</div>
+    </div>
 </body>
 </html>
-
-
-
