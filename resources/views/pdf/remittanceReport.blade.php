@@ -1,213 +1,186 @@
 <?php
-
-
-function asMoney($value)
-{
+function asMoney($value) {
     return number_format($value, 2);
 }
-
 ?>
 <html>
 <head>
-
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
     <style type="text/css">
-
-        table {
-            max-width: 100%;
-            background-color: transparent;
-        }
-
-        th {
-            text-align: left;
-        }
-
-        .table {
-            width: 100%;
-            margin-bottom: 50px;
-        }
-
-        hr {
-            margin-top: 1px;
-            margin-bottom: 2px;
-            border: 0;
-            border-top: 2px dotted #eee;
-        }
-
-        .hr1 {
-            display: block;
-            height: 1px;
-            width: 300px;
-            border: 0;
-            border-top: 1px solid #000;
-            padding: 0;
-        }
-
-        .hr2 {
-            display: block;
-            height: 1px;
-            width: 300px;
-            margin-top: -100px;
-            border: 0;
-            border-top: 1px solid #000;
-            padding: 0;
+        * {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
         }
 
         body {
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            font-size: 12px;
-            line-height: 1.428571429;
-            color: #333;
-            background-color: #fff;
+            margin: 0;
+            padding: 0;
         }
 
-
-        @page {
-            margin: 170px 30px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0 20px;
         }
 
-        .header {
-            position: top;
-            left: 0px;
-            top: -150px;
-            right: 0px;
-            height: 150px;
+        th, td {
+            padding: 8px 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f5f5f5;
+            font-weight: bold;
             text-align: center;
         }
 
-        .content {
-            margin-top: -100px;
-            margin-bottom: -150px
+        .header {
+            position: relative;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .header-text {
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .logo {
+            max-width: 120px;
+            max-height: 80px;
+            margin-right: 20px;
+        }
+
+        .title-section {
+            text-align: center;
+            margin: 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .report-title {
+            font-size: 16px;
+            font-weight: bold;
         }
 
         .footer {
             position: fixed;
-            left: 0px;
-            bottom: -180px;
-            right: 0px;
-            height: 50px;
+            bottom: -40px;
+            left: 0;
+            right: 0;
+            height: 30px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 5px;
         }
 
-        .footer .page:after {
-            content: counter(page, upper-roman);
+        .content {
+            padding: 0 10px;
         }
 
+        .amount-cell {
+            text-align: right;
+            font-family: monospace;
+        }
 
+        .total-row {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+
+        .organization-name {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        @page {
+            margin: 100px 25px 70px 25px;
+        }
+
+        .page-number:after {
+            content: "Page " counter(page);
+        }
     </style>
-
 </head>
 <body>
+    <div class="header">
+        <div class="header-content">
+            @if($organization->logo && file_exists(public_path('uploads/logo/'.$organization->logo)))
+                <img class="logo" src="{{ public_path('uploads/logo/'.$organization->logo) }}" alt="logo">
+            @endif
+            <div class="header-text">
+                <strong style="font-size: 16px;">{{ strtoupper($organization->name) }}</strong><br>
+                {{ $organization->address }}<br>
+                Phone: {{ $organization->phone }} | 
+                Email: {{ $organization->email }}<br>
+                {{ $organization->website }}
+            </div>
+        </div>
+    </div>
 
-<div class="header" style='margin-top:-150px;'>
-    <table>
+    <div class="organization-name">{{ $organization->name }}</div>
 
-        <tr>
+    <div class="content">
+        <table>
+            <thead>
+                <tr>
+                    <th width="30">#</th>
+                    <th>Staff No.</th>
+                    <th>Employee Name</th>
+                    <th>Code</th>
+                    <th>Account No.</th>
+                    <th class="amount-cell">Amount ({{ $currencies->shortname }})</th>
+                    <th>Pay Method</th>
+                    <th>DR Account</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php $i = 1; ?>
+                @foreach($rems as $rem)
+                    <tr>
+                        <td>{{ $i }}</td>
+                        <td>{{ $rem->personal_file_number }}</td>
+                        <td>
+                            @if($rem->middle_name)
+                                {{ $rem->first_name.' '.$rem->middle_name.' '.$rem->last_name }}
+                            @else
+                                {{ $rem->first_name.' '.$rem->last_name }}
+                            @endif
+                        </td>
+                        <td>{{ $rem->bank_eft_code }}</td>
+                        <td>{{ $rem->bank_account_number ?: '' }}</td>
+                        <td class="amount-cell">{{ asMoney($rem->net) }}</td>
+                        <td>Corporate Salary Transfer</td>
+                        <td>{{ $organization->bank_account_number }}</td>
+                    </tr>
+                    <?php $i++; ?>
+                @endforeach
 
-
-            <td style="width:150px">
-                @if($organization->logo && file_exists(public_path('uploads/logo/'.$organization->logo)))
-                    <img src="{{public_path('uploads/logo/'.$organization->logo)}}" alt="logo" width="80%">
-                @else
-                    {{-- Display a placeholder or organization name if no logo --}}
-                    <div style="width:80%; text-align:center;">
-                        {{ $organization->name }}
-                    </div>
-                @endif
-            </td>
-
-            <td>
-                <strong>
-                    {{ strtoupper($organization->name)}}
-                </strong><br>
-                {{ $organization->phone}}<br>
-                {{ $organization->email}}<br>
-                {{ $organization->website}}<br>
-                {{ $organization->address}}
-
-
-            </td>
-
-
-        </tr>
-
-
-        <tr>
-
-            <hr>
-        </tr>
-
-
-    </table>
-</div>
-
-
-<div class="footer">
-    <p class="page">Page <?php $PAGE_NUM ?></p>
-</div>
-
-
-<div class="content" style='margin-top:-50px;'>
-
-    <div align="center" style="margin-bottom:20px"><strong>{{$organization->name}}</strong></div>
-
-    <table class="table table-bordered" border='1' cellspacing='0' cellpadding='0'>
-
-        <tr>
-
-            <td width='20'><strong># </strong></td>
-            <td><strong>STAFF NO. </strong></td>
-            <td><strong>EMPLOYEE NAME </strong></td>
-            <td><strong>CODE </strong></td>
-            <td><strong>ACCOUNT NO.</strong></td>
-            <td><strong>AMOUNT</strong></td>
-            <td><strong>PAY MTHD</strong></td>
-            <td><strong>DR AC</strong></td>
-        </tr>
-        <?php $i = 1; ?>
-        @foreach($rems as $rem)
-            <tr>
-
-
-                <td td width='20'>{{$i}}</td>
-                <td> {{ $rem->personal_file_number }}</td>
-                @if($rem->middle_name != null || $rem->middle_name != '')
-                    <td> {{$rem->first_name.' '.$rem->middle_name.' '.$rem->last_name}}</td>
-                @else
-                    <td> {{$rem->first_name.' '.$rem->last_name}}</td>
-                @endif
-                <td> {{ $rem->bank_eft_code }}</td>
-
-                @if($rem->bank_account_number != null)
-                    <td> {{ $rem->bank_account_number }}</td>
-                @else
+                <tr class="total-row">
+                    <td colspan="5" align="right"><strong>Total Remittances ({{ $currencies->shortname}}) :</strong></td>
+                    <td class="amount-cell"><strong>{{ asMoney($total) }}</strong></td>
                     <td></td>
-                @endif
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-                <td align="right"> {{ asMoney($rem->net ) }}</td>
-                <td> corporate salary transfer</td>
-                <td> {{ $organization->bank_account_number }}</td>
-            </tr>
-            <?php $i++; ?>
-
-        @endforeach
-
-
-        <tr>
-            <td align="right" colspan='5'><strong>Total Remittances: </strong></td>
-            <td align="right">{{ asMoney($total ) }}</td>
-            <td></td>
-            <td></td>
-        </tr>
-
-    </table>
-
-
-</div>
-
-
+    <div class="footer">
+        <div class="page-number"></div>
+        <div>Printed on: {{ date('Y-m-d H:i:s') }}</div>
+    </div>
 </body>
 </html>
-
-
-

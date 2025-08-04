@@ -2,327 +2,358 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payslip Monthly Report</title>
     <style type="text/css">
-
-        table {
-            max-width: 100%;
-            background-color: transparent;
-        }
-
-        th {
-            text-align: left;
-        }
-
-        td {
-            text-indent: 5px;
-        }
-
-        .table {
-            width: 100%;
-        }
-
-        hr {
-            margin-top: 1px;
-            margin-bottom: 2px;
-            border: 0;
-            border-top: 2px dotted #eee;
+        * {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-size: 11px;
+            line-height: 1.4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            font-size: 11px;
-            line-height: 1.428571429;
-            color: #333;
             background-color: #fff;
+            padding: 10px;
         }
 
+        .payslip-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 20px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            page-break-after: always;
+        }
 
         .header {
-            width: 100%;
-            float: left;
+            padding: 15px;
             text-align: center;
+            border-bottom: 2px solid #f0f0f0;
+            background-color: #f9f9f9;
         }
 
-        .header1 {
-            width: 100%;
-            margin-top: -30px;
-            float: left;
-            text-align: center;
-            height: 120px;
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
         }
 
-        .content {
-            display: inline-block;
-            float: left;
-            margin: 0;
-            width: 100%;
-            margin-top: 100px;
+        .logo {
+            height: 50px;
+            margin-right: 15px;
         }
 
-        .container {
+        .organization-info {
+            text-align: left;
+        }
+
+        .organization-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .period-title {
+            font-weight: bold;
+            font-size: 12px;
+            margin-top: 5px;
+            padding: 5px;
+            background-color: #f0f0f0;
+        }
+
+        .payslip-content {
+            padding: 15px;
+        }
+
+        .payslip-table {
             width: 100%;
-            display: block;
-            margin: 5px 0;
-            float: left;
-            page-break-after: always;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .payslip-table th {
+            background-color: #f5f5f5;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #ddd;
+        }
+
+        .payslip-table td {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+        }
+
+        .amount-cell {
+            text-align: right;
+            font-family: monospace;
+        }
+
+        .section-title {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+
+        .total-row {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+
+        .signature-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+        }
+
+        .signature-line {
+            border-top: 1px solid #333;
+            margin: 20px 0 5px;
+            width: 200px;
+        }
+
+        .signature-label {
+            font-size: 10px;
+            color: #666;
+        }
+
+        @media print {
+            .payslip-container {
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                page-break-after: always;
+            }
         }
     </style>
 </head>
 <body>
-    <div>
-        <?php
+    <?php
+        use App\Models\Employee;
+        use Illuminate\Support\Facades\Auth;
+        
+        if(request('employeeid') == 'All') {
+            $empall = Employee::where('organization_id', Auth::user()->organization_id)->get();   
+        } else {
+            $empall = Employee::where('id', request('employeeid'))->get();
+        }
+    ?>
 
-            use App\Models\Employee;
-            use Illuminate\Support\Facades\Auth;
-            use Illuminate\Http\Request;
-
-            if(request('employeeid') == 'All'){
-                 $empall = Employee::where('organization_id', Auth::user()->organization_id)->get();   
-            }
-            else{
-                $empall = Employee::where('id', request('employeeid'))->get();
-            }
-
-        ?>
-    </div>
-@foreach($empall as $emp)
-    <div class="container">
-        <div style="width:46%; margin:0 2%;  float:left; display:inline-block; ">
-            <div class="header">
-                <table>
-                    <tr>
-                        <td style="width:70px">
-                            <!--<img src="{{asset('/uploads/logo/'.$organization->logo)}}" alt="logo"
-                                 style="height: 40px;">-->
-
-                            <img src="{{asset('/uploads/logo/sycum.jpeg')}}" alt="logo"
-                                 style="height: 40px;">     
-                        </td>
-                        <td><strong>{{strtoupper($organization->name)}}</strong><br>{{ $organization->phone}},
-                            {{ $organization->website}} <br>{{ $organization->email}}<br>
-                            {{ nl2br($organization->address)}}
-                        </td>
-                    </tr>
-                    <tr><td colspan="2" align="center"><strong>PAYROLL FOR PERIOD : {{ $period }}</strong></td></tr>
-                </table>
+    @foreach($empall as $emp)
+    <div class="payslip-container">
+        <div class="header">
+            <div class="header-content">
+                <img class="logo" src="{{asset('/uploads/logo/sycum.jpeg')}}" alt="logo">
+                <div class="organization-info">
+                    <div class="organization-name">{{strtoupper($organization->name)}}</div>
+                    <div>{{ $organization->phone}} | {{ $organization->website}}</div>
+                    <div>{{ $organization->email}}</div>
+                    <div>{{ nl2br($organization->address)}}</div>
+                </div>
             </div>
-            <div class="content">
-                <br>
-                <table class="table table-bordered border=1" cellspacing='0' cellpadding='0' style='width:100%'>
-                    {{'<tr><td colspan="2" align="center"><strong>PERIOD : '.$period.'</strong></td></tr>'}}
-                    <tr>
-                        <td colspan='2'><strong>PERSONAL DETAILS</strong></td>
-                    </tr>
-                    <tr>
-                        <td>Payroll Number:</td>
-                        <td>{{$emp->personal_file_number}}</td>
-                    </tr>
-                    @if($emp->middle_name != null || $emp->middle_name != '')
+            <div class="period-title">PAYSLIP FOR PERIOD: {{ $period }}</div>
+        </div>
+
+        <div class="payslip-content">
+            <table class="payslip-table">
+                <tr class="section-title">
+                    <td colspan="2">EMPLOYEE DETAILS</td>
+                </tr>
+                <tr>
+                    <td width="40%">Payroll Number:</td>
+                    <td>{{$emp->personal_file_number}}</td>
+                </tr>
+                <tr>
+                    <td>Employee Name:</td>
+                    <td>
+                        {{$emp->first_name}}
+                        @if($emp->middle_name) {{' '.$emp->middle_name}} @endif
+                        {{' '.$emp->last_name}}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Identity Number:</td>
+                    <td>{{$emp->identity_number}}</td>
+                </tr>
+                <tr>
+                    <td>KRA Pin:</td>
+                    <td>{{$emp->pin ?: 'N/A'}}</td>
+                </tr>
+                <tr>
+                    <td>NSSF Number:</td>
+                    <td>{{$emp->social_security_number ?: 'N/A'}}</td>
+                </tr>
+                <tr>
+                    <td>NHIF Number:</td>
+                    <td>{{$emp->hospital_insurance_number ?: 'N/A'}}</td>
+                </tr>
+            </table>
+
+            <table class="payslip-table">
+                <tr class="section-title">
+                    <td colspan="2">EARNINGS</td>
+                </tr>
+                <tr>
+                    <td>Basic Pay:</td>
+                    <td class="amount-cell">{{ App\Models\Payroll::processedsalaries($emp->personal_file_number,$period) }}</td>
+                </tr>
+
+                @if(App\Models\Payroll::processedearningnames($emp->id,$period) != null)
+                    @foreach(App\Models\Payroll::processedearnings($emp->id,$period) as $name => $amount)
                         <tr>
-                            <td>Employee Name:</td>
-                            <td> {{$emp->first_name.' '.$emp->middle_name.' '.$emp->last_name}}</td>
+                            <td>{{ $name }}:</td>
+                            <td class="amount-cell">{{ $amount }}</td>
                         </tr>
-                    @else
+                    @endforeach
+                @endif
+
+                @if(App\Models\Payroll::processedovertimenames($emp->id,$period) != null)
+                    @foreach(App\Models\Payroll::processedovertimes($emp->id,$period) as $name => $amount)
                         <tr>
-                            <td>Employee Name:</td>
-                            <td> {{$emp->first_name.' '.$emp->last_name}}</td>
+                            <td>{{ $name }}:</td>
+                            <td class="amount-cell">{{ $amount }}</td>
                         </tr>
-                    @endif
-                    <tr>
-                        <td>Identity Number:</td>
-                        <td>{{$emp->identity_number}}</td>
-                    </tr>
-                    <tr>
-                        <td>Kra Pin:</td>
-                        @if($emp->pin != null)
-                            <td>{{$emp->pin}}</td>
-                        @else
-                            <td></td>
-                        @endif
-                    </tr>
-                    <tr>
-                        <td>Nssf Number:</td>
-                        @if($emp->social_security_number != null)
-                            <td>{{$emp->social_security_number}}</td>
-                        @else
-                            <td></td>
-                        @endif
-                    </tr>
-                    <tr>
-                        <td>Nhif Number:</td>
-                        @if($emp->hospital_insurance_number != null)
-                            <td>{{$emp->hospital_insurance_number}}</td>
-                        @else
-                            <td></td>
-                        @endif
-                    </tr>
-                    <tr>
-                        <td><strong>EARNINGS</strong></td>
-                        <td><strong>Amount ({{$currency->shortname}})</strong></td>
-                    </tr>
-                    <tr>
-                        <td>Basic Pay:</td>
-                        <td align='right'>{{ App\Models\Payroll::processedsalaries($emp->personal_file_number,$period) }}</td>
-                    </tr>
+                    @endforeach
+                @endif
 
-                    @if(App\Models\Payroll::processedearningnames($emp->id,$period) != null)
-                        @foreach(App\Models\Payroll::processedearnings($emp->id,$period) as $name => $amount)
-                            <tr>
-                                <td>{{ $name }}:</td>
-                                <td align='right'>{{ $amount }}</td>
-                            </tr>
-                        @endforeach
-                    @endif
+                <tr class="total-row">
+                    <td><strong>Gross Pay:</strong></td>
+                    <td class="amount-cell"><strong>{{ App\Models\Payroll::processedgrossincome($emp->personal_file_number,$period) }}</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Taxable Pay:</strong></td>
+                    <td class="amount-cell"><strong>{{ App\Models\Payroll::processedgross($emp->personal_file_number,$period) }}</strong></td>
+                </tr>
+            </table>
 
-                    @if(App\Models\Payroll::processedovertimenames($emp->id,$period) != null)
-                        @foreach(App\Models\Payroll::processedovertimes($emp->id,$period) as $name => $amount)
-                            <tr>
-                                <td>{{ $name }}:</td>
-                                <td align='right'>{{ $amount }}</td>
-                            </tr>
-                        @endforeach
-                    @endif
+            <table class="payslip-table">
+                <tr class="section-title">
+                    <td colspan="2">ALLOWANCES</td>
+                </tr>
+                @if(App\Models\Payroll::processedallowancenames($emp->id,$period) != null)
+                    @foreach(App\Models\Payroll::processedallowances($emp->id,$period) as $name => $amount)
+                        <tr>
+                            <td>{{ $name }}:</td>
+                            <td class="amount-cell">{{ $amount }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr><td colspan="2">No allowances</td></tr>
+                @endif
+            </table>
 
-                    <tr>
-                        <td><strong>ALLOWANCES</strong>
-                        <td></td>
-                    </tr>
-                    @if(App\Models\Payroll::processedallowancenames($emp->id,$period) != null)
-                        @foreach(App\Models\Payroll::processedallowances($emp->id,$period) as $name => $amount)
-                            <tr>
-                                <td>{{ $name }}:</td>
-                                <td align='right'>{{ $amount }}</td>
-                            </tr>
-                        @endforeach
-                    @endif
-                    <tr>
-                        <td><strong>Gross Pay: </strong></td>
-                        <td align='right'>
-                            <strong>{{ App\Models\Payroll::processedgrossincome($emp->personal_file_number,$period) }}</strong>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Taxable Pay: </strong></td>
-                        <td align='right'>
-                            <strong>{{ App\Models\Payroll::processedgross($emp->personal_file_number,$period) }}</strong>
-                        </td>
-                    </tr>
-                    @if(App\Models\Payroll::processednontaxnames($emp->id,$period) != null)
-                        @foreach(App\Models\Payroll::processednontaxables($emp->id,$period) as $name => $amount)
-                            <tr>
-                                <td>{{ $name }}:</td>
-                                <td align='right'>{{ $amount }}</td>
-                            </tr>
-                        @endforeach
-                    @endif
+            <table class="payslip-table">
+                <tr class="section-title">
+                    <td colspan="2">NON-TAXABLE ITEMS</td>
+                </tr>
+                @if(App\Models\Payroll::processednontaxnames($emp->id,$period) != null)
+                    @foreach(App\Models\Payroll::processednontaxables($emp->id,$period) as $name => $amount)
+                        <tr>
+                            <td>{{ $name }}:</td>
+                            <td class="amount-cell">{{ $amount }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr><td colspan="2">No non-taxable items</td></tr>
+                @endif
+            </table>
 
-                    @if(App\Models\Payroll::processedreliefnames($emp->id,$period) != null)
-                        @foreach(App\Models\Payroll::processedreliefs($emp->id,$period) as $name => $amount)
-                            <tr>
-                                <td>{{ $name }}:</td>
-                                <td align='right'>{{ $amount }}</td>
-                            </tr>
-                        @endforeach
-                    @endif
-                    
-                    <tr>
-                        <td>Gross Tax:</td>
-                        <td align='right'>{{ App\Models\Payroll::processedgrosstax($emp->personal_file_number,$period) }}</td>
-                    </tr>
-                    
-                    <tr>
-                        <td>Personal Relief:</td>
-                        <td align='right'>{{ App\Models\Payroll::processedpersonalrelief($emp->personal_file_number,$period) }}</td>
-                    </tr>
+            <table class="payslip-table">
+                <tr class="section-title">
+                    <td colspan="2">TAX RELIEFS</td>
+                </tr>
+                @if(App\Models\Payroll::processedreliefnames($emp->id,$period) != null)
+                    @foreach(App\Models\Payroll::processedreliefs($emp->id,$period) as $name => $amount)
+                        <tr>
+                            <td>{{ $name }}:</td>
+                            <td class="amount-cell">{{ $amount }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr><td colspan="2">No tax reliefs</td></tr>
+                @endif
+                <tr>
+                    <td>Gross Tax:</td>
+                    <td class="amount-cell">{{ App\Models\Payroll::processedgrosstax($emp->personal_file_number,$period) }}</td>
+                </tr>
+                <tr>
+                    <td>Personal Relief:</td>
+                    <td class="amount-cell">{{ App\Models\Payroll::processedpersonalrelief($emp->personal_file_number,$period) }}</td>
+                </tr>
+            </table>
 
-                    <tr>
-                        <td><strong>DEDUCTIONS</strong>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Paye:</td>
-                        <td align='right'>{{ App\Models\Payroll::processedpaye($emp->personal_file_number,$period) }}</td>
-                    </tr>
+            <table class="payslip-table">
+                <tr class="section-title">
+                    <td colspan="2">DEDUCTIONS</td>
+                </tr>
+                <tr>
+                    <td>PAYE:</td>
+                    <td class="amount-cell">{{ App\Models\Payroll::processedpaye($emp->personal_file_number,$period) }}</td>
+                </tr>
+                <tr>
+                    <td>NSSF:</td>
+                    <td class="amount-cell">{{ App\Models\Payroll::processedNssf($emp->personal_file_number,$period) }}</td>
+                </tr>
+                <tr>
+                    <td>NHIF:</td>
+                    <td class="amount-cell">{{ App\Models\Payroll::processedNhif($emp->personal_file_number,$period) }}</td>
+                </tr>
+                <tr>
+                    <td>Housing Levy:</td>
+                    <td class="amount-cell">{{ App\Models\Payroll::processedLevy($emp->personal_file_number,$period) }}</td>
+                </tr>
+                <tr>
+                    <td>Pension Contribution:</td>
+                    <td class="amount-cell">{{ App\Models\Payroll::processedpensions($emp->personal_file_number,$period) }}</td>
+                </tr>
 
-                    <tr>
-                        <td>Nssf:</td>
-                        <td align='right'>
-                            {{ App\Models\Payroll::processedNssf($emp->personal_file_number,$period) }}
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td>Shif:</td>
-                        <td align='right'>{{ App\Models\Payroll::processedNhif($emp->personal_file_number,$period) }}</td>
-                    </tr>
-                    <tr>
-                        <td>Housing Levy:</td>
-                        <td align='right'>{{ App\Models\Payroll::processedLevy($emp->personal_file_number,$period) }}</td>
-                    </tr>
+                @if(App\Models\Payroll::processeddeductionnames($emp->id,$period) != null)
+                    @foreach(App\Models\Payroll::processedDeductions($emp->id,$period) as $name => $amount)
+                        <tr>
+                            <td>{{ $name }}:</td>
+                            <td class="amount-cell">{{ $amount }}</td>
+                        </tr>
+                    @endforeach
+                @endif
 
-                    @if(App\Models\Payroll::processeddeductionnames($emp->id,$period) != null)
-                        @foreach(App\Models\Payroll::processedDeductions($emp->id,$period) as $name => $amount)
-                            <tr>
-                                <td>{{ $name }}:</td>
-                                <td align='right'>{{ $amount }}</td>
-                            </tr>
-                        @endforeach
-                    @endif
-                    <tr>
-                        <td>Pension Contribution
-                            :
-                        </td>
-                        <td align='right'>{{ App\Models\Payroll::processedpensions($emp->personal_file_number,$period) }}</td>
-                    </tr>
+                <tr class="total-row">
+                    <td><strong>TOTAL DEDUCTIONS:</strong></td>
+                    <td class="amount-cell"><strong>{{ App\Models\Payroll::processedtotaldeds($emp->id,$period) }}</strong></td>
+                </tr>
+            </table>
 
-                    <tr>
-                        <td><strong>TOTAL DEDUCTIONS
-                                : </strong></td>
-                        <td align='right'>
-                            <strong>{{ App\Models\Payroll::processedtotaldeds($emp->id,$period) }}</strong>
-                        </td>
-                    </tr>
+            <table class="payslip-table">
+                <tr class="total-row">
+                    <td><strong>NET PAY:</strong></td>
+                    <td class="amount-cell"><strong>{{ App\Models\Payroll::processednet($emp->personal_file_number,$period) }}</strong></td>
+                </tr>
+            </table>
 
-                    <tr>
-                        <td><strong>NET PAY: </strong></td>
-                        <td align='right'>
-                            <strong>{{ App\Models\Payroll::processednet($emp->personal_file_number,$period) }}</strong>
-                        </td>
-                    </tr>
-                </table>
-                <br>
-                <table cellspacing="0" style="width:100%; float:left;">
-                    <tr>
-                        <td width="100">
-                            I certify that the above information is correct and I have received the payment, in full and final settlement
-                        </td>
-                    </tr>
-                    <tr>
-                        <td width="100%"><strong>Employee Sign</strong>......................................................
-                        </td>
-                    </tr>
-                    <tr>
-                        <td width="100%"><strong>Employer Sign</strong>......................................................
-                        </td>
-                    </tr>
-                    <tr>
-                        <td width="100%"><strong>Date</strong>.........................................................
-                        </td>
-                    </tr>
-                    <tr>
-                        <td width="100%"><strong>Stamp</strong></td>
-                    </tr>
-                    <tr>
-                        <td width="0px"></td>
-                    </tr>
-                </table>
+            <div class="signature-section">
+                <p>I certify that the above information is correct and I have received the payment, in full and final settlement</p>
+                
+                <div style="margin-top: 30px;">
+                    <div style="float: left; width: 33%;">
+                        <div class="signature-line"></div>
+                        <div class="signature-label">Employee Signature</div>
+                    </div>
+                    <div style="float: left; width: 33%;">
+                        <div class="signature-line"></div>
+                        <div class="signature-label">Employer Signature</div>
+                    </div>
+                    <div style="float: left; width: 33%;">
+                        <div class="signature-line"></div>
+                        <div class="signature-label">Date</div>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
             </div>
         </div>
     </div>
-@endforeach
+    @endforeach
 </body>
 </html>
