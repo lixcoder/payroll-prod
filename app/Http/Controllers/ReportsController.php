@@ -8,6 +8,8 @@ use App\Exports\NhifReport;
 use App\Exports\NssfReport;
 use App\Exports\PayeReport;
 use App\Exports\PayrollExport;
+use App\Exports\EarningsReportExport;
+use App\Exports\OvertimesReportExport;
 use Maatwebsite\Excel\Concerns\Exportable;
 use App\Exports\RemittanceReportExport;
 use App\Exports\P9FormExports;
@@ -7224,6 +7226,8 @@ class ReportsController extends Controller
 
                 $part = explode("-", $request->get('period'));
 
+                $type = $request->get('type');
+
                 $m = "";
 
                 if (strlen($part[0]) == 1) {
@@ -7232,138 +7236,18 @@ class ReportsController extends Controller
                     $m = $part[0];
                 }
 
-                $month = $m;//."-".$part[1];
+                $month = $m; //."-".$part[1];
 
+                $export = new EarningsReportExport(
+                    $data,
+                    $total,
+                    $type,
+                    $currency,
+                    $organization,
+                    $request->get('period')
+                );
 
-                Excel::create('Earnings Report ' . $month, function ($excel) use ($data, $currency, $total, $organization) {
-
-                    require_once(base_path() . "/vendor/phpoffice/phpexcel/Classes/PHPExcel/NamedRange.php");
-                    require_once(base_path() . "/vendor/phpoffice/phpexcel/Classes/PHPExcel/IOFactory.php");
-
-
-                    $objPHPExcel = new Spreadsheet();
-                    // Set the active Excel worksheet to sheet 0
-                    $objPHPExcel->setActiveSheetIndex(0);
-
-
-                    $excel->sheet('Earnings', function ($sheet) use ($data, $total, $currency, $organization, $objPHPExcel) {
-                        $sheet->row(1, array(
-                            'Organization Name: ', $organization->name
-                        ));
-
-                        $sheet->cell('A1', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-
-                        $sheet->row(2, array(
-                            'Report name: ', 'Earning Report'
-                        ));
-
-                        $sheet->cell('A2', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->row(3, array(
-                            'Currency: ', $currency->shortname
-                        ));
-
-                        $sheet->cell('A3', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->row(4, array(
-                            'Period: ', $request->get('period')
-                        ));
-
-                        $sheet->cell('A4', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-
-                        $sheet->mergeCells('A6:D6');
-                        $sheet->row(6, array(
-                            'Earning Report'
-                        ));
-
-                        $sheet->row(6, function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setAlignment('center');
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'x_employee', 'Earning TYPE', 'AMOUNT'
-                        ));
-
-                        $sheet->row(8, function ($r) {
-
-                            // call cell manipulation methods
-                            $r->setFontWeight('bold');
-
-                        });
-
-                        $row = 9;
-
-
-                        for ($i = 0; $i < count($data); $i++) {
-
-                            $name = '';
-
-                            if ($data[$i]->middle_name == '' || $data[$i]->middle_name == null) {
-                                $name = $data[$i]->first_name . ' ' . $data[$i]->last_name;
-                            } else {
-                                $name = $data[$i]->first_name . ' ' . $data[$i]->middle_name . ' ' . $data[$i]->last_name;
-                            }
-
-                            $sheet->row($row, array(
-                                $data[$i]->personal_file_number, $name, $data[$i]->earning_name, $data[$i]->earning_amount
-                            ));
-
-                            $sheet->cell('D' . $row, function ($cell) {
-
-                                // manipulate the cell
-                                $cell->setAlignment('right');
-
-                            });
-
-                            $row++;
-
-                        }
-                        $sheet->row($row, array(
-                            '', '', 'Total', $total
-                        ));
-                        $sheet->row($row, function ($r) {
-
-                            // call cell manipulation methods
-                            $r->setFontWeight('bold');
-
-                        });
-
-                        $sheet->cell('D' . $row, function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setAlignment('right');
-
-                        });
-
-                    });
-
-                })->download('xls');
+                return Excel::download($export, 'Earnings Report ' . $month . '.xls');
             } else {
                 $type = $request->get('earning');
 
@@ -7415,135 +7299,16 @@ class ReportsController extends Controller
 
                 $month = $m . "-" . $part[1];
 
-                Excel::create('Earnings Report ' . $month, function ($excel) use ($data, $total, $type, $currency, $organization) {
+                $export = new EarningsReportExport(
+                    $data,
+                    $total,
+                    $type,
+                    $currency,
+                    $organization,
+                    $request->get('period')
+                );
 
-                    require_once(base_path() . "/vendor/phpoffice/phpexcel/Classes/PHPExcel/NamedRange.php");
-                    require_once(base_path() . "/vendor/phpoffice/phpexcel/Classes/PHPExcel/IOFactory.php");
-
-
-                    $objPHPExcel = new Spreadsheet();
-// Set the active Excel worksheet to sheet 0
-                    $objPHPExcel->setActiveSheetIndex(0);
-
-
-                    $excel->sheet('Earnings', function ($sheet) use ($data, $total, $type, $currency, $organization, $objPHPExcel) {
-
-                        $sheet->row(1, array(
-                            'Organization Name: ', $organization->name
-                        ));
-
-                        $sheet->cell('A1', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-
-                        $sheet->row(2, array(
-                            'Report name: ', 'Earnings Report'
-                        ));
-
-                        $sheet->cell('A2', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->row(3, array(
-                            'Currency: ', $currency->shortname
-                        ));
-
-                        $sheet->cell('A3', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->row(4, array(
-                            'Period: ', $request->get('period')
-                        ));
-
-                        $sheet->cell('A4', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->mergeCells('A6:C6');
-                        $sheet->row(6, array(
-                            'Earning Report for ' . $type
-                        ));
-
-                        $sheet->row(6, function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setAlignment('center');
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'x_employee', 'AMOUNT'
-                        ));
-
-                        $sheet->row(8, function ($r) {
-
-                            // call cell manipulation methods
-                            $r->setFontWeight('bold');
-
-                        });
-
-                        $row = 9;
-
-
-                        for ($i = 0; $i < count($data); $i++) {
-
-                            $name = '';
-
-                            if ($data[$i]->middle_name == '' || $data[$i]->middle_name == null) {
-                                $name = $data[$i]->first_name . ' ' . $data[$i]->last_name;
-                            } else {
-                                $name = $data[$i]->first_name . ' ' . $data[$i]->middle_name . ' ' . $data[$i]->last_name;
-                            }
-
-                            $sheet->row($row, array(
-                                $data[$i]->personal_file_number, $name, $data[$i]->earning_amount
-                            ));
-
-                            $sheet->cell('C' . $row, function ($cell) {
-
-                                // manipulate the cell
-                                $cell->setAlignment('right');
-
-                            });
-
-                            $row++;
-
-                        }
-                        $sheet->row($row, array(
-                            '', 'Total', $total
-                        ));
-                        $sheet->row($row, function ($r) {
-
-                            // call cell manipulation methods
-                            $r->setFontWeight('bold');
-
-                        });
-
-                        $sheet->cell('C' . $row, function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setAlignment('right');
-
-                        });
-
-                    });
-
-                })->download('xls');
+                return Excel::download($export, 'Earnings Report ' . $month . '.xls');
             }
         } else {
             if ($request->get('earning') == 'All') {
@@ -8944,166 +8709,45 @@ class ReportsController extends Controller
 
                 $month = $m . "-" . $part[1];
 
+                $export = new OvertimesReportExport(
+                    $data,
+                    $total,
+                    $currency,
+                    $organization,
+                    $request->get('period')
+                );
 
-                Excel::create('Overtimes Report ' . $month, function ($excel) use ($data, $currency, $total, $organization) {
-
-                    require_once(base_path() . "/vendor/phpoffice/phpexcel/Classes/PHPExcel/NamedRange.php");
-                    require_once(base_path() . "/vendor/phpoffice/phpexcel/Classes/PHPExcel/IOFactory.php");
-
-
-                    $objPHPExcel = new Spreadsheet();
-                    // Set the active Excel worksheet to sheet 0
-                    $objPHPExcel->setActiveSheetIndex(0);
-
-
-                    $excel->sheet('Overtimes', function ($sheet) use ($data, $total, $currency, $organization, $objPHPExcel) {
-                        $sheet->row(1, array(
-                            'Organization Name: ', $organization->name
-                        ));
-
-                        $sheet->cell('A1', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-
-                        $sheet->row(2, array(
-                            'Report name: ', 'Overtime Report'
-                        ));
-
-                        $sheet->cell('A2', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->row(3, array(
-                            'Currency: ', $currency->shortname
-                        ));
-
-                        $sheet->cell('A3', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->row(4, array(
-                            'Period: ', $request->get('period')
-                        ));
-
-                        $sheet->cell('A4', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-
-                        $sheet->mergeCells('A6:D6');
-                        $sheet->row(6, array(
-                            'overtime Report'
-                        ));
-
-                        $sheet->row(6, function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setAlignment('center');
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'x_employee', 'OVERTIME TYPE', 'AMOUNT'
-                        ));
-
-                        $sheet->row(8, function ($r) {
-
-                            // call cell manipulation methods
-                            $r->setFontWeight('bold');
-
-                        });
-
-                        $row = 9;
-
-
-                        for ($i = 0; $i < count($data); $i++) {
-
-                            $name = '';
-
-                            if ($data[$i]->middle_name == '' || $data[$i]->middle_name == null) {
-                                $name = $data[$i]->first_name . ' ' . $data[$i]->last_name;
-                            } else {
-                                $name = $data[$i]->first_name . ' ' . $data[$i]->middle_name . ' ' . $data[$i]->last_name;
-                            }
-
-                            $sheet->row($row, array(
-                                $data[$i]->personal_file_number, $name, $data[$i]->overtime_type, $data[$i]->overtime_amount
-                            ));
-
-                            $sheet->cell('D' . $row, function ($cell) {
-
-                                // manipulate the cell
-                                $cell->setAlignment('right');
-
-                            });
-
-                            $row++;
-
-                        }
-                        $sheet->row($row, array(
-                            '', '', 'Total', $total
-                        ));
-                        $sheet->row($row, function ($r) {
-
-                            // call cell manipulation methods
-                            $r->setFontWeight('bold');
-
-                        });
-
-                        $sheet->cell('D' . $row, function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setAlignment('right');
-
-                        });
-
-                    });
-
-                })->download('xls');
+                return Excel::download($export, 'Overtimes Report ' . $month . '.xls');
             } else {
                 $type = $request->get('overtime');
 
                 if ($request->get('type') == 'All') {
-                    $data = DB::table('transact_overtimes')
-                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'x_employee.id')
+                    $data = DB::table('x_transact_overtimes')
+                        ->join('x_employee', 'x_transact_overtimes.employee_id', '=', 'x_employee.id')
                         ->where('overtime_type', '=', $request->get('overtime'))
                         ->where('x_employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
-                        ->select('personal_file_number', 'first_name', 'last_name', 'middle_name', 'transact_overtimes.overtime_type', 'transact_overtimes.overtime_amount')
+                        ->select('personal_file_number', 'first_name', 'last_name', 'middle_name', 'x_transact_overtimes.overtime_type', 'x_transact_overtimes.overtime_amount')
                         ->get();
 
-                    $total = DB::table('transact_overtimes')
-                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'x_employee.id')
+                    $total = DB::table('x_transact_overtimes')
+                        ->join('x_employee', 'x_transact_overtimes.employee_id', '=', 'x_employee.id')
                         ->where('x_employee.organization_id', Auth::user()->organization_id)
                         ->where('overtime_type', '=', $request->get('overtime'))
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->sum("overtime_amount");
                 } else {
-                    $data = DB::table('transact_overtimes')
-                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'x_employee.id')
+                    $data = DB::table('x_transact_overtimes')
+                        ->join('x_employee', 'x_transact_overtimes.employee_id', '=', 'x_employee.id')
                         ->where('overtime_type', '=', $request->get('overtime'))
                         ->where('x_employee.organization_id', Auth::user()->organization_id)
                         ->where('financial_month_year', '=', $request->get('period'))
                         ->where('process_type', '=', $request->get('type'))
-                        ->select('personal_file_number', 'first_name', 'last_name', 'middle_name', 'transact_overtimes.overtime_type', 'transact_overtimes.overtime_amount')
+                        ->select('personal_file_number', 'first_name', 'last_name', 'middle_name', 'x_transact_overtimes.overtime_type', 'x_transact_overtimes.overtime_amount')
                         ->get();
 
-                    $total = DB::table('transact_overtimes')
-                        ->join('x_employee', 'transact_overtimes.employee_id', '=', 'x_employee.id')
+                    $total = DB::table('x_transact_overtimes')
+                        ->join('x_employee', 'x_transact_overtimes.employee_id', '=', 'x_employee.id')
                         ->where('x_employee.organization_id', Auth::user()->organization_id)
                         ->where('overtime_type', '=', $request->get('overtime'))
                         ->where('process_type', '=', $request->get('type'))
@@ -9125,135 +8769,15 @@ class ReportsController extends Controller
 
                 $month = $m . "-" . $part[1];
 
-                Excel::create('Overtimes Report ' . $month, function ($excel) use ($data, $total, $type, $currency, $organization) {
+                $export = new OvertimesReportExport(
+                    $data,
+                    $total,
+                    $currency,
+                    $organization,
+                    $request->get('period')
+                );
 
-                    require_once(base_path() . "/vendor/phpoffice/phpexcel/Classes/PHPExcel/NamedRange.php");
-                    require_once(base_path() . "/vendor/phpoffice/phpexcel/Classes/PHPExcel/IOFactory.php");
-
-
-                    $objPHPExcel = new Spreadsheet();
-// Set the active Excel worksheet to sheet 0
-                    $objPHPExcel->setActiveSheetIndex(0);
-
-
-                    $excel->sheet('Overtimes', function ($sheet) use ($data, $total, $type, $currency, $organization, $objPHPExcel) {
-
-                        $sheet->row(1, array(
-                            'Organization Name: ', $organization->name
-                        ));
-
-                        $sheet->cell('A1', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-
-                        $sheet->row(2, array(
-                            'Report name: ', 'Overtimes Report'
-                        ));
-
-                        $sheet->cell('A2', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->row(3, array(
-                            'Currency: ', $currency->shortname
-                        ));
-
-                        $sheet->cell('A3', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->row(4, array(
-                            'Period: ', $request->get('period')
-                        ));
-
-                        $sheet->cell('A4', function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->mergeCells('A6:C6');
-                        $sheet->row(6, array(
-                            'Overtime Report for ' . $type
-                        ));
-
-                        $sheet->row(6, function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setAlignment('center');
-                            $cell->setFontWeight('bold');
-
-                        });
-
-                        $sheet->row(8, array(
-                            'PERSONAL FILE NUMBER', 'x_employee', 'AMOUNT'
-                        ));
-
-                        $sheet->row(8, function ($r) {
-
-                            // call cell manipulation methods
-                            $r->setFontWeight('bold');
-
-                        });
-
-                        $row = 9;
-
-
-                        for ($i = 0; $i < count($data); $i++) {
-
-                            $name = '';
-
-                            if ($data[$i]->middle_name == '' || $data[$i]->middle_name == null) {
-                                $name = $data[$i]->first_name . ' ' . $data[$i]->last_name;
-                            } else {
-                                $name = $data[$i]->first_name . ' ' . $data[$i]->middle_name . ' ' . $data[$i]->last_name;
-                            }
-
-                            $sheet->row($row, array(
-                                $data[$i]->personal_file_number, $name, $data[$i]->overtime_amount
-                            ));
-
-                            $sheet->cell('C' . $row, function ($cell) {
-
-                                // manipulate the cell
-                                $cell->setAlignment('right');
-
-                            });
-
-                            $row++;
-
-                        }
-                        $sheet->row($row, array(
-                            '', 'Total', $total
-                        ));
-                        $sheet->row($row, function ($r) {
-
-                            // call cell manipulation methods
-                            $r->setFontWeight('bold');
-
-                        });
-
-                        $sheet->cell('C' . $row, function ($cell) {
-
-                            // manipulate the cell
-                            $cell->setAlignment('right');
-
-                        });
-
-                    });
-
-                })->download('xls');
+                return Excel::download($export, 'Overtimes Report ' . $month . '.xls');
             }
         } else {
             if ($request->get('overtime') == 'All') {

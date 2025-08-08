@@ -59,6 +59,7 @@
                                                 <label for="username">Download as: <span style="color:red">*</span></label>
                                                 <select required name="format" class="form-control">
                                                     <option></option>
+                                                    <option value="excel"> Excel</option>
                                                     <option value="pdf"> PDF</option>
                                                 </select>
                                             </div>
