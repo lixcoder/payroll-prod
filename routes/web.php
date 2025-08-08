@@ -136,6 +136,7 @@ Route::post('/employee/import', [EmployeesController::class, 'importEmployees'])
 Route::get('employees/show/{id}', [EmployeesController::class, 'show']);
 Route::get('v1/employees', [EmployeesController::class, 'getEmployees']);
 Route::get('employees/create', [EmployeesController::class, 'create']);
+Route::get('/get-bank-branches/{bankId}', [BankController::class, 'getBranches']);
 Route::get('employee/type/{id}', [EmployeesController::class, 'employeeType']);
 Route::post('employee/confirm/{id}',[EmployeesController::class,'confirm']);
 
@@ -151,6 +152,8 @@ Route::post('createCitizenship', [EmployeesController::class, 'createcitizenship
 Route::post('createEducation', [EmployeesController::class, 'createeducation']);
 Route::post('createBank', [EmployeesController::class, 'createbank']);
 Route::post('createBankBranch', [EmployeesController::class, 'createbankbranch']);
+// For updating the bank branch and redirecting to the main page-->
+Route::get('/bank_branch', [BankBranchController::class, 'index'])->name('bank_branch.index');
 Route::post('createBranch', [EmployeesController::class, 'createbranch']);
 Route::post('createDepartment', [EmployeesController::class, 'createdepartment']);
 Route::post('createType', [EmployeesController::class, 'createtype']);

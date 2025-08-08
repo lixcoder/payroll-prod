@@ -194,11 +194,11 @@
                                         <span class="pcoded-mtext">Branches</span>
                                     </a>
                                 </li>
-                                <li>
+                                <!-- <li>
                                     <a href="{{ url('groups') }}" class="waves-effect waves-dark">
                                         <span class="pcoded-mtext">Job Groups</span>
                                     </a>
-                                </li>
+                                </li> -->
                                 <li>
                                     <a href="{{ url('currencies') }}" class="waves-effect waves-dark">
                                         <span class="pcoded-mtext">Currency</span>
@@ -448,12 +448,12 @@
                         </li>
                     </ul>
                 </li>
-                <li class="">
+                <!-- <li class="">
                     <a href="{{ url('licence')}}" class="waves-effect waves-dark">
                         <span class="pcoded-micon"><i class="feather icon-briefcase"></i></span>
                         <span class="pcoded-mtext">Licence Payments</span>
                     </a>
-                </li>
+                </li> -->
             </ul>
         </div>
     </div>
