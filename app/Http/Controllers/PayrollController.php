@@ -37,10 +37,10 @@ use Illuminate\Support\Carbon;
 use Symfony\Component\Console\Input\Input as InputInput;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use SMSLeopard\Client;
 
 class PayrollController extends Controller
 {
-    // public $start = '2023-08-01';
 
     /**
      * Display a listing of branches
@@ -990,19 +990,18 @@ class PayrollController extends Controller
         $sms->save();
         return view('employees.sms', ['smsdata' => $sms]);
     }
-    //send sms notification
 
-    public function africastalkingfunction($employeephoneno, $employee_name, $net, $financial_month_year, $basic_pay, $total_deductions)
-	  {
-       
-	    // Set your app credentials
-	   // $username = "cbsmpesa";
-	   // $apiKey = "eb6d8abb74babdf68637c28be2a9606364590a8de81feaca086043dacbf51dea";
-	    
-	    $username = config('services.africastalking.username');
-        $apiKey = config('services.africastalking.api_key');
 
-        $smsdata = SmsModel::where('id', 1)->first();
+    public function smsLeopardFunction($employeephoneno, $employee_name, $net, $financial_month_year, $basic_pay, $total_deductions)
+    {
+        try {
+            // Get SMS Leopard credentials from config  
+            $accountId = config('services.smsleopard.account_id');
+            $accountKey = config('services.smsleopard.account_key');
+            $senderId = config('services.smsleopard.sender_id');
+
+            // Get custom message from database (same as your existing logic)
+            $smsdata = SmsModel::where('id', 1)->first();
         if ($smsdata) {
             $objectmessage = (object) $smsdata;
             $Themessage = $objectmessage->smsdetails;
@@ -1010,85 +1009,107 @@ class PayrollController extends Controller
             $Themessage = '';
         }
 
-	    // Initialize the SDK
-	    $AT = new AfricasTalking($username, $apiKey);
+            // Initialize SMS Leopard client with correct parameter names
+            $client = new Client($accountId, $accountKey);
 
-	    // Get the SMS service
-	    $sms = $AT->sms();
+            // Prepare the message
+            $message = "Hi " . $employee_name . ", " . $Themessage . " your total gross salary of " . $basic_pay . " Total deductions of " . $total_deductions . " and the Net pay of " . $net . " for the month of " . $financial_month_year . " has been successfully credited into your account.";
 
-        $recipients = $employeephoneno;
+            // Prepare recipients array - SMS Leopard expects this format
+            $recipients = [
+                ['number' => $employeephoneno]
+            ];
 
-        // Set your message
-        $message = "Hi " . $employee_name . ", " . $Themessage . " your total gross salary of " . $basic_pay . " Total deductions of " .        $total_deductions . " and the Net pay of " . $net . " for the month of " . $financial_month_year . " has been successifully credited into your account.";
+            // Send the SMS
+            $response = $client->send($senderId, $message, $recipients);
 
-	    // Set your shortCode or senderId
-	    $from = "";
+            // Process the response
+            $res_recipients = $response['recipients'] ?? [];
+            $res_status = $response['status'] ?? 'unknown';
 
-        try {
-	      // Thats it, hit send and we'll take care of the rest
-	      $result = $sms->send([
-		'to' => $recipients,
-		'message' => $message,
-		'from' => $from
-	      ]);
-            // dd($result);
-            $objectresult = (object) $result;
-	      echo $elements = count($objectresult->data->SMSMessageData->Recipients);
-	      for ($i = 0; $i < $elements; $i++) {
-		echo "<br>";
-		//  echo $status=$objectresult->status;
-		$message = $objectresult->data->SMSMessageData->Message;
-		echo $mymessage = $message;
-		//$implodedMessage=implode(', ',$message);
-		$message = $objectresult->data->SMSMessageData->Recipients;
-		//  $objectmessage = (object) $message;
-		echo $messageid = $message[$i]->messageId;
-		echo $eachstatus = $message[$i]->status;
-		echo $cost = $message[$i]->cost;
-		echo $number = $message[$i]->number;
-		echo $status = $message[$i]->status;
-		//echo $messageid=$objectresult->messageId;
-		//  var_dump($result);
+            Log::info('SMS Leopard Response', [
+                'status' => $res_status,
+                'recipients' => $res_recipients,
+                'full_response' => $response
+            ]);
 
-		$curl = curl_init();
-		curl_setopt_array($curl, array(
-		  CURLOPT_URL => 'https://ussdhost.000webhostapp.com/jsonreceive.php',
-		  CURLOPT_RETURNTRANSFER => true,
-		  CURLOPT_ENCODING => '',
-		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 15,
-		  CURLOPT_FOLLOWLOCATION => true,
-		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		  CURLOPT_CUSTOMREQUEST => 'POST',
-		  CURLOPT_POSTFIELDS => '{
-		    "status":"' . $status . '",
-		    "message":"' . $mymessage . '",
-		    "messageid":"' . $messageid . '",
-		    "number":"' . $number . '",
-		    "cost":"' . $cost . '",
-		    "status":"' . $status . '"
-		    }',
+            // Process each recipient response (similar to your existing logic)
+            if (!empty($res_recipients)) {
+                foreach ($res_recipients as $recipient) {
+                    $messageId = $recipient['messageId'] ?? '';
+                    $status = $recipient['status'] ?? '';
+                    $cost = $recipient['cost'] ?? '';
+                    $number = $recipient['number'] ?? '';
 
+                    // Log individual recipient details
+                    echo "Message ID: " . $messageId . "<br>";
+                    echo "Status: " . $status . "<br>";
+                    echo "Cost: " . $cost . "<br>";
+                    echo "Number: " . $number . "<br>";
+                    echo "Message: " . $message . "<br>";
 
-		  CURLOPT_HTTPHEADER => array(
-		    'h_api_key: bbd4c579ccf589ce16fb7240d2b8332d0609b90d5e3393c57be8adf51329c8fe',
-		    'Content-Type: application/json'
-		  ),
-		)
-		);
+                    // Send data to your webhook endpoint (keeping your existing logic)
+                    $this->sendToWebhook($status, $message, $messageId, $number, $cost);
+                }
+            }
 
-		$response = curl_exec($curl);
+            return $response;
+        } catch (Exception $e) {
+            Log::error('SMS Leopard Error', [
+                'error' => $e->getMessage(),
+                'employee_phone' => $employeephoneno,
+                'employee_name' => $employee_name
+            ]);
 
-		curl_close($curl);
-		 //dd($response);
-		//return $response;
-	       //$this->sharedData=$result;
-	      // $this->getDataendpoints();
-		
-	      }
-	    } catch (Exception $e) {
-	      echo "Error: " . $e->getMessage();
+            echo "Error: " . $e->getMessage();
+            throw $e;
         }
+    }
+
+    // Helper method to send data to your webhook (extracted from your existing code)
+    private function sendToWebhook($status, $message, $messageId, $number, $cost)
+    {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://ussdhost.000webhostapp.com/jsonreceive.php',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 15,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode([
+                'status' => $status,
+                'message' => $message,
+                'messageid' => $messageId,
+                'number' => $number,
+                'cost' => $cost
+            ]),
+            CURLOPT_HTTPHEADER => array(
+                'h_api_key: bbd4c579ccf589ce16fb7240d2b8332d0609b90d5e3393c57be8adf51329c8fe',
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        if (curl_errno($curl)) {
+            Log::warning('Webhook curl error', [
+                'error' => curl_error($curl),
+                'message_id' => $messageId
+            ]);
+        } else if ($httpCode >= 400) {
+            Log::warning('Webhook HTTP error', [
+                'http_code' => $httpCode,
+                'response' => $response,
+                'message_id' => $messageId
+            ]);
+        }
+
+        curl_close($curl);
+        return $response;
     }
 
 
@@ -1343,7 +1364,7 @@ class PayrollController extends Controller
             $totalDeductions = $payroll->total_deductions;
             $net = $payroll->net;
 
-            $this->africastalkingfunction($employeePhoneNo, $employeeName, $net, $period, $basicPay, $totalDeductions);
+            $this->smsLeopardFunction($employeePhoneNo, $employeeName, $net, $period, $basicPay, $totalDeductions);
 
             Log::debug('SMS notification sent', [
                 'employee_id' => $employee->id,

@@ -4,6 +4,12 @@
     "description": "The Laravel Framework.",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/Njau-dev/smsleopard-php"
+        }
+    ],
     "require": {
         "php": "^7.3|^8.0",
         "africastalking/africastalking": "^3.0",
@@ -19,6 +25,7 @@
         "laravelcollective/html": "^6.3",
         "maatwebsite/excel": "^3.1",
         "nesbot/carbon": "2.73.0",
+        "njau-dev/smsleopard-php": "dev-master",
         "nyholm/psr7": "^1.5",
         "phpmailer/phpmailer": "^6.1",
         "phpoffice/phpexcel": "^1.8",

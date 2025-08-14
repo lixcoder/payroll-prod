@@ -29,10 +29,12 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
-    
-    'africastalking' => [
-    'username' => env('AFRICASTALKING_USERNAME'),
-    'api_key' => env('AFRICASTALKING_API_KEY'),
-],
+
+    'smsleopard' => [
+        'account_id' => env('SMSLEOPARD_API_KEY'),
+        'account_key' => env('SMSLEOPARD_API_SECRET'),
+        'access_token' => env('SMSLEOPARD_ACCESS_TOKEN'),
+        'sender_id' => env('SMSLEOPARD_SENDER_ID'),
+    ],
 
 ];
