@@ -992,7 +992,7 @@ class PayrollController extends Controller
     }
 
 
-    public function smsLeopardFunction($employeephoneno, $employee_name, $net, $financial_month_year, $basic_pay, $total_deductions)
+    public function smsLeopardFunction($employeephoneno, $employee_name, $net, $financial_month_year, $gross_pay, $total_deductions)
     {
         try {
             // Get SMS Leopard credentials from config  
@@ -1013,7 +1013,7 @@ class PayrollController extends Controller
             $client = new Client($accountId, $accountKey);
 
             // Prepare the message
-            $message = "Hi " . $employee_name . ", " . $Themessage . " your total gross salary of " . $basic_pay . " Total deductions of " . $total_deductions . " and the Net pay of " . $net . " for the month of " . $financial_month_year . " has been successfully credited into your account.";
+            $message = "Hi " . $employee_name . ", " . $Themessage . " your total gross salary of " . $gross_pay . " Total deductions of " . $total_deductions . " and the Net pay of " . $net . " for the month of " . $financial_month_year . " has been successfully credited into your account.";
 
             // Prepare recipients array - SMS Leopard expects this format
             $recipients = [
@@ -1360,11 +1360,11 @@ class PayrollController extends Controller
         try {
             $employeePhoneNo = $employee->telephone_mobile;
             $employeeName = $employee->first_name;
-            $basicPay = $payroll->basic_pay;
+            $grossPay = $payroll->basic_pay + $payroll->earning_amount;
             $totalDeductions = $payroll->total_deductions;
             $net = $payroll->net;
 
-            $this->smsLeopardFunction($employeePhoneNo, $employeeName, $net, $period, $basicPay, $totalDeductions);
+            $this->smsLeopardFunction($employeePhoneNo, $employeeName, $net, $period, $grossPay, $totalDeductions);
 
             Log::debug('SMS notification sent', [
                 'employee_id' => $employee->id,
