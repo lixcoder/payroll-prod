@@ -1137,7 +1137,6 @@ class PayrollController extends Controller
                 'user_id' => Auth::user()->id
             ]);
 
-            // Parse period and get date range
             $date = Carbon::createFromFormat('m-Y', $period);
             $start = $date->startOfMonth()->format('Y-m-d');
             $end = $date->endOfMonth()->format('Y-m-d');
@@ -1173,7 +1172,6 @@ class PayrollController extends Controller
             // Process main payroll records
             $this->processMainPayroll($employees, $period);
 
-            // Process transaction tables - PASS THE PROCESSED EMPLOYEES
             $this->processTransactionTables($start, $end, $jgroup, strtolower($type) == 'management', $employees);
 
             Log::info('Payroll processing completed successfully', [
