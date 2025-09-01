@@ -1,4 +1,6 @@
 <?php
+
+use App\Http\Controllers\Auth\LoginController;
 use App\Models\SmsModel;
 use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\AdvanceController;
@@ -14,6 +16,7 @@ use App\Http\Controllers\BanksController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\OfficeShiftController;
 use App\Http\Controllers\BenefitSettingsController;
 use App\Http\Controllers\BranchesController;
@@ -963,4 +966,59 @@ Route::group(['prefix' => 'api/v1'], function () {
     Route::post('attendance/employee/{id}', [AttendanceController::class, 'collectBioAtt']);
     Route::get("employees", [BiometricsController::class, 'employees']);
 
+});
+
+/*
+|--------------------------------------------------------------------------
+| Flutter App Routes (JSON API)
+|--------------------------------------------------------------------------
+| These routes mirror the web routes but with /app/ prefix for Flutter app
+| They use the same controllers but return JSON responses instead of views
+*/
+
+Route::prefix('app')->group(function () {
+
+    Route::get('/', function () {
+        return response()->json([
+            'success' => true,
+            'message' => 'Welcome to the Flutter app API',
+            'data' => ['redirect_to' => 'login']
+        ]);
+    });
+
+    Route::post('login', [LoginController::class, 'login']);
+    Route::post('register', [RegisterController::class, 'register']);
+    Route::post('logout', [LoginController::class, 'logout']);
+
+
+    Route::middleware(['api.auth'])->group(function () {
+
+        Route::get('/home', [HomeController::class, 'index'])->name('app.home');
+
+        // Users
+        Route::resource('users', UserController::class);
+        Route::post('users/update/{id}', [UserController::class, 'update']);
+
+        // Roles
+        Route::resource('roles', RoleController::class);
+
+        // Employees
+        Route::resource('employees', EmployeesController::class);
+        Route::get('employee/template', [EmployeesController::class, 'exportTemplate']);
+        Route::post('/employee/import', [EmployeesController::class, 'importEmployees'])->name('app.employees.import');
+        Route::get('employees/show/{id}', [EmployeesController::class, 'show']);
+        Route::get('v1/employees', [EmployeesController::class, 'getEmployees']);
+        Route::get('employees/create', [EmployeesController::class, 'create']);
+        Route::get('/get-bank-branches/{bankId}', [BankController::class, 'getBranches']);
+        Route::get('employee/type/{id}', [EmployeesController::class, 'employeeType']);
+        Route::post('employee/confirm/{id}', [EmployeesController::class, 'confirm']);
+        Route::post('employees/update/{id}', [EmployeesController::class, 'update']);
+        Route::get('employees/deactivate/{id}', [EmployeesController::class, 'deactivate']);
+        Route::get('employees/activate/{id}', [EmployeesController::class, 'activate']);
+        Route::get('employees/edit/{id}', [EmployeesController::class, 'edit']);
+        Route::get('employees/view/{id}', [EmployeesController::class, 'view']);
+        Route::get('employees/viewdeactive/{id}', [EmployeesController::class, 'viewdeactive']);
+
+        // For now, let's start with just a few routes to test
+    });
 });

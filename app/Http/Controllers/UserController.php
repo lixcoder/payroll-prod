@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Traits\ApiResponseTrait;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,12 +18,15 @@ class UserController extends Controller
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
      */
+
+    use ApiResponseTrait;
+
     public function index(Request $request)
     {
         //
         $roles= Role::pluck('name','name')->all();
         $users = User::where('organization_id', Auth::user()->organization_id)->orderBy('id','desc')->simplePaginate(5);
-        return view('admin.index',compact('users','roles'))->with('i',($request->input('page',1)-1)*5);
+        return $this->respondWith(view('admin.index', compact('users', 'roles'))->with('i', ($request->input('page', 1) - 1) * 5));
     }
 
     /**

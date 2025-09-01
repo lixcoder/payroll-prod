@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Traits\ApiResponseTrait;
 use App\Models\Employee;
 use App\Models\EType;
 use App\Models\Leaveapplication;
@@ -18,6 +19,9 @@ class HomeController extends Controller
      *
      * @return void
      */
+
+    use ApiResponseTrait;
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -79,9 +83,41 @@ class HomeController extends Controller
                 $emps = Employee::where('type_id',$employeeTypes[$i]->id)->get();
                 (($employeeTypes[$i]->employee_type_name.' -'.count($emps)));
             }
-        return view('home', compact('male', 'female','departments', 'approved', 'applied', 'cancelled','month1','month2','month3','month4','month5'
-        ,'month6','month7','month8','month9','month10','month11','month12','employees','users','leaves','monthss1','monthss2','monthss3','monthss4','monthss5'
-            ,'monthss6','monthss7','monthss8','monthss9','monthss10','monthss11','monthss12'));
+        return $this->respondWith(view('home', compact(
+            'male',
+            'female',
+            'departments',
+            'approved',
+            'applied',
+            'cancelled',
+            'month1',
+            'month2',
+            'month3',
+            'month4',
+            'month5',
+            'month6',
+            'month7',
+            'month8',
+            'month9',
+            'month10',
+            'month11',
+            'month12',
+            'employees',
+            'users',
+            'leaves',
+            'monthss1',
+            'monthss2',
+            'monthss3',
+            'monthss4',
+            'monthss5',
+            'monthss6',
+            'monthss7',
+            'monthss8',
+            'monthss9',
+            'monthss10',
+            'monthss11',
+            'monthss12'
+        )));
     }
 
 

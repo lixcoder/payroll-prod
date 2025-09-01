@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Traits\ApiResponseTrait;
 use App\Models\EmployeeProbation;
 use Carbon\Carbon;
 use App\Models\Bank;
@@ -52,6 +53,9 @@ class EmployeesController extends Controller
      *
      * @return Response
      */
+
+    use ApiResponseTrait;
+
     public function index()
     {
 
@@ -60,7 +64,7 @@ class EmployeesController extends Controller
 
         Audit::logaudit(now(), 'view', 'viewed employee list');
 
-        return view('employees.index', compact('employees','probation'));
+        return $this->respondWith(view('employees.index', compact('employees', 'probation')));
     }
 
     public function getEmployees()

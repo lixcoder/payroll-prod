@@ -3,26 +3,19 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Traits\ApiResponseTrait;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
-    use RegistersUsers;
+    use RegistersUsers, ApiResponseTrait;
 
     /**
      * Where to redirect users after registration.
@@ -42,9 +35,44 @@ class RegisterController extends Controller
     }
 
     /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function register(Request $request)
+    {
+        try {
+            $this->validator($request->all())->validate();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($this->isAppRequest($request)) {
+                return $this->validationErrorResponse($e->errors(), 'Registration failed', $request);
+            }
+            throw $e;
+        }
+
+        $user = $this->create($request->all());
+
+        event(new Registered($user));
+
+        Auth::login($user);
+
+        if ($this->isAppRequest($request)) {
+            return $this->authSuccessResponse(
+                $user,
+                'Registration successful',
+                'home',
+                $request
+            );
+        }
+
+        return $this->registered($request, $user) ?: redirect($this->redirectPath());
+    }
+
+    /**
      * Get a validator for an incoming registration request.
      *
-     * @param  array  $data
+     * @param array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function validator(array $data)
@@ -59,7 +87,7 @@ class RegisterController extends Controller
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
+     * @param array $data
      * @return \App\Models\User
      */
     protected function create(array $data)
@@ -69,5 +97,40 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+    }
+
+
+    /**
+     * The user has been registered.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function registered(Request $request, $user)
+    {
+        if ($this->isAppRequest($request)) {
+            return $this->authSuccessResponse(
+                $user,
+                'Registration successful',
+                'home',
+                $request
+            );
+        }
+        // Default: do nothing, let Laravel handle web redirect
+    }
+
+    /**
+     * Handle validation errors for API requests
+     */
+    protected function sendFailedRegistrationResponse(Request $request, array $errors)
+    {
+        if ($this->isAppRequest($request)) {
+            return $this->validationErrorResponse($errors, 'Registration failed', $request);
+        }
+
+        return redirect()->back()
+            ->withInput($request->only('name', 'email'))
+            ->withErrors($errors);
     }
 }
