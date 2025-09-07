@@ -20,7 +20,7 @@ class BBranch extends Model
     );
 
     // Don't forget to fill this array
-    protected $fillable = [];
+    protected $fillable = ['branch_code','bank_branch_name','organization_id','bank_id'];
 
 
     public function members()

@@ -5,21 +5,29 @@ use Illuminate\Database\Eloquent\Model;
 
 class HousingLevy extends Model
 {
-    public $table = "housing_levy";
+    protected $table = "housing_levy";
+
+    protected $fillable = ['employee_rate','employer_rate','organization_id'];
 
     public static $rules = [
-        'percentage' => 'required|numeric',
+        'employee_rate' => 'required|numeric|min:0',
+        'employer_rate' => 'required|numeric|min:0',
     ];
 
-    public static $messages = array(
-        'percentage.required' => 'Please insert percentage!',
-    );
-
-    protected $fillable = ['percentage'];
+    public static $messages = [
+        'employee_rate.required' => 'Please insert employee percentage!',
+        'employer_rate.required' => 'Please insert employer percentage!',
+    ];
 
     public static function getCurrentRate()
     {
         $levy = self::first();
-        return $levy ? $levy->percentage / 100 : 0.015; // Convert to decimal, fallback to 1.5%
+
+        if (! $levy) {
+            return 0; // fallback if no rates found
+        }
+
+        // Sum both employee and employer rates and convert to decimal
+        return ($levy->employee_rate + $levy->employer_rate) / 100;
     }
 }

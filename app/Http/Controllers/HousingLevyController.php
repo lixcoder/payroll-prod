@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 
 class HousingLevyController extends Controller
@@ -41,25 +42,40 @@ class HousingLevyController extends Controller
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store()
-    {
-        $validator = Validator::make($data = request()->all(), HousingLevy::$rules,HousingLevy::$messages);
+public function store()
+{
+    $validator = Validator::make(request()->all(), HousingLevy::$rules, HousingLevy::$messages);
 
-        if ($validator->fails())
-        {
-            return Redirect::back()->withErrors($validator)->withInput();
-        }
-
-        $hrate = new HousingLevy;
-
-        $hrate->percentage = request('percentage');
-
-        $hrate->organization_id = Auth::user()->organization_id;
-
-        $hrate->save();
-
-        return Redirect::route('housinglevy.index');
+    if ($validator->fails()) {
+        return Redirect::back()->withErrors($validator)->withInput();
     }
+
+    $hrate = new HousingLevy;
+    $hrate->employee_rate = request('employee_rate');
+    $hrate->employer_rate = request('employer_rate');
+    $hrate->organization_id = Auth::user()->organization_id;
+    $hrate->save();
+
+    return Redirect::route('housinglevy.index');
+}
+
+public function update(Request $request, $id)
+{
+    $hrate = HousingLevy::findOrFail($id);
+
+    $validator = Validator::make($request->all(), HousingLevy::$rules, HousingLevy::$messages);
+
+    if ($validator->fails()) {
+        return Redirect::back()->withErrors($validator)->withInput();
+    }
+
+    $hrate->employee_rate = $request->input('employee_rate');
+    $hrate->employer_rate = $request->input('employer_rate');
+    $hrate->update();
+
+    return Redirect::route('housinglevy.index');
+}
+
 
     /**
      * Display the specified branch.
@@ -93,23 +109,7 @@ class HousingLevyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update( Request $request,$id)
-    {
-        $hrate = HousingLevy::findOrFail($id);
 
-        $validator = Validator::make($data = request()->all(), HousingLevy::$rules,HousingLevy::$messages);
-
-        if ($validator->fails())
-        {
-            return Redirect::back()->withErrors($validator)->withInput();
-        }
-
-        $hrate->percentage = $request('percentage');
-
-        $hrate->update();
-
-        return Redirect::route('housinglevy.index');
-    }
 
     /**
      * Remove the specified branch from storage.
