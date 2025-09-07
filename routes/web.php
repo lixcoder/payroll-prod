@@ -139,7 +139,7 @@ Route::post('/employee/import', [EmployeesController::class, 'importEmployees'])
 Route::get('employees/show/{id}', [EmployeesController::class, 'show']);
 Route::get('v1/employees', [EmployeesController::class, 'getEmployees']);
 Route::get('employees/create', [EmployeesController::class, 'create']);
-Route::get('/get-bank-branches/{bankId}', [BankController::class, 'getBranches']);
+// Route::get('/get-bank-branches/{bankId}', [BankController::class, 'getBranches']);
 Route::get('employee/type/{id}', [EmployeesController::class, 'employeeType']);
 Route::post('employee/confirm/{id}',[EmployeesController::class,'confirm']);
 
@@ -165,6 +165,7 @@ Route::post('createJobtitle', [EmployeesController::class, 'createjobtitle']);
 Route::post('createGroup', [EmployeesController::class, 'creategroup']);
 Route::post('createEmployee', [EmployeesController::class, 'serializeDoc']);
 Route::get('employeeIndex', [EmployeesController::class, 'getIndex']);
+Route::get('/api/getBankBranches/{bankId}', [EmployeesController::class,'getBankBranches']);
 
 
 /*

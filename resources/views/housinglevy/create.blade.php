@@ -21,20 +21,22 @@
                                             </div>
                                         @endforeach
                                     @endif
-                                    <form method="POST" action="{{{ URL::to('housinglevy') }}}" accept-charset="UTF-8">
+                                    <form action="{{ route('housinglevy.store') }}" method="POST">
                                         @csrf
-                                        <fieldset>
-                                            <div class="form-group">
-                                                <label for="percentage">percentage <span style="color:red">*</span> </label>
-                                                <input class="form-control" placeholder="" type="text" name="percentage"
-                                                       id="percentage"
-                                                       value="{{{ old('percentage') }}}">
-                                            </div>
-                                            <div class="form-actions form-group">
-                                                <button type="submit" class="btn btn-primary btn-sm">Create housing levy
-                                                </button>
-                                            </div>
-                                        </fieldset>
+
+                                        <div class="form-group">
+                                            <label for="employee_rate">Employee Percentage (%)</label>
+                                            <input type="number" step="0.01" name="employee_rate" id="employee_rate" 
+                                                class="form-control" value="{{ old('employee_rate') }}" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="employer_rate">Employer Percentage (%)</label>
+                                            <input type="number" step="0.01" name="employer_rate" id="employer_rate" 
+                                                class="form-control" value="{{ old('employer_rate') }}" required>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary">Save</button>
                                     </form>
                                 </div>
                             </div>
