@@ -80,6 +80,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
+use App\Http\Controllers\CourtOrderController;
+use App\Http\Controllers\EmployeeCourtOrderController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -142,6 +145,17 @@ Route::get('employees/create', [EmployeesController::class, 'create']);
 // Route::get('/get-bank-branches/{bankId}', [BankController::class, 'getBranches']);
 Route::get('employee/type/{id}', [EmployeesController::class, 'employeeType']);
 Route::post('employee/confirm/{id}',[EmployeesController::class,'confirm']);
+
+//    Route::Court Orders;
+Route::resource('court_orders', CourtOrderController::class);
+Route::get('court_orders', [App\Http\Controllers\CourtOrderController::class, 'index'])->name('court_orders.index');
+Route::get('court_orders/create', [App\Http\Controllers\CourtOrderController::class, 'create'])->name('court_orders.create');
+Route::post('court_orders/store', [App\Http\Controllers\CourtOrderController::class, 'store'])->name('court_orders.store');
+Route::get('court_orders/edit/{id}', [App\Http\Controllers\CourtOrderController::class, 'edit'])->name('court_orders.edit');
+Route::post('court_orders/update/{id}', [App\Http\Controllers\CourtOrderController::class, 'update'])->name('court_orders.update');
+Route::get('court_orders/delete/{id}', [App\Http\Controllers\CourtOrderController::class, 'destroy'])->name('court_orders.delete');
+//    Employee Court Orders Routes;
+Route::resource('employee_court_orders', EmployeeCourtOrderController::class);
 
 //    Route::resource('employees', 'EmployeesController');
 Route::post('employees/update/{id}', [EmployeesController::class, 'update']);

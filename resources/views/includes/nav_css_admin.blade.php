@@ -60,6 +60,11 @@
                                     </a>
                                 </li>
                                 <li class="">
+                                    <a href="{{ route('court_orders.index') }}" class="waves-effect waves-dark">
+                                        <span class="pcoded-mtext">Employee Court Orders</span>
+                                    </a>
+                                </li>
+                                <li class="">
                                     <a href="{{ url('deactives') }}" class="waves-effect waves-dark">
                                         <span class="pcoded-mtext">Employees Exits</span>
                                     </a>
@@ -273,6 +278,11 @@
                                 <li class="">
                                     <a href="{{ url('employee_relief') }}" class="waves-effect waves-dark">
                                         <span class="pcoded-mtext">Relief</span>
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a href="{{ url('employee_court_orders') }}" class="waves-effect waves-dark">
+                                        <span class="pcoded-mtext">Court Orders</span>
                                     </a>
                                 </li>
                                 <li class="">
