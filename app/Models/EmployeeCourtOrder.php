@@ -4,27 +4,32 @@ use Illuminate\Database\Eloquent\Model;
 
 class EmployeeCourtOrder extends Model
 {
-    protected $table = 'employee_court_orders';
+    protected $table = "employee_court_orders";
 
     protected $fillable = [
         'employee_id',
         'court_order_id',
-        'amount',
+        'deduction_type',
+        'deduction_value',
+        'max_deduction',
+        'apply_on',
         'start_date',
         'end_date',
         'organization_id'
     ];
 
     public static $rules = [
-        'employee_id' => 'required',
-        'court_order_id' => 'required',
-        'amount' => 'required|numeric'
+        'employee_id'     => 'required|exists:x_employee,id',
+        'court_order_id'  => 'required|exists:court_orders,id',
+        'deduction_type'  => 'required|in:fixed,percentage',
+        'deduction_value' => 'required|numeric|min:0',
+        'max_deduction'   => 'nullable|numeric|min:0',
+        'apply_on'        => 'required|in:gross,net',
     ];
 
     public static $messages = [
-        'employee_id.required' => 'Please select an employee',
-        'court_order_id.required' => 'Please select a court order',
-        'amount.required' => 'Please enter the deduction amount'
+        'deduction_value.required' => 'Please enter the deduction value',
+        'deduction_value.numeric'  => 'Deduction value must be numeric',
     ];
 
     public function employee()

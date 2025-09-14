@@ -33,7 +33,7 @@
                 <div class="page-header-title">
                     <i class="feather icon-home bg-c-blue"></i>
                     <div class="d-inline">
-                        <h5>{{Auth::user()->organization->name}}</h5>
+                        <h5>{{ optional(Auth::user())->name }}</h5>
                         <span>Dashboard</span>
                     </div>
                 </div>

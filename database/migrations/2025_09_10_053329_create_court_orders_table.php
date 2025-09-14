@@ -17,15 +17,29 @@ class CreateCourtOrdersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('organization_id');
             $table->string('order_number')->unique();
-            $table->string('description')->nullable();
+
+            // 🔹 Use TEXT for flexible description
+            $table->text('description')->nullable();
+
+            // 🔹 Combined enums
             $table->enum('order_type', ['garnishment', 'attachment', 'deduction'])->default('deduction');
             $table->enum('rate_type', ['fixed', 'percentage'])->default('fixed');
-            $table->decimal('rate_amount', 10, 2)->default(0);
+
+            // 🔹 Amounts
+            $table->decimal('rate_amount', 10, 2)->default(0);   // main amount
+            $table->decimal('amount', 10, 2)->nullable();        // optional amount
+            $table->decimal('percentage', 5, 2)->nullable();     // optional %
+
+            // 🔹 Dates
             $table->date('effective_date');
             $table->date('expiry_date')->nullable();
+            $table->date('end_date')->nullable(); // extra end date
+
+            // 🔹 Tracking
             $table->unsignedBigInteger('created_by')->nullable();
             $table->timestamps();
 
+            // 🔹 Indexes
             $table->index('organization_id');
         });
     }

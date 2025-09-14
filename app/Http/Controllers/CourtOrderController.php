@@ -2,7 +2,6 @@
 
 use App\Models\Audit;
 use App\Models\CourtOrder;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -11,12 +10,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use Illuminate\Validation\Rule;
 
-class CourtOrderController extends Controller {
-
+class CourtOrderController extends Controller
+{
     /*
      * Display a listing of court orders
-     *
-     * @return Response
      */
     public function index()
     {
@@ -31,8 +28,6 @@ class CourtOrderController extends Controller {
 
     /*
      * Show the form for creating a new court order
-     *
-     * @return Response
      */
     public function create()
     {
@@ -40,27 +35,41 @@ class CourtOrderController extends Controller {
     }
 
     /*
-     * Store a newly created court order in storage.
-     *
-     * @return Response
+     * Store a newly created court order
      */
     public function store(Request $request)
     {
-        $validator = Validator::make(
-            $data = $request->all(),
-            CourtOrder::$rules,
-            CourtOrder::$messages
-        );
+        $validator = Validator::make($request->all(), [
+            'order_number'   => 'required|unique:court_orders,order_number',
+            'order_type'     => 'required|in:fixed,percentage',
+            'amount'         => 'nullable|numeric|min:0',
+            'percentage'     => 'nullable|numeric|min:0|max:100',
+            'apply_on'       => 'required|in:gross,net',
+            'effective_date' => 'required|date',
+            'end_date'       => 'nullable|date|after_or_equal:effective_date',
+        ], CourtOrder::$messages);
 
         if ($validator->fails()) {
             return Redirect::back()->withErrors($validator)->withInput();
         }
 
-        $court_order = new CourtOrder;
+        // extra validation depending on type
+        if ($request->order_type === 'fixed' && !$request->amount) {
+            return Redirect::back()->withErrors(['amount' => 'Amount is required for fixed type'])->withInput();
+        }
+        if ($request->order_type === 'percentage' && !$request->percentage) {
+            return Redirect::back()->withErrors(['percentage' => 'Percentage is required for percentage type'])->withInput();
+        }
 
+        $court_order = new CourtOrder;
         $court_order->order_number    = $request->get('order_number');
-        $court_order->description     = $request->get('description');
+        $court_order->order_type      = $request->get('order_type');
+        $court_order->amount          = $request->get('amount');
+        $court_order->percentage      = $request->get('percentage');
+        $court_order->apply_on        = $request->get('apply_on');
         $court_order->effective_date  = $request->get('effective_date');
+        $court_order->end_date        = $request->get('end_date');
+        $court_order->description     = $request->get('description');
         $court_order->organization_id = Auth::user()->organization_id;
 
         $court_order->save();
@@ -71,57 +80,52 @@ class CourtOrderController extends Controller {
     }
 
     /*
-     * Display the specified court order
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function show($id)
-    {
-        $court_order = CourtOrder::findOrFail($id);
-
-        return View::make('court_orders.show', compact('court_order'));
-    }
-
-    /*
-     * Show the form for editing the specified court order
-     *
-     * @param  int  $id
-     * @return Response
+     * Show the form for editing a court order
      */
     public function edit($id)
     {
-        $court_order = CourtOrder::find($id);
+        $court_order = CourtOrder::findOrFail($id);
 
         return View::make('court_orders.edit', compact('court_order'));
     }
 
     /*
-     * Update the specified court order in storage.
-     *
-     * @param  int  $id
-     * @return Response
+     * Update a court order
      */
     public function update(Request $request, $id)
     {
         $court_order = CourtOrder::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            'order_number' => [
-                'required',
-                Rule::unique('court_orders', 'order_number')->ignore($id),
-            ],
-            'description' => 'required',
+            'order_number'   => ['required', Rule::unique('court_orders', 'order_number')->ignore($id)],
+            'order_type'     => 'required|in:fixed,percentage',
+            'amount'         => 'nullable|numeric|min:0',
+            'percentage'     => 'nullable|numeric|min:0|max:100',
+            'apply_on'       => 'required|in:gross,net',
             'effective_date' => 'required|date',
+            'end_date'       => 'nullable|date|after_or_equal:effective_date',
         ], CourtOrder::$messages);
 
         if ($validator->fails()) {
             return Redirect::back()->withErrors($validator)->withInput();
         }
 
+        // conditional validation
+        if ($request->order_type === 'fixed' && !$request->amount) {
+            return Redirect::back()->withErrors(['amount' => 'Amount is required for fixed type'])->withInput();
+        }
+        if ($request->order_type === 'percentage' && !$request->percentage) {
+            return Redirect::back()->withErrors(['percentage' => 'Percentage is required for percentage type'])->withInput();
+        }
+
         $court_order->order_number   = $request->get('order_number');
-        $court_order->description    = $request->get('description');
+        $court_order->order_type     = $request->get('order_type');
+        $court_order->amount         = $request->get('amount');
+        $court_order->percentage     = $request->get('percentage');
+        $court_order->apply_on       = $request->get('apply_on');
         $court_order->effective_date = $request->get('effective_date');
+        $court_order->end_date       = $request->get('end_date');
+        $court_order->description    = $request->get('description');
         $court_order->update();
 
         Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'update', 'updated court order: ' . $court_order->order_number);
@@ -130,27 +134,23 @@ class CourtOrderController extends Controller {
     }
 
     /*
-     * Remove the specified court order from storage.
-     *
-     * @param  int  $id
-     * @return Response
+     * Remove a court order
      */
     public function destroy($id)
     {
         $court_order = CourtOrder::findOrFail($id);
 
-        // Check if the court order is assigned to any employees
+        // Prevent delete if assigned
         $assigned = DB::table('employee_court_orders')->where('court_order_id', $id)->count();
 
         if ($assigned > 0) {
-            return Redirect::route('court_orders.index')->withDeleteMessage('Cannot delete this court order because it is assigned to an employee(s)!');
-        } else {
-            CourtOrder::destroy($id);
-
-            Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'delete', 'deleted court order: ' . $court_order->order_number);
-
-            return Redirect::route('court_orders.index')->withDeleteMessage('Court Order successfully deleted!');
+            return Redirect::route('court_orders.index')->withDeleteMessage('Cannot delete this court order because it is assigned to employees!');
         }
-    }
 
+        CourtOrder::destroy($id);
+
+        Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'delete', 'deleted court order: ' . $court_order->order_number);
+
+        return Redirect::route('court_orders.index')->withDeleteMessage('Court Order successfully deleted!');
+    }
 }

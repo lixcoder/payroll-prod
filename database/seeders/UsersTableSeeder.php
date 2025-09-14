@@ -12,35 +12,37 @@ use Spatie\Permission\Models\Role;
 
 class UsersTableSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
-        
-       $org = Organization::create([
-           'name'=>'Oarizon',
-           'email'=>'info@oarizon.net',
-           'installation_date'=>'2020-07-04',
-           'licensed'=>100
-       ]);
-       $cur = Currency::create([
-           'name'=>'Kenyan Shilling',
-           'shortname'=>'KES',
-           'organization_id'=>$org->id,
-       ]);
+        // Create organization
+        $org = Organization::create([
+            'name' => 'Oarizon',
+            'email' => 'info@oarizon.net',
+            'installation_date' => '2020-07-04',
+            'licensed' => 100,
+        ]);
 
+        // Create currency
+        $cur = Currency::create([
+            'name' => 'Kenyan Shilling',
+            'shortname' => 'KES',
+            'organization_id' => $org->id,
+        ]);
+
+        // Create user with the correct organization_id
         $user = User::create([
-           'name'=>'Ian Wanyoike',
-           'email'=>'ian.n.wanyoike@gmail.com',
-           'password'=>Hash::make('work_work'),
-           'organization_id'=> 1,
-       ]);
-        $role = Role::create(['name'=>'Admin']);
-        $permissions = Permission::pluck('id','id')->all();
+            'name' => 'Ian Wanyoike',
+            'email' => 'ian.n.wanyoike@gmail.com',
+            'password' => Hash::make('work_work'),
+            'organization_id' => $org->id, // Use the created organization's ID
+        ]);
+
+        // Create role and sync permissions
+        $role = Role::create(['name' => 'Admin']);
+        $permissions = Permission::pluck('id')->all(); // Simplified pluck
         $role->syncPermissions($permissions);
+
+        // Assign role to user
         $user->assignRole('Admin');
     }
 }

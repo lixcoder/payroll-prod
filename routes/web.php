@@ -129,7 +129,12 @@ Route::post('users/update/{id}', [UserController::class, 'update']);
 /*
  * Roles
  * */
+Route::middleware(['auth'])->group(function () {
+    Route::resource('roles', RoleController::class);
+});
 Route::resource('roles', RoleController::class);
+
+
 
 /*
  *
@@ -1015,7 +1020,9 @@ Route::prefix('app')->group(function () {
         Route::post('users/update/{id}', [UserController::class, 'update']);
 
         // Roles
+        Route::middleware(['auth'])->group(function () {
         Route::resource('roles', RoleController::class);
+        });
 
         // Employees
         Route::resource('employees', EmployeesController::class);

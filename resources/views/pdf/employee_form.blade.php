@@ -85,7 +85,10 @@
 
             <td style="width:150px">
 
-                <img src="{{public_path().'/assets/logo/'.$organization->logo}}" alt="logo" width="80%">
+                <!-- <img src="{{public_path().'/assets/logo/'.$organization->logo}}" alt="logo" width="80%"> -->
+                <!-- <img src="file://{{ public_path('assets/logo/'.$organization->logo) }}" width="80%"> -->
+                <!-- <img src="{{ asset('assets/logo/'.$organization->logo) }}" width="80%"> -->
+                 <img src="{{asset('/uploads/logo/'.$organization->logo)}}" alt="logo" width="80%">
 
 
             </td>
