@@ -19,8 +19,7 @@
                         <h3>New Court Order</h3>
                     </div>
                     <div class="card-block">
-
-                        <form method="POST" action="{{ url('court_orders') }}" accept-charset="UTF-8">
+                        <form method="POST" action="{{ url('court_orders') }}">
                             @csrf
                             <fieldset>
                                 <!-- Order Number -->
@@ -54,35 +53,35 @@
                                 <div class="form-group">
                                     <label for="order_type">Order Type <span style="color:red">*</span></label>
                                     <select class="form-control" name="order_type" id="order_type" required>
-                                        <option value="fixed" {{ old('order_type') == 'fixed' ? 'selected' : '' }}>Fixed</option>
-                                        <option value="percentage" {{ old('order_type') == 'percentage' ? 'selected' : '' }}>Percentage</option>
+                                        <option value="garnishment" {{ old('order_type') == 'garnishment' ? 'selected' : '' }}>Garnishment</option>
+                                        <option value="attachment" {{ old('order_type') == 'attachment' ? 'selected' : '' }}>Attachment</option>
+                                        <option value="deduction" {{ old('order_type') == 'deduction' ? 'selected' : '' }}>Deduction</option>
                                     </select>
                                 </div>
 
-                                <!-- Amount (if fixed) -->
+                                <!-- Rate Type -->
+                                <div class="form-group">
+                                    <label for="rate_type">Rate Type <span style="color:red">*</span></label>
+                                    <select class="form-control" name="rate_type" id="rate_type" required>
+                                        <option value="fixed" {{ old('rate_type') == 'fixed' ? 'selected' : '' }}>Fixed</option>
+                                        <option value="percentage" {{ old('rate_type') == 'percentage' ? 'selected' : '' }}>Percentage</option>
+                                    </select>
+                                </div>
+
+                                <!-- Amount -->
                                 <div class="form-group">
                                     <label for="amount">Amount (if Fixed)</label>
                                     <input class="form-control" type="number" step="0.01" name="amount" id="amount"
                                            value="{{ old('amount') }}">
                                 </div>
 
-                                <!-- Percentage (if percentage) -->
+                                <!-- Percentage -->
                                 <div class="form-group">
                                     <label for="percentage">Percentage (if Percentage)</label>
                                     <input class="form-control" type="number" step="0.01" name="percentage" id="percentage"
                                            value="{{ old('percentage') }}">
                                 </div>
 
-                                <!-- Apply On -->
-                                <div class="form-group">
-                                    <label for="apply_on">Apply On <span style="color:red">*</span></label>
-                                    <select class="form-control" name="apply_on" id="apply_on" required>
-                                        <option value="gross" {{ old('apply_on') == 'gross' ? 'selected' : '' }}>Gross Salary</option>
-                                        <option value="net" {{ old('apply_on') == 'net' ? 'selected' : '' }}>Net Salary</option>
-                                    </select>
-                                </div>
-
-                                <!-- Submit -->
                                 <div class="form-actions form-group">
                                     <button type="submit" class="btn btn-primary btn-sm">Create Court Order</button>
                                 </div>

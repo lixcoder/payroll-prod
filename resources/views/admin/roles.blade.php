@@ -14,53 +14,49 @@
                                             <p>{{ $message }}</p>
                                         </div>
                                     @endif
+
                                     <div class="mb-2">
-                                        <a href="{{url('roles/create')}}" class="btn btn-sm btn-info">
+                                        <a href="{{ route('roles.create') }}" class="btn btn-sm btn-info">
                                             Create Role
                                         </a>
                                     </div>
+
                                     <table class="table table-striped table-bordered table-hover">
                                         <thead>
                                         <tr>
                                             <th>#</th>
                                             <th>Name</th>
-                                            <th>Action</th>
+                                            <th width="280px">Action</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <?php $count = 1?>
-                                        @foreach($roles as $role)
+                                        @foreach($roles as $key => $role)
                                             <tr>
-                                                <td>{{$count++}}</td>
-                                                <td>{{$role->name}}</td>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $role->name }}</td>
                                                 <td>
-                                                    <button type="button" class="btn btn-sm btn-primary dropdown-toggle"
-                                                            data-toggle="dropdown">
-                                                        <i class="fa fa-cogs"></i>Action
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li class="dropdown-item text-info">
-                                                            <a href="{{route('roles.show',$role->id)}}">
-                                                                <i class="fa fa-eye"></i>
-                                                                View Role
-                                                            </a>
-                                                        </li>
-                                                        <li class="dropdown-item text-success" data-toggle="modal"
-                                                            data-target="#editUser{{$role->id}}">
-                                                            <i class="fa fa-edit"></i>
-                                                            Edit
-                                                        </li>
-                                                        <li class="dropdown-item text-danger" data-toggle="modal"
-                                                            data-target="#editUserPassword{{$role->id}}">
-                                                            <i class="fa fa-edit"></i>
-                                                            Delete
-                                                        </li>
-                                                    </ul>
+                                                    <a class="btn btn-info btn-sm" href="{{ route('roles.show', $role->id) }}">
+                                                        <i class="fa fa-eye"></i> View
+                                                    </a>
+                                                    <a class="btn btn-success btn-sm" href="{{ route('roles.edit', $role->id) }}">
+                                                        <i class="fa fa-edit"></i> Edit
+                                                    </a>
+                                                    <form action="{{ route('roles.destroy', $role->id) }}" method="POST" style="display:inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">
+                                                            <i class="fa fa-trash"></i> Delete
+                                                        </button>
+                                                    </form>
                                                 </td>
                                             </tr>
                                         @endforeach
                                         </tbody>
                                     </table>
+
+                                    {{-- Pagination if using paginate() --}}
+                                    {{ $roles->links() }}
+
                                 </div>
                             </div>
                         </div>

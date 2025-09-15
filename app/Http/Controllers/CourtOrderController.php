@@ -12,9 +12,6 @@ use Illuminate\Validation\Rule;
 
 class CourtOrderController extends Controller
 {
-    /*
-     * Display a listing of court orders
-     */
     public function index()
     {
         $court_orders = CourtOrder::whereNull('organization_id')
@@ -22,51 +19,36 @@ class CourtOrderController extends Controller
             ->get();
 
         Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'view', 'viewed court orders');
-
         return View::make('court_orders.index', compact('court_orders'));
     }
 
-    /*
-     * Show the form for creating a new court order
-     */
     public function create()
     {
         return View::make('court_orders.create');
     }
 
-    /*
-     * Store a newly created court order
-     */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'order_number'   => 'required|unique:court_orders,order_number',
-            'order_type'     => 'required|in:fixed,percentage',
-            'amount'         => 'nullable|numeric|min:0',
-            'percentage'     => 'nullable|numeric|min:0|max:100',
-            'apply_on'       => 'required|in:gross,net',
-            'effective_date' => 'required|date',
-            'end_date'       => 'nullable|date|after_or_equal:effective_date',
-        ], CourtOrder::$messages);
+        $validator = Validator::make($request->all(), CourtOrder::$rules, CourtOrder::$messages);
 
         if ($validator->fails()) {
             return Redirect::back()->withErrors($validator)->withInput();
         }
 
-        // extra validation depending on type
-        if ($request->order_type === 'fixed' && !$request->amount) {
+        // conditional validation
+        if ($request->rate_type === 'fixed' && !$request->amount) {
             return Redirect::back()->withErrors(['amount' => 'Amount is required for fixed type'])->withInput();
         }
-        if ($request->order_type === 'percentage' && !$request->percentage) {
+        if ($request->rate_type === 'percentage' && !$request->percentage) {
             return Redirect::back()->withErrors(['percentage' => 'Percentage is required for percentage type'])->withInput();
         }
 
         $court_order = new CourtOrder;
         $court_order->order_number    = $request->get('order_number');
-        $court_order->order_type      = $request->get('order_type');
+        $court_order->order_type      = $request->get('order_type');   // garnishment/attachment/deduction
+        $court_order->rate_type       = $request->get('rate_type');    // fixed/percentage
         $court_order->amount          = $request->get('amount');
         $court_order->percentage      = $request->get('percentage');
-        $court_order->apply_on        = $request->get('apply_on');
         $court_order->effective_date  = $request->get('effective_date');
         $court_order->end_date        = $request->get('end_date');
         $court_order->description     = $request->get('description');
@@ -75,33 +57,25 @@ class CourtOrderController extends Controller
         $court_order->save();
 
         Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'create', 'created court order: ' . $court_order->order_number);
-
         return Redirect::route('court_orders.index')->withFlashMessage('Court Order successfully created!');
     }
 
-    /*
-     * Show the form for editing a court order
-     */
     public function edit($id)
     {
         $court_order = CourtOrder::findOrFail($id);
-
         return View::make('court_orders.edit', compact('court_order'));
     }
 
-    /*
-     * Update a court order
-     */
     public function update(Request $request, $id)
     {
         $court_order = CourtOrder::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
             'order_number'   => ['required', Rule::unique('court_orders', 'order_number')->ignore($id)],
-            'order_type'     => 'required|in:fixed,percentage',
+            'order_type'     => 'required|in:garnishment,attachment,deduction',
+            'rate_type'      => 'required|in:fixed,percentage',
             'amount'         => 'nullable|numeric|min:0',
             'percentage'     => 'nullable|numeric|min:0|max:100',
-            'apply_on'       => 'required|in:gross,net',
             'effective_date' => 'required|date',
             'end_date'       => 'nullable|date|after_or_equal:effective_date',
         ], CourtOrder::$messages);
@@ -111,36 +85,30 @@ class CourtOrderController extends Controller
         }
 
         // conditional validation
-        if ($request->order_type === 'fixed' && !$request->amount) {
+        if ($request->rate_type === 'fixed' && !$request->amount) {
             return Redirect::back()->withErrors(['amount' => 'Amount is required for fixed type'])->withInput();
         }
-        if ($request->order_type === 'percentage' && !$request->percentage) {
+        if ($request->rate_type === 'percentage' && !$request->percentage) {
             return Redirect::back()->withErrors(['percentage' => 'Percentage is required for percentage type'])->withInput();
         }
 
         $court_order->order_number   = $request->get('order_number');
         $court_order->order_type     = $request->get('order_type');
+        $court_order->rate_type      = $request->get('rate_type');
         $court_order->amount         = $request->get('amount');
         $court_order->percentage     = $request->get('percentage');
-        $court_order->apply_on       = $request->get('apply_on');
         $court_order->effective_date = $request->get('effective_date');
         $court_order->end_date       = $request->get('end_date');
         $court_order->description    = $request->get('description');
         $court_order->update();
 
         Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'update', 'updated court order: ' . $court_order->order_number);
-
         return Redirect::route('court_orders.index')->withFlashMessage('Court Order successfully updated!');
     }
 
-    /*
-     * Remove a court order
-     */
     public function destroy($id)
     {
         $court_order = CourtOrder::findOrFail($id);
-
-        // Prevent delete if assigned
         $assigned = DB::table('employee_court_orders')->where('court_order_id', $id)->count();
 
         if ($assigned > 0) {
@@ -148,7 +116,6 @@ class CourtOrderController extends Controller
         }
 
         CourtOrder::destroy($id);
-
         Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'delete', 'deleted court order: ' . $court_order->order_number);
 
         return Redirect::route('court_orders.index')->withDeleteMessage('Court Order successfully deleted!');
