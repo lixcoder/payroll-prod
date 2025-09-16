@@ -565,6 +565,7 @@ Route::post('payrollReports/nontaxables', [ReportsController::class, 'employeeno
 Route::get('payrollReports/selectPayePeriod', [ReportsController::class, 'period_paye']);
 Route::post('payrollReports/payeReturns', [ReportsController::class, 'payeReturns']);
 Route::post('payrollReports/p9form', [ReportsController::class, 'p9form1']);
+Route::post('payrollReports/p10form', [ReportsController::class, 'p10form']);
 Route::get('payrollReports/selectRemittancePeriod', [ReportsController::class, 'period_rem']);
 Route::post('payrollReports/payRemittances', [ReportsController::class, 'payeRems']);
 Route::get('payrollReports/selectSummaryPeriod', [ReportsController::class, 'period_summary']);
@@ -658,6 +659,12 @@ Route::get('payrollReports/selectYear', function () {
     return view('pdf.p9Select', compact('employees', 'branches', 'departments'));
 });
 
+Route::get('payrollReports/selectP10Year', function () {
+    $branches = Branch::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
+    $departments = Department::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
+    $employees = Employee::where('organization_id', Auth::user()->organization_id)->get();
+    return view('pdf.p10Select', compact('employees', 'branches', 'departments'));
+});
 
 /**
  * Advance reports

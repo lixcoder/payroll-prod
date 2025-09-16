@@ -97,6 +97,21 @@ class RoleController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $role = Role::findOrFail($id);
+
+        // Prevent deleting super-admin role (optional safeguard)
+        if ($role->name === 'Admin') {
+            return redirect()->route('roles.index')
+                ->with('error', 'The Admin role cannot be deleted!');
+        }
+
+        // Detach permissions first to avoid orphan records
+        $role->permissions()->detach();
+
+        // Delete the role
+        $role->delete();
+
+        return redirect()->route('roles.index')
+            ->with('success', 'Role deleted successfully');
     }
 }

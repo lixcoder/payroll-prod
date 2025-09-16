@@ -590,28 +590,41 @@ public function importEmployees(Request $request)
             ->withInput();
     }
 
+    $initialCount = Employee::where('organization_id', Auth::user()->organization_id)->count();
     $import = new EmployeeImport();
     try {
         Excel::import($import, $request->file('file'));
+        $errors = $import->getErrors();
+        Log::info('Import completed. Errors count: ' . count($errors));
+
         Audit::logaudit(now(), Auth::user()->username, 'import', 'Imported employees via file upload');
 
-            $errors = $import->getErrors();
-            if (!empty($errors)) {
-                Log::warning('Import errors: ' . json_encode($errors));
-                return redirect()->back()->with('import_errors', $errors);
+        if (!empty($errors)) {
+            Log::warning('Import errors: ' . json_encode($errors));
+            return redirect()->back()->with('import_errors', $errors);
         }
 
-        return redirect()->back()->with('flash_message', 'Employees successfully uploaded!');
+        $finalCount = Employee::where('organization_id', Auth::user()->organization_id)->count();
+        if ($finalCount === $initialCount) {
+            Log::warning('No new employees imported');
+            return redirect()->back()->with('error', 'No employees were imported. Please check your file for duplicate pins or emails.');
+        }
+
+        return redirect()->back()->with('flash_message', ($finalCount - $initialCount) . ' employees successfully uploaded!');
     } catch (ValidationException $e) {
         $failures = $e->failures();
         $errors = [];
         foreach ($failures as $failure) {
-            $errors[] = 'Row ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+            $rowErrors = [];
+            foreach ($failure->errors() as $field => $messages) {
+                $rowErrors[] = $field . ': ' . implode(', ', $messages);
+            }
+            $errors[] = 'Row ' . $failure->row() . ': ' . implode('; ', $rowErrors);
         }
-        Log::error('Validation exception: ' . json_encode($errors));
+        Log::error('Validation failures: ' . json_encode($errors));
         return redirect()->back()->with('import_errors', $errors);
     } catch (\Exception $e) {
-        Log::error('Employee import failed: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
+        Log::error('Import exception: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
         return redirect()->back()->with('error', 'Failed to import employees: ' . $e->getMessage());
     }
 }

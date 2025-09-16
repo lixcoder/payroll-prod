@@ -12116,4 +12116,24 @@ class ReportsController extends Controller
         }
     }
 
+
+    public function p10form(Request $request)
+    {
+        $organization = Organization::find(Auth::user()->organization_id);
+        $year = $request->period;
+
+        // Fetch employees and their transactions for the year
+        $employees = Employee::where('organization_id', $organization->id)
+            ->with(['transactions' => function($q) use ($year) {
+                $q->where('financial_month_year', 'LIKE', "%$year%");
+            }])->get();
+
+        if ($request->type == "Excel") {
+            return \Excel::download(new P10FormExports($year, $employees, $organization), "P10Form_$year.xls");
+        } else {
+            $pdf = app('dompdf.wrapper')->loadView('pdf.p10Pdf', compact('organization','employees','year'));
+            return $pdf->stream("P10_{$organization->name}_{$year}.pdf");
+        }
+    }
+
 }
