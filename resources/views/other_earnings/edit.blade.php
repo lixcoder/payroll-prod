@@ -1,228 +1,139 @@
 @extends('layouts.main_hr')
-<?php
-
-function asMoney($value)
-{
-    return number_format($value, 2);
-}
-
-?>
-
 @section('xara_cbs')
-    <link href="{{asset('jquery-ui-1.11.4.custom/jquery-ui.css')}}" rel="stylesheet">
+    <?php
+    function asMoney($value) {
+        return number_format($value, 2);
+    }
+    ?>
 
-    <style>
-        label, input {
-            display: block;
-        }
-
-        input.text {
-            margin-bottom: 12px;
-            width: 95%;
-            padding: .4em;
-        }
-
-        fieldset {
-            padding: 0;
-            border: 0;
-            margin-top: 25px;
-        }
-
-        h1 {
-            font-size: 1.2em;
-            margin: .6em 0;
-        }
-
-        div#users-contain {
-            width: 350px;
-            margin: 20px 0;
-        }
-
-        div#users-contain table {
-            margin: 1em 0;
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        div#users-contain table td, div#users-contain table th {
-            border: 1px solid #eee;
-            padding: .6em 10px;
-            text-align: left;
-        }
-
-        .ui-dialog .ui-state-error {
-            padding: .3em;
-        }
-
-        .validateTips {
-            border: 1px solid transparent;
-            padding: 0.3em;
-        }
-
-        .ui-dialog {
-            position: fixed;
-            margin-bottom: 950px;
-        }
-
-
-        .ui-dialog-titlebar-close {
-            background: url("{{ URL::asset('jquery-ui-1.11.4.custom/images/ui-icons_888888_256x240.png'); }}") repeat scroll -93px -128px rgba(0, 0, 0, 0);
-            border: medium none;
-        }
-
-        .ui-dialog-titlebar-close:hover {
-            background: url("{{ URL::asset('jquery-ui-1.11.4.custom/images/ui-icons_222222_256x240.png'); }}") repeat scroll -93px -128px rgba(0, 0, 0, 0);
-        }
-
-    </style>
-    @include('partials.breadcrumbs')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <div class="pcoded-inner-content">
         <div class="main-body">
             <div class="page-wrapper">
                 <div class="page-body">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <h3>Update Employee Earning</h3>
-
-                            <hr>
-                        </div>
-                        <div class="col-lg-12">
+                        <div class="col-sm-12">
                             <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0"><i class="feather icon-edit mr-2 text-primary"></i>Update Employee Allowance</h5>
+                                            <small class="text-muted">Modify employee allowance details</small>
+                                        </div>
+                                        <div class="card-header-right">
+                                            <a class="btn btn-outline-secondary btn-sm" href="{{ URL::previous() }}">
+                                                <i class="feather icon-arrow-left mr-1"></i> Back
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="card-body">
-
                                     @if ($errors)
                                         @foreach ($errors->all() as $error)
-                                            <div class="alert alert-danger">
-                                                {{ $error }}<br>
+                                            <div class="alert alert-danger alert-dismissible fade show">
+                                                <button type="button" class="close" data-dismiss="alert">×</button>
+                                                <i class="feather icon-x-circle mr-2"></i>{{ $error }}
                                             </div>
                                         @endforeach
                                     @endif
 
-
-                                    <div id="dialog-form" title="Create new earning type">
-                                        <p class="validateTips">Please insert Earning Type.</p>
-
+                                    <div id="dialog-form" title="Create new allowance type" style="display: none;">
+                                        <p class="validateTips">Please insert Allowance Type.</p>
                                         <form>
                                             <fieldset>
-                                                <label for="name">Name <span style="color:red">*</span></label>
-                                                <input type="text" name="name" id="name" value=""
-                                                       class="text ui-widget-content ui-corner-all">
-
-                                                <!-- Allow form submission with keyboard without duplicating the dialog button -->
-                                                <input type="submit" tabindex="-1"
-                                                       style="position:absolute; top:-1000px">
+                                                <div class="form-group">
+                                                    <label for="name">Name <span style="color:red">*</span></label>
+                                                    <input type="text" name="name" id="name" value="" class="form-control">
+                                                </div>
+                                                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
                                             </fieldset>
                                         </form>
                                     </div>
 
-                                    <form method="POST" action="{{{ url('other_earnings/update/'.$earning->id) }}}"
-                                          accept-charset="UTF-8">
+                                    <form method="POST" action="{{ URL::to('employee_allowances/update/'.$eallw->id) }}" accept-charset="UTF-8">
                                         @csrf
-                                        <fieldset>
-                                            <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="username">Employee</label>
-                                                    <input class="form-control" placeholder="" type="text" readonly
-                                                           name="employee"
-                                                           id="employee"
-                                                           value="{{ $earning->first_name.' '.$earning->last_name }}">
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="form-group">
-                                                <label for="username">Earning Type <span
-                                                        style="color:red">*</span></label>
-                                                <select name="earning" id="earning" class="form-control">
-                                                    <option></option>
-                                                    <option value="cnew">Create New</option>
-                                                    @foreach($earningsettings as $earningsetting)
-                                                        <option
-                                                            value="{{ $earningsetting->id }}"<?= ($earning->earning_id == $earningsetting->id) ? 'selected="selected"' : ''; ?>> {{ $earningsetting->earning_name }}</option>
-                                                    @endforeach
-                                                </select>
-
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="username">Narrative <span style="color:red">*</span></label>
-                                                <input class="form-control" placeholder="" type="text" name="narrative"
-                                                       id="narrative"
-                                                       value="{{ $earning->narrative}}">
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="username">Formular <span style="color:red">*</span></label>
-                                                <select name="formular" id="formular" class="form-control forml">
-                                                    <option></option>
-                                                    <option
-                                                        value="One Time"<?= ($earning->formular == 'One Time') ? 'selected="selected"' : ''; ?>>
-                                                        One Time
-                                                    </option>
-                                                    <option
-                                                        value="Recurring"<?= ($earning->formular == 'Recurring') ? 'selected="selected"' : ''; ?>>
-                                                        Recurring
-                                                    </option>
-                                                    <option id="instals"
-                                                            value="Instalments"<?= ($earning->formular == 'Instalments') ? 'selected="selected"' : ''; ?>>
-                                                        Instalments
-                                                    </option>
-                                                </select>
-
-                                            </div>
-
-                                            <div class="form-group" id="insts">
-                                                <label for="username">Instalments </label>
-                                                <input class="form-control" placeholder="" onkeypress="totalB()"
-                                                       onkeyup="totalB()" type="text"
-                                                       name="instalments" id="instalments"
-                                                       value="{{ $earning->instalments}}">
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="username">Amount <span style="color:red">*</span></label>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon">{{$currency->shortname}}</span>
-                                                    <input class="form-control" placeholder=""
-                                                           onkeypress="totalBalance()"
-                                                           onkeyup="totalBalance()" type="text" name="amount"
-                                                           id="amount"
-                                                           value="{{ asMoney($earning->earnings_amount)}}">
+                                                    <label for="employee">Employee</label>
+                                                    <input class="form-control" type="text" readonly name="employee" id="employee" 
+                                                           value="{{ $eallw->employee->first_name.' '.$eallw->employee->last_name }}">
                                                 </div>
                                             </div>
-
-                                            <div class="form-group bal_amt" id="bal">
-                                                <label for="username">Total </label>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon">{{$currency->shortname}}</span>
-                                                    <input class="form-control" placeholder="" readonly="readonly"
-                                                           type="text" name="balance"
-                                                           id="balance"
-                                                           value="{{ asMoney((double)$earning->earnings_amount * (double)$earning->instalments)}}">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="allowance">Allowance Type <span style="color:red">*</span></label>
+                                                    <select name="allowance" id="allowance" class="form-control">
+                                                        <option value="">Select Allowance Type</option>
+                                                        <option value="cnew">Create New</option>
+                                                        @foreach($allowances as $allowance)
+                                                            <option value="{{$allowance->id }}"<?= ($eallw->allowance_id == $allowance->id) ? 'selected="selected"' : ''; ?>> 
+                                                                {{ $allowance->allowance_name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
                                             </div>
+                                        </div>
 
-
-                                            <div class="form-group">
-                                                <label for="username">Earning Date <span
-                                                        style="color:red">*</span></label>
-                                                <div class="right-inner-addon ">
-                                                    <i class="glyphicon glyphicon-calendar"></i>
-                                                    <input class="form-control earningdate" readonly="readonly"
-                                                           placeholder="" type="text"
-                                                           name="ddate" id="ddate" value="{{ $earning->earning_date }}">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="formular">Formular <span style="color:red">*</span></label>
+                                                    <select name="formular" id="formular" class="form-control forml">
+                                                        <option value="">Select Formular</option>
+                                                        <option value="One Time"<?= ($eallw->formular == 'One Time') ? 'selected="selected"' : ''; ?>>One Time</option>
+                                                        <option value="Recurring"<?= ($eallw->formular == 'Recurring') ? 'selected="selected"' : ''; ?>>Recurring</option>
+                                                        <option id="instals" value="Instalments"<?= ($eallw->formular == 'Instalments') ? 'selected="selected"' : ''; ?>>Instalments</option>
+                                                    </select>
                                                 </div>
                                             </div>
-                                            <div class="form-actions form-group">
-
-                                                <button type="submit" class="btn btn-primary btn-sm">Update Employee
-                                                    Earning
-                                                </button>
+                                            <div class="col-md-6">
+                                                <div class="form-group" id="insts">
+                                                    <label for="instalments">Instalments</label>
+                                                    <input class="form-control" placeholder="Enter number of instalments" 
+                                                           onkeypress="totalB(),getdate()" onkeyup="totalB(),getdate()" 
+                                                           type="text" name="instalments" id="instalments" value="{{ $eallw->instalments}}">
+                                                </div>
                                             </div>
+                                        </div>
 
-                                        </fieldset>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="amount">Amount <span style="color:red">*</span></label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">{{$currency->shortname}}</span>
+                                                        <input class="form-control" placeholder="0.00" type="text" onkeypress="totalBalance()"
+                                                               onkeyup="totalBalance()" name="amount" id="amount" value="{{ $eallw->allowance_amount}}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group bal_amt" id="bal">
+                                                    <label for="balance">Total</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">{{$currency->shortname}}</span>
+                                                        <input class="form-control" placeholder="" readonly="readonly" type="text" 
+                                                               name="balance" id="balance" value="{{ asMoney((double)$eallw->allowance_amount * (double)$eallw->instalments)}}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="adate">Allowance Date <span style="color:red">*</span></label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="feather icon-calendar"></i></span>
+                                                <input class="form-control allowancedate" readonly="readonly" placeholder="Select date" 
+                                                       type="text" name="adate" id="adate" value="{{ $eallw->allowance_date }}">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-actions form-group">
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="feather icon-check-circle mr-1"></i> Update Employee Allowance
+                                            </button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -232,20 +143,79 @@ function asMoney($value)
             </div>
         </div>
     </div>
-    <script src="{{asset('media/jquery-1.8.0.min.js')}}"></script>
-    <script src="{{asset('jquery-ui-1.11.4.custom/jquery-ui.js')}}"></script>
-    <script src="{{asset('datepicker/js/bootstrap-datepicker.min.js')}}"></script>
-    <script type="text/javascript">
-        console.log(document.getElementById("instalments").value * document.getElementById("amount").value.replace(/,/g, ''));
 
+    <link href="{{ asset('jquery-ui-1.11.4.custom/jquery-ui.css') }}" rel="stylesheet">
+    <script src="{{ asset('media/jquery-1.8.0.min.js') }}"></script>
+    <script src="{{ asset('jquery-ui-1.11.4.custom/jquery-ui.js') }}"></script>
+    <script src="{{ asset('datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+
+    <style>
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 4px;
+            padding: 8px 12px;
+            border: 1px solid #dce1e6;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #4361ee;
+            box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .input-group-addon {
+            background-color: #f8f9fa;
+            border: 1px solid #dce1e6;
+            color: #6c757d;
+            padding: 8px 12px;
+        }
+        
+        .btn {
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-weight: 500;
+        }
+        
+        .alert {
+            border-radius: 4px;
+            border: none;
+            padding: 12px 16px;
+        }
+        
+        #dialog-form {
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .ui-dialog {
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .ui-dialog-titlebar {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 8px 8px 0 0;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .allowancedate {
+            background-color: white;
+        }
+    </style>
+
+    <script type="text/javascript">
         function totalBalance() {
             var instals = document.getElementById("instalments").value;
             var amt = document.getElementById("amount").value.replace(/,/g, '');
             var total = instals * amt * 10;
-
             total = total.toLocaleString('en-US', {minimumFractionDigits: 2});
             document.getElementById("balance").value = total;
-
         }
 
         function totalB() {
@@ -254,14 +224,11 @@ function asMoney($value)
             var total = instals * amt;
             total = total.toLocaleString('en-US', {minimumFractionDigits: 2});
             document.getElementById("balance").value = total;
-
         }
-
     </script>
 
     <script type="text/javascript">
         $(document).ready(function () {
-
             $('#formular option#instals').each(function () {
                 if (this.selected) {
                     $('#insts').show();
@@ -281,43 +248,28 @@ function asMoney($value)
                     $('#bal').hide();
                 }
             });
-
-
         });
     </script>
+
     <script type="text/javascript">
         $(function () {
-
-            $('.earningdate').datepicker({
+            $('.allowancedate').datepicker({
                 format: 'yyyy-mm-dd',
                 startDate: '-60y',
                 autoclose: true
             });
         });
+    </script>
 
-    </script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#amount').Intl.NumberFormat('en-Ke', {
-                style: 'currency',
-                currency: 'KES'
-            }).format();
-        });
-    </script>
     <script>
         $(function () {
             var dialog, form,
-
-                // From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
                 name = $("#name"),
-
                 allFields = $([]).add(name),
                 tips = $(".validateTips");
 
             function updateTips(t) {
-                tips
-                    .text(t)
-                    .addClass("ui-state-highlight");
+                tips.text(t).addClass("ui-state-highlight");
                 setTimeout(function () {
                     tips.removeClass("ui-state-highlight", 1500);
                 }, 500);
@@ -326,7 +278,7 @@ function asMoney($value)
             function checkLength(o) {
                 if (o.val().length == 0) {
                     o.addClass("ui-state-error");
-                    updateTips("Please insert earning type!");
+                    updateTips("Please insert allowance type!");
                     return false;
                 } else {
                     return true;
@@ -348,44 +300,24 @@ function asMoney($value)
                 allFields.removeClass("ui-state-error");
 
                 valid = valid && checkLength(name);
-
-                valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for earning type.");
+                valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for allowance type.");
 
                 if (valid) {
-
-                    /* displaydata();
-
-                    function displaydata(){
-                     $.ajax({
-                                    url     : "{{URL::to('reloaddata')}}",
-                      type    : "POST",
-                      async   : false,
-                      data    : { },
-                      success : function(s){
-                        var data = JSON.parse(s)
-                        //alert(data.id);
-                      }
-       });
-       }*/
-
                     $.ajax({
-                        url: "{{URL::to('createEarning')}}",
+                        url: "{{URL::to('createAllowance')}}",
                         type: "POST",
                         async: false,
                         data: {
                             'name': name.val()
                         },
                         success: function (s) {
-
-                            $('#earning').append($('<option>', {
+                            $('#allowance').append($('<option>', {
                                 value: s,
                                 text: name.val(),
                                 selected: true
                             }));
-
                         }
                     });
-
                     dialog.dialog("close");
                 }
                 return valid;
@@ -413,11 +345,10 @@ function asMoney($value)
                 addUser();
             });
 
-            $('#earning').change(function () {
+            $('#allowance').change(function () {
                 if ($(this).val() == "cnew") {
                     dialog.dialog("open");
                 }
-
             });
         });
     </script>

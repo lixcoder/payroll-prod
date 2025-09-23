@@ -129,8 +129,7 @@ Route::post('users/update/{id}', [UserController::class, 'update']);
 /*
  * Roles
  * */
-Route::resource('roles', App\Http\Controllers\RoleController::class);
-
+Route::resource('roles', RoleController::class);
 
 
 
@@ -586,6 +585,7 @@ Route::post('payrollReports/nontaxables', [ReportsController::class, 'employeeno
 Route::get('payrollReports/selectPayePeriod', [ReportsController::class, 'period_paye']);
 Route::post('payrollReports/payeReturns', [ReportsController::class, 'payeReturns']);
 Route::post('payrollReports/p9form', [ReportsController::class, 'p9form1']);
+Route::post('payrollReports/p10form', [ReportsController::class, 'p10form']);
 Route::get('payrollReports/selectRemittancePeriod', [ReportsController::class, 'period_rem']);
 Route::post('payrollReports/payRemittances', [ReportsController::class, 'payeRems']);
 Route::get('payrollReports/selectSummaryPeriod', [ReportsController::class, 'period_summary']);
@@ -677,6 +677,13 @@ Route::get('payrollReports/selectYear', function () {
     $departments = Department::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
     $employees = Employee::where('organization_id', Auth::user()->organization_id)->get();
     return view('pdf.p9Select', compact('employees', 'branches', 'departments'));
+});
+
+Route::get('payrollReports/selectP10Year', function () {
+    $branches = Branch::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
+    $departments = Department::whereNull('organization_id')->orWhere('organization_id', Auth::user()->organization_id)->get();
+    $employees = Employee::where('organization_id', Auth::user()->organization_id)->get();
+    return view('pdf.p10Select', compact('employees', 'branches', 'departments'));
 });
 
 
@@ -965,6 +972,7 @@ Route::get('probation/getProbation',[ProbationController::class,'getProbation'])
 Route::group(['prefix' => 'timesheet'], function () {
     Route::get('work_shift', [OfficeShiftController::class, 'index']);
     Route::get('work_shift/create', [OfficeShiftController::class, 'create']);
+    Route::get('work_shift/edit/{id}', [OfficeShiftController::class, 'edit']);
     Route::post('work_shift/save', [OfficeShiftController::class, 'store']);
     Route::post('work_shift/deactivate', [OfficeShiftController::class, 'destroy']);
     Route::get('officeshift/{id}/{clock_in}/{clock_out}', [OfficeShiftController::class, 'getShift']);
@@ -1018,9 +1026,7 @@ Route::prefix('app')->group(function () {
         Route::post('users/update/{id}', [UserController::class, 'update']);
 
         // Roles
-        Route::middleware(['auth'])->group(function () {
         Route::resource('roles', RoleController::class);
-        });
 
         // Employees
         Route::resource('employees', EmployeesController::class);

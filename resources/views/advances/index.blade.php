@@ -1,163 +1,92 @@
 @extends('layouts.main_hr')
-<script type="text/javascript">
-    function YNconfirm() {
-        var per = document.getElementById("period").value;
-        if (window.confirm('Do you wish to process payroll for ' + per + '?')) {
-            window.location.href = "{{ URL::to('payroll/accounts')}}";
-        }
-    }
-</script>
-
 @section('xara_cbs')
-    <style>
-        label, input {
-            display: block;
-        }
-
-        input.text {
-            margin-bottom: 12px;
-            width: 95%;
-            padding: .4em;
-        }
-
-        fieldset {
-            padding: 0;
-            border: 0;
-            margin-top: 25px;
-        }
-
-        h1 {
-            font-size: 1.2em;
-            margin: .6em 0;
-        }
-
-        div#users-contain {
-            width: 350px;
-            margin: 20px 0;
-        }
-
-        div#users-contain table {
-            margin: 1em 0;
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        div#users-contain table td, div#users-contain table th {
-            border: 1px solid #eee;
-            padding: .6em 10px;
-            text-align: left;
-        }
-
-        .ui-dialog .ui-state-error {
-            padding: .3em;
-        }
-
-        .validateTips {
-            border: 1px solid transparent;
-            padding: 0.3em;
-        }
-
-        .ui-dialog {
-            position: fixed;
-            margin-bottom: 850px;
-        }
-
-
-        .ui-dialog-titlebar-close {
-            background: url("{{ URL::asset('jquery-ui-1.11.4.custom/images/ui-icons_888888_256x240.png') }}") repeat scroll -93px -128px rgba(0, 0, 0, 0);
-            border: medium none;
-        }
-
-        .ui-dialog-titlebar-close:hover {
-            background: url("{{ URL::asset('jquery-ui-1.11.4.custom/images/ui-icons_222222_256x240.png') }}") repeat scroll -93px -128px rgba(0, 0, 0, 0);
-        }
-
-    </style>
     @include('partials.breadcrumbs')
+    
     <div class="pcoded-inner-content">
         <div class="main-body">
             <div class="page-wrapper">
                 <div class="page-body">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <h3>Period</h3>
-
-                            <hr>
-                        </div>
-                        <div class="col-lg-12">
+                        <div class="col-sm-12">
                             <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0"><i class="feather icon-calendar mr-2 text-primary"></i>Payroll Period</h5>
+                                            <small class="text-muted">Select period for advance payroll preview</small>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="card-body">
-                                    <div id="dialog-form" title="Create new Account">
-                                        <p class="validateTips">Please insert All fields.</p>
+                                    @if (Session::has('flash_message'))
+                                        <div class="alert alert-success alert-dismissible fade show">
+                                            <button type="button" class="close" data-dismiss="alert">×</button>
+                                            <i class="feather icon-check-circle mr-2"></i>{{ Session::get('flash_message') }}
+                                        </div>
+                                    @endif
 
+                                    <div id="dialog-form" title="Create New Account" style="display: none;">
+                                        <p class="validateTips">Please fill all required fields.</p>
                                         <form>
-                                            <fieldset>
-                                                <label for="name">Account Category <span
-                                                        style="color:red">*</span></label>
+                                            <div class="form-group">
+                                                <label for="category">Account Category <span class="text-danger">*</span></label>
                                                 <select class="form-control" name="category" id="category">
-                                                    <option value=""></option>
+                                                    <option value="">Select Category</option>
                                                     <option value="ASSET">Asset (1000)</option>
                                                     <option value="INCOME">Income (2000)</option>
                                                     <option value="EXPENSE">Expense (3000)</option>
                                                     <option value="EQUITY">Equity (4000)</option>
                                                     <option value="LIABILITY">Liability (5000)</option>
                                                 </select>
-                                                <br/>
-                                                <label for="name">Name <span style="color:red">*</span></label>
-                                                <input type="text" name="name" id="name" value=""
-                                                       class="text ui-widget-content ui-corner-all">
-                                                <label for="name">GL Code <span style="color:red">*</span></label>
-                                                <input type="text" name="code" id="code" value=""
-                                                       class="text ui-widget-content ui-corner-all">
-                                                <input type="submit" tabindex="-1"
-                                                       style="position:absolute; top:-1000px">
-                                            </fieldset>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="name">Name <span class="text-danger">*</span></label>
+                                                <input type="text" name="name" id="name" class="form-control">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="code">GL Code <span class="text-danger">*</span></label>
+                                                <input type="text" name="code" id="code" class="form-control">
+                                            </div>
                                         </form>
                                     </div>
 
-                                    @if (Session::has('flash_message'))
-
-                                        <div class="alert alert-success">
-                                            {{ Session::get('flash_message') }}
-                                        </div>
-                                    @else
-
-                                        <form method="POST" action="{{ URL::to('advance/preview')}}"
-                                              accept-charset="UTF-8">
-                                            @csrf
-                                            <fieldset>
+                                    <form method="POST" action="{{ URL::to('advance/preview')}}" accept-charset="UTF-8" class="needs-validation" novalidate>
+                                        @csrf
+                                        <div class="row">
+                                            <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="username">Period <span
-                                                            style="color:red">*</span></label>
-                                                    <input required class="form-control datepicker2"
-                                                           placeholder=""
-                                                           type="text"
-                                                           name="period" id="period" value="{{ old('period') }}">
-
+                                                    <label for="period" class="form-label">Period <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><i class="feather icon-calendar"></i></span>
+                                                        </div>
+                                                        <input required class="form-control datepicker2" placeholder="Select period" 
+                                                               type="text" name="period" id="period" value="{{ old('period') }}">
+                                                    </div>
                                                 </div>
-
+                                            </div>
+                                            <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="username">Select Account <span
-                                                            style="color:red">*</span></label>
+                                                    <label for="account" class="form-label">Select Account <span class="text-danger">*</span></label>
                                                     <select name="account" id="account" class="form-control" required>
-                                                        <option></option>
-                                                        <option value="cnew">Create New</option>
+                                                        <option value="">Select Account</option>
+                                                        <option value="cnew">Create New Account</option>
                                                         @foreach($accounts as $account)
-                                                            <option
-                                                                value="{{ $account->id }}"> {{ $account->code.' '.$account->name }}</option>
+                                                            <option value="{{ $account->id }}"> 
+                                                                {{ $account->code.' - '.$account->name }}
+                                                            </option>
                                                         @endforeach
                                                     </select>
-
                                                 </div>
+                                            </div>
+                                        </div>
 
-                                                <div class="form-actions form-group">
-
-                                                    <button type="submit" class="btn btn-primary btn-sm">Select</button>
-                                                </div>
-
-                                            </fieldset>
-                                        </form>
-                                    @endif
+                                        <div class="form-actions form-group">
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="feather icon-check-circle mr-1"></i> Select
+                                            </button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -166,10 +95,47 @@
             </div>
         </div>
     </div>
-    <link rel="stylesheet" href="{{asset('jquery-ui-1.11.4.custom/jquery-ui.css')}}">
-    <script type="text/javascript" src="{{asset('media/jquery-1.8.0.min.js')}}"></script>
-    <script src="{{asset('jquery-ui-1.11.4.custom/jquery-ui.js')}}"></script>
-    <script src="{{asset('datepicker/js/bootstrap-datepicker.min.js')}}"></script>
+
+    <link rel="stylesheet" href="{{ asset('jquery-ui-1.11.4.custom/jquery-ui.css') }}">
+    <script type="text/javascript" src="{{ asset('media/jquery-1.8.0.min.js') }}"></script>
+    <script src="{{ asset('jquery-ui-1.11.4.custom/jquery-ui.js') }}"></script>
+    <script src="{{ asset('datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+
+    <style>
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+            border: 1px solid #dce1e6;
+            color: #6c757d;
+        }
+        
+        #dialog-form {
+            padding: 20px;
+        }
+        
+        .ui-dialog {
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .ui-dialog-titlebar {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+    </style>
+
     <script type="text/javascript">
         $(function () {
             $('.datepicker2').datepicker({
@@ -179,12 +145,9 @@
                 autoclose: true
             });
         });
-    </script>
-    <script>
+
         $(function () {
             var dialog, form,
-
-                // From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
                 name = $("#name"),
                 code = $("#code"),
                 category = $("#category"),
@@ -192,9 +155,7 @@
                 tips = $(".validateTips");
 
             function updateTips(t) {
-                tips
-                    .text(t)
-                    .addClass("ui-state-highlight");
+                tips.text(t).addClass("ui-state-highlight");
                 setTimeout(function () {
                     tips.removeClass("ui-state-highlight", 1500);
                 }, 500);
@@ -210,53 +171,24 @@
                 }
             }
 
-            function checkRegexp(o, regexp, n) {
-                if (!(regexp.test(o.val()))) {
-                    o.addClass("ui-state-error");
-                    updateTips(n);
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-
             function addUser() {
                 var valid = true;
                 allFields.removeClass("ui-state-error");
 
                 valid = valid && checkLength(category, "Please select account category!");
-
                 valid = valid && checkLength(name, "Please insert account name!");
-
                 valid = valid && checkLength(code, "Please insert account code!");
 
-                valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for account name.");
-
-
                 if (valid) {
-
-                    /* displaydata();
-
-                    function displaydata(){
-                     $.ajax({
-                                    url     : "{{URL::to('reloaddata')}}",
-                      type    : "POST",
-                      async   : false,
-                      data    : { },
-                      success : function(s){
-                        var data = JSON.parse(s)
-                        //alert(data.id);
-                      }
-       });
-       }*/
-                    const advance ={
+                    const advance = {
                         "name": document.getElementById('name').value,
                         "code": document.getElementById('code').value,
                         "category": document.getElementById('category').value,
-                        "_token": "{{csrf_token()}}"
-                    }
+                        "_token": "{{ csrf_token() }}"
+                    };
+                    
                     $.ajax({
-                        url: "{{URL::to('createAccount')}}",
+                        url: "{{ URL::to('createAccount') }}",
                         type: "POST",
                         async: false,
                         data: advance,
@@ -277,7 +209,7 @@
             dialog = $("#dialog-form").dialog({
                 autoOpen: false,
                 height: 390,
-                width: 350,
+                width: 400,
                 modal: true,
                 buttons: {
                     "Create": addUser,
@@ -291,17 +223,19 @@
                 }
             });
 
-            form = dialog.find("form").on("submit", function (event) {
-                event.preventDefault();
-                addUser();
-            });
-
+            form = dialog.find("form");
             $('#account').change(function () {
                 if ($(this).val() == "cnew") {
                     dialog.dialog("open");
                 }
-
             });
         });
+
+        function YNconfirm() {
+            var per = document.getElementById("period").value;
+            if (window.confirm('Do you wish to process payroll for ' + per + '?')) {
+                window.location.href = "{{ URL::to('payroll/accounts')}}";
+            }
+        }
     </script>
 @endsection

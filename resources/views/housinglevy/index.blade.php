@@ -1,77 +1,128 @@
 @extends('layouts.main_hr')
-
 @section('xara_cbs')
     @include('partials.breadcrumbs')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-
+    
     <div class="pcoded-inner-content">
         <div class="main-body">
             <div class="page-wrapper">
                 <div class="page-body">
                     <div class="row">
                         <div class="col-lg-12">
-                            <h3>Housing Levy Rates</h3>
-                            <hr>
-                        </div>
-                        
-                        <div class="col-lg-12">
                             <div class="card">
-                                <div class="card-body">
-                                    <div class="mb-2">
-                                        <a class="btn btn-info btn-sm-2" href="{{ URL::to('housinglevy/create') }}">
-                                            Add Housing Levy
-                                        </a>
+                                <!-- Card Header -->
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0">
+                                                <i class="feather icon-home mr-2 text-info"></i>
+                                                Housing Levy Rates Management
+                                            </h5>
+                                            <small class="text-muted">
+                                                Manage housing levy contribution rates for employees and employers
+                                            </small>
+                                        </div>
+                                        <div class="card-header-right">
+                                            <a href="{{ URL::to('housinglevy/create') }}" class="btn btn-info btn-sm">
+                                                <i class="feather icon-plus mr-1"></i>
+                                                Add Housing Levy
+                                            </a>
+                                        </div>
                                     </div>
-                                    
-                                    <table id="users" class="table table-condensed table-bordered table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Employee Percentage</th>
-                                                <th>Employer Percentage</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($hrates as $hrate)
-                                                <tr>
-                                                    <td>{{ $hrate->id }}</td>
-                                                    <td>{{ $hrate->employee_rate }}%</td>
-                                                    <td>{{ $hrate->employer_rate }}%</td>
-                                                    <td>
-                                                        <div class="btn-group">
-                                                            <button type="button"
-                                                                    class="btn btn-info btn-sm dropdown-toggle"
-                                                                    data-toggle="dropdown" aria-expanded="false">
-                                                                Action <span class="caret"></span>
-                                                            </button>
+                                </div>
 
-                                                            <ul class="dropdown-menu" role="menu">
-                                                                <li>
-                                                                    <a href="{{ URL::to('housinglevy/edit/'.$hrate->id) }}">
-                                                                        Update
-                                                                    </a>
-                                                                </li>
-                                                                <li>
-                                                                    <a href="{{ URL::to('housinglevy/delete/'.$hrate->id) }}"
-                                                                       onclick="return confirm('Are you sure you want to delete this record?')">
-                                                                        Delete
-                                                                    </a>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-
-                                    @if($hrates->isEmpty())
-                                        <div class="alert alert-info mt-3">
-                                            No housing levy rates found.
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <!-- Alert Messages -->
+                                    @if (Session::has('success_message'))
+                                        <div class="alert alert-success alert-dismissible fade show">
+                                            <button type="button" class="close" data-dismiss="alert">×</button>
+                                            <i class="feather icon-check-circle mr-2"></i>
+                                            {{ Session::get('success_message') }}
                                         </div>
                                     @endif
 
+                                    @if (Session::has('delete_message'))
+                                        <div class="alert alert-danger alert-dismissible fade show">
+                                            <button type="button" class="close" data-dismiss="alert">×</button>
+                                            <i class="feather icon-alert-triangle mr-2"></i>
+                                            {{ Session::get('delete_message') }}
+                                        </div>
+                                    @endif
+
+                                    <!-- Housing Levy Rates Table -->
+                                    <div class="table-responsive">
+                                        <table id="housingLevyTable" class="table table-hover">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Employee Rate</th>
+                                                    <th>Employer Rate</th>
+                                                    <th>Total Contribution</th>
+                                                    <th>Status</th>
+                                                    <th class="text-center">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($hrates as $hrate)
+                                                    <tr>
+                                                        <td>{{ $hrate->id }}</td>
+                                                        <td>
+                                                            <span class="badge badge-primary">
+                                                                {{ number_format($hrate->employee_rate, 2) }}%
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge badge-success">
+                                                                {{ number_format($hrate->employer_rate, 2) }}%
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="font-weight-bold text-info">
+                                                                {{ number_format($hrate->employee_rate + $hrate->employer_rate, 2) }}%
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge badge-success">Active</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div class="btn-group" role="group">
+                                                                <a href="{{ URL::to('housinglevy/edit/'.$hrate->id) }}" 
+                                                                   class="btn btn-outline-primary btn-sm" 
+                                                                   data-toggle="tooltip" 
+                                                                   title="Edit Housing Levy">
+                                                                    <i class="feather icon-edit"></i>
+                                                                </a>
+                                                                <a href="{{ URL::to('housinglevy/delete/'.$hrate->id) }}" 
+                                                                   class="btn btn-outline-danger btn-sm" 
+                                                                   data-toggle="tooltip" 
+                                                                   title="Delete Housing Levy"
+                                                                   onclick="return confirm('Are you sure you want to delete this housing levy rate?')">
+                                                                    <i class="feather icon-trash-2"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    @if($hrates->isEmpty())
+                                        <div class="text-center py-5">
+                                            <div class="empty-state">
+                                                <div class="empty-state-icon">
+                                                    <i class="feather icon-home"></i>
+                                                </div>
+                                                <h4>No Housing Levy Rates Found</h4>
+                                                <p class="text-muted">Get started by adding your first housing levy rate.</p>
+                                                <a href="{{ URL::to('housinglevy/create') }}" class="btn btn-info">
+                                                    <i class="feather icon-plus mr-1"></i>
+                                                    Add Housing Levy
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -80,4 +131,133 @@
             </div>
         </div>
     </div>
+
+    <style>
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .table td {
+            vertical-align: middle;
+            border-color: #f1f1f1;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(23, 162, 184, 0.05);
+            transform: translateY(-1px);
+            transition: all 0.3s ease;
+        }
+        
+        .btn {
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            border: none;
+        }
+        
+        .btn-info:hover {
+            background: linear-gradient(135deg, #138496 0%, #17a2b8 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .btn-outline-primary, .btn-outline-danger {
+            border-width: 1px;
+            margin: 0 2px;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 15px;
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .empty-state {
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state h4 {
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .card-header-right {
+                margin-top: 1rem;
+                width: 100%;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn-group .btn {
+                margin: 2px 0;
+            }
+        }
+    </style>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+            
+            // Initialize DataTable
+            $('#housingLevyTable').DataTable({
+                responsive: true,
+                pageLength: 10,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search housing levy rates...",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)"
+                },
+                dom: '<"row"<"col-md-6"l><"col-md-6"f>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
+                columnDefs: [
+                    { orderable: false, targets: [5] }
+                ],
+                order: [[0, 'asc']]
+            });
+            
+            // Fade out alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeTo(500, 0).slideUp(500, function(){
+                    $(this).remove(); 
+                });
+            }, 5000);
+        });
+    </script>
 @stop

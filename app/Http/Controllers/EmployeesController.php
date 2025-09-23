@@ -627,144 +627,77 @@ public function edit($id)
 
 public function update(Request $request, $id)
 {
+    Log::debug('Import update request: ' . json_encode($request->all()));
+
     $employee = Employee::findOrFail($id);
-    $validator = Validator::make($request->all(), [
-        'fname' => 'required|string|max:255',
-        'pin' => 'nullable|unique:x_employee,pin,' . $id,
-        'swift_code' => 'nullable|unique:x_employee,swift_code,' . $id,
-        'email_office' => 'nullable|email|unique:x_employee,email_office,' . $id,
-        'bank_account_number' => 'nullable|unique:x_employee,bank_account_number,' . $id,
-    ], [
-        'fname.required' => 'The first name is required.',
-        'pin.unique' => 'This PIN is already in use.',
-        'swift_code.unique' => 'This SWIFT code is already in use.',
-        'email_office.unique' => 'This email is already in use.',
-        'bank_account_number.unique' => 'This bank account number is already in use.',
-    ]);
 
-    if ($validator->fails()) {
-        return redirect()->back()->withErrors($validator)->withInput();
-    }
+    // Map form field names to model column names used in DB
+    $payload = [
+        'personal_file_number'   => $request->input('personal_file_number'),
+        'first_name'             => $request->input('fname'),
+        'last_name'              => $request->input('lname'),
+        'middle_name'            => $request->input('mname'),
+        'identity_number'        => $request->input('identity_number'),
+        'passport_number'        => $request->input('passport_number'),
+        'yob'                    => $request->input('dob'),
+        'marital_status'         => $request->input('status'),
+        'citizenship_id'         => $request->input('citizenship'),
+        'education_type_id'      => $request->input('education'),
+        'gender'                 => $request->input('gender'),
+        'pin'                    => $request->input('pin'),
+        'social_security_number' => $request->input('social_security_number'),
+        'hospital_insurance_number' => $request->input('hospital_insurance_number'),
+        'in_employment'          => $request->has('active') ? 'Y' : 'N',
+        'confirmed'              => $request->has('confirmed') ? 'Y' : 'N',
+        'mode_of_payment'        => $request->input('modep'), // form uses modep
+        'bank_id'                => $request->input('bank_id'),
+        // form uses bbranch_id -> map to bank_branch_id column
+        'bank_branch_id'         => $request->input('bbranch_id'),
+        'bank_account_number'    => $request->input('bank_account_number'),
+        'bank_eft_code'          => $request->input('bank_eft_code'),
+        'swift_code'             => $request->input('swift_code'),
+        'branch_id'              => $request->input('branch_id'),
+        'department_id'          => $request->input('department_id'),
+        'job_group_id'           => $request->input('jgroup_id'),
+        'type_id'                => $request->input('type_id'),
+        'start_date'             => $request->input('startdate'),
+        'end_date'               => $request->input('enddate'),
+        'work_permit_number'     => $request->input('work_permit_number'),
+        'job_title'              => $request->input('jtitle'),
+        'basic_pay'              => $request->input('pay') ? $request->input('pay') : $employee->basic_pay,
+        'date_joined'            => $request->input('djoined'),
+        'telephone_mobile'       => $request->input('telephone_mobile'),
+        'email_office'           => $request->input('email_office'),
+        'email_personal'         => $request->input('email_personal'),
+        'postal_zip'             => $request->input('zip'),
+        'postal_address'         => $request->input('address'),
+    ];
 
-    if ($request->hasFile('image')) {
-        $file = $request->file('image');
-        $name = time() . '-' . $file->getClientOriginalName();
-        $file = $file->move('public/uploads/employees/photo', $name);
-        $employee->photo = $name;
+    // If mode of payment is not Bank, remove bank fields so we don't try to write null into non-nullable columns
+    if (strtolower((string)$payload['mode_of_payment']) !== 'bank') {
+        unset(
+            $payload['bank_id'],
+            $payload['bank_branch_id'],
+            $payload['bank_account_number'],
+            $payload['bank_eft_code'],
+            $payload['swift_code']
+        );
     } else {
-        $employee->photo = $request->get('photo');
-    }
-
-    if ($request->hasFile('signature')) {
-        $file = $request->file('signature');
-        $name = time() . '-' . $file->getClientOriginalName();
-        $file = $file->move('public/uploads/employees/signature/', $name);
-        $employee->signature = $name;
-    } else {
-        $employee->signature = $request->get('sign');
-    }
-
-    $employee->personal_file_number = $request->get('personal_file_number');
-    $employee->first_name = $request->get('fname');
-    $employee->last_name = $request->get('lname');
-    $employee->middle_name = $request->get('mname');
-    $employee->identity_number = $request->get('identity_number');
-    $employee->passport_number = $request->get('passport_number') ?? null;
-    $employee->pin = $request->get('pin') ?? null;
-    $employee->social_security_number = $request->get('social_security_number') ?? null;
-    $employee->hospital_insurance_number = $request->get('hospital_insurance_number') ?? null;
-    $employee->work_permit_number = $request->get('work_permit_number') ?? null;
-    $employee->job_title = $request->get('jtitle');
-    $employee->education_type_id = $request->get('education') ?? null;
-    $employee->basic_pay = str_replace(',', '', $request->get('pay'));
-    $employee->gender = $request->get('gender');
-    $employee->marital_status = $request->get('status');
-    $employee->yob = $request->get('dob');
-    $employee->citizenship_id = $request->get('citizenship') ?? null;
-    $employee->mode_of_payment = $request->get('modep');
-    $employee->bank_account_number = $request->get('bank_account_number') ?? null;
-    $employee->bank_eft_code = $request->get('bank_eft_code') ?? null;
-    $employee->swift_code = $request->get('swift_code') ?? null;
-    $employee->email_office = $request->get('email_office') ?? null;
-    $employee->email_personal = $request->get('email_personal') ?? null;
-    $employee->telephone_mobile = $request->get('telephone_mobile') ?? null;
-    $employee->postal_address = $request->get('address');
-    $employee->postal_zip = $request->get('zip');
-    $employee->date_joined = date('Y-m-d', strtotime($request->get('djoined')));
-    $employee->bank_id = $request->get('bank_id') ?? null;
-    $employee->bank_branch_id = $request->get('bbranch_id') ?? null;
-    $employee->branch_id = $request->get('branch_id') ?? null;
-    $employee->department_id = $request->get('department_id') ?? null;
-    $employee->job_group_id = $request->get('jgroup_id') ?? null;
-    $employee->type_id = $request->get('type_id') ?? null;
-    $employee->income_tax_applicable = $request->get('i_tax') ? '1' : '0';
-    $employee->income_tax_relief_applicable = $request->get('i_tax_relief') ? '1' : '0';
-    $employee->hospital_insurance_applicable = $request->get('a_nhif') ? '1' : '0';
-    $employee->social_security_applicable = $request->get('a_nssf') ? '1' : '0';
-    $employee->custom_field1 = $request->get('omode');
-    $employee->organization_id = Auth::user()->organization_id;
-    $employee->start_date = $request->get('startdate');
-    $employee->end_date = $request->get('enddate');
-    $employee->in_employment = $request->get('active') ? 'Y' : 'N';
-    $employee->confirmed = $request->get('confirmed') ? 'Y' : 'N';
-
-    $employee->update();
-
-    Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'update', 'updated: ' . $employee->personal_file_number . '-' . $employee->first_name . ' ' . $employee->last_name);
-
-    $insertedId = $employee->id;
-    Nextofkin::where('employee_id', $id)->delete();
-    if (isset($request->get('kin_first_name')[0])) {
-        for ($i = 0; $i < count($request->get('kin_first_name')); $i++) {
-            if (($request->get('kin_first_name')[$i] != '' || $request->get('kin_first_name')[$i] != null) && ($request->get('kin_last_name')[$i] != '' || $request->get('kin_last_name')[$i] != null)) {
-                $kin = new Nextofkin;
-                $kin->employee_id = $insertedId;
-                $kin->kin_name = $request->get('kin_first_name')[$i] . ' ' . $request->get('kin_last_name')[$i] . ' ' . $request->get('kin_middle_name')[$i];
-                $kin->relation = $request->get('relationship')[$i];
-                $kin->contact = $request->get('contact')[$i];
-                $kin->id_number = $request->get('id_number')[$i];
-                $kin->save();
-                Audit::logaudit('NextofKins', 'create', 'created: ' . $request->get('kin_first_name')[$i] . ' for ' . Employee::getEmployeeName($insertedId));
-            }
+        // When Bank is selected, ensure branch id exists — provide clearer feedback
+        if (empty($payload['bank_branch_id'])) {
+            return redirect()->back()
+                ->withErrors(['bank_branch_id' => 'Bank branch is required when payment mode is Bank.'])
+                ->withInput();
         }
     }
 
-    Document::where('employee_id', $id)->delete();
-    $files = $request->file('path');
-    $j = 0;
-    if ($files === null) {
-        // No action
-    } else {
-        foreach ($files as $file) {
-            if ($request->get('doc_name')[$j] != null || $request->get('doc_name')[$j] != '') {
-                $document = new Document;
-                $document->employee_id = $id;
-                if ($file) {
-                    $name = time() . '-' . $file->getClientOriginalName();
-                    $file->storeAs('uploads/employees/documents', $name, 'public');
-                    $extension = pathinfo($name, PATHINFO_EXTENSION);
-                    $document->document_path = $name;
-                    $document->document_name = $request->get('doc_name')[$j] . '.' . $extension;
-                } else {
-                    $name = $request->get('curpath')[$j];
-                    $extension = pathinfo($name, PATHINFO_EXTENSION);
-                    $document->document_path = $name;
-                    $document->document_name = $request->get('doc_name')[$j] . '.' . $extension;
-                }
-                $document->description = $request->get('description')[$j];
-                $document->from_date = $request->get('fdate')[$j];
-                $document->expiry_date = $request->get('edate')[$j];
-                $document->save();
-                Audit::logaudit(date('Y-m-d'), Auth::user()->name, 'create', 'created: ' . $request->get('doc_name')[$j] . ' for ' . Employee::getEmployeeName($id));
-                $j++;
-            }
-        }
-    }
-
-    if (Auth::user()->user_type == 'employee') {
-        return Redirect::to('dashboard');
-    } else {
-        return Redirect::route('employees.index')->withFlashMessage('Employee successfully updated!');
+    try {
+        $employee->update(array_filter($payload, function ($v) { return $v !== null || $v === 0 || $v === '0'; }));
+        Audit::logaudit(now(), Auth::user()->username, 'update', 'Updated employee ID '.$employee->id);
+        return redirect()->back()->with('flash_message', 'Employee updated successfully!');
+    } catch (\Exception $e) {
+        Log::error('Employee update failed (ID '.$id.'): '.$e->getMessage());
+        return redirect()->back()->with('error', 'Failed to update employee: '.$e->getMessage());
     }
 }
 }

@@ -1,405 +1,387 @@
 @extends('layouts.main')
-
-{{--{{HTML::script('') }}--}}
-
-
-<?php
-$organization = App\Models\Organization::find(Auth::user()->organization_id);
-
-$string = $organization->name;
-
-function initials($str, $pfn)
-{
-    $ret = '';
-    foreach (explode(' ', $str) as $word) {
-        if ($word == null) {
-            $ret .= strtoupper($str[0]);
-        } else {
-            $ret .= strtoupper($word[0]);
-        }
-    }
-    return $ret . '.' . ($pfn + 1);
-}
-
-?>
-
-
-<style>
-    #imagePreview {
-        width: 180px;
-        height: 180px;
-        background-position: center center;
-        background-size: cover;
-        background-image: url("{{asset('/public/uploads/employees/photo/default_photo.png') }}");
-        -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, .3);
-        display: inline-block;
-    }
-
-    #signPreview {
-        width: 180px;
-        height: 100px;
-        background-position: center center;
-        background-size: cover;
-        -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, .3);
-        background-image: url("{{asset('/public/uploads/employees/signature/sign_av.jpg') }}");
-        display: inline-block;
-    }
-</style>
-
-<style>
-
-    #ncontainer table {
-        border-collapse: collapse;
-        border-radius: 25px;
-        width: 500px;
-    }
-
-    table, td, th {
-        border: 1px solid #00BB64;
-    }
-
-    #ncontainer input[type=checkbox] {
-        height: 30px;
-        width: 10px;
-        border: 1px solid #fff;
-    }
-
-    tr, #ncontainer input, #ncontainer textarea, #fdate, #edate {
-        height: 30px;
-        width: 150px;
-        border: 1px solid #fff;
-    }
-
-    #ncontainer textarea {
-        height: 50px;
-        width: 150px;
-        border: 1px solid #fff;
-    }
-
-    #dcontainer #fdate, #edate {
-        height: 30px;
-        width: 180px;
-        border: 1px solid #fff;
-        background: #EEE
-    }
-
-    #ncontainer input:focus, #dcontainer input#fdate:focus, #dcontainer input#edate:focus, #ncontainer textarea:focus {
-        border: 1px solid yellow;
-    }
-
-    .space {
-        margin-bottom: 2px;
-    }
-
-    #ncontainer {
-        margin-left: 0px;
-    }
-
-    .but {
-        width: 270px;
-        background: #00BB64;
-        border: 1px solid #00BB64;
-        height: 40px;
-        border-radius: 3px;
-        color: white;
-        margin-top: 10px;
-        margin: 0px 0px 0px 290px;
-    }
-</style>
-
-<style>
-
-    #dcontainer table {
-        border-collapse: collapse;
-        border-radius: 25px;
-        width: 500px;
-    }
-
-    table, td, th {
-        border: 1px solid #00BB64;
-    }
-
-    #dcontainer input[type=checkbox] {
-        height: 30px;
-        width: 10px;
-        border: 1px solid #fff;
-    }
-
-    tr, #dcontainer input, #dcontainer textarea {
-        height: 30px;
-        width: 180px;
-        border: 1px solid #fff;
-    }
-
-    \
-    #f {
-        width: 200px;
-    }
-
-    #dcontainer textarea {
-        height: 50px;
-        width: 100px;
-        border: 1px solid #fff;
-    }
-
-    #dcontainer input:focus, #dcontainer input:focus {
-        border: 1px solid yellow;
-    }
-
-    .space {
-        margin-bottom: 2px;
-    }
-
-    #dcontainer {
-        margin-left: 0px;
-    }
-
-    .but {
-        width: 270px;
-        background: #00BB64;
-        border: 1px solid #00BB64;
-        height: 40px;
-        border-radius: 3px;
-        color: white;
-        margin-top: 10px;
-        margin: 0px 0px 0px 290px;
-    }
-</style>
-
-<style>
-    label, input#cname, input#ename {
-        display: block;
-    }
-
-    input.text {
-        margin-bottom: 12px;
-        width: 95%;
-        padding: .4em;
-    }
-
-    fieldset {
-        padding: 0;
-        border: 0;
-        margin-top: 25px;
-    }
-
-    h1 {
-        font-size: 1.2em;
-        margin: .6em 0;
-    }
-
-    div#users-contain {
-        width: 350px;
-        margin: 20px 0;
-    }
-
-    div#users-contain table {
-        margin: 1em 0;
-        border-collapse: collapse;
-        width: 100%;
-    }
-
-    div#users-contain table td, div#users-contain table th {
-        border: 1px solid #eee;
-        padding: .6em 10px;
-        text-align: left;
-    }
-
-    .ui-dialog .ui-state-error {
-        padding: .3em;
-    }
-
-    .validateTips, .validateTips1, .validateTips2, .validateTips3, .validateTips4, .validateTips5, .validateTips6, .validateTips7, .validateTips8, .validateTips9 {
-        border: 1px solid transparent;
-        padding: 0.3em;
-    }
-
-    .ui-dialog {
-        position: fixed;
-        margin-bottom: 850px;
-    }
-
-
-    .ui-dialog-titlebar-close {
-        background: url("{{ URL::asset('jquery-ui-1.11.4.custom/images/ui-icons_888888_256x240.png') }}") repeat scroll -93px -128px rgba(0, 0, 0, 0);
-        border: medium none;
-    }
-
-    .ui-dialog-titlebar-close:hover {
-        background: url("{{ URL::asset('jquery-ui-1.11.4.custom/images/ui-icons_222222_256x240.png') }}") repeat scroll -93px -128px rgba(0, 0, 0, 0);
-    }
-
-</style>
 @section('xara_cbs')
     @include('partials.breadcrumbs')
-    <link rel="stylesheet" href="{{asset('jquery-ui-1.11.4.custom/jquery-ui.css')}}">
+    
+    <link rel="stylesheet" href="{{ asset('jquery-ui-1.11.4.custom/jquery-ui.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="{{ asset('bt-datetimepicker/bootstrap-datetimepicker.min.css') }}">
+    
+    <style>
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e3e6f0;
+        }
+        
+        .page-title {
+            color: #5a5c69;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .form-section-title {
+            color: #4e73df;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e3e6f0;
+        }
+        
+        .time-input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .time-input-group .row {
+            margin: 0 -5px;
+        }
+        
+        .time-input-group .col-md-6 {
+            padding: 0 5px;
+        }
+        
+        .time-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .day-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #e3e6f0;
+            transition: all 0.3s ease;
+        }
+        
+        .day-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: #4e73df;
+        }
+        
+        .day-header {
+            font-weight: 600;
+            color: #4e73df;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .day-header i {
+            margin-right: 8px;
+        }
+        
+        .btn-primary {
+            background-color: #4e73df;
+            border-color: #4e73df;
+            padding: 10px 25px;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2e59d9;
+            border-color: #2e59d9;
+        }
+        
+        .alert {
+            border-radius: 4px;
+            border: none;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .time-input {
+            position: relative;
+        }
+        
+        .time-input .form-control {
+            padding-left: 35px;
+        }
+        
+        .time-input i {
+            position: absolute;
+            left: 12px;
+            top: 10px;
+            color: #6c757d;
+        }
+        
+        @media (max-width: 768px) {
+            .day-card {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+
     <div class="pcoded-inner-content">
         <div class="main-body">
             <div class="page-wrapper">
                 <div class="page-body">
                     <div class="row">
                         <div class="col-lg-12">
-                            <h3>New Shift
-                            </h3>
-                            <hr>
-                        </div>
-                        <div class="col-sm-12">
                             <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-business-time mr-2"></i>Create New Work Shift
+                                    </h5>
+                                </div>
+                                
                                 <div class="card-body">
-                                    <form method="POST" action="{{{ URL::to('timesheet/work_shift/save') }}}"
-                                          accept-charset="UTF-8">
-                                        @csrf
-                                        @if (count($errors) > 0)
-                                            <div class="alert alert-danger">
+                                    <!-- Error Messages -->
+                                    @if (count($errors) > 0)
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            <i class="fas fa-exclamation-circle mr-2"></i>
+                                            <strong>Please fix the following errors:</strong>
+                                            <ul class="mb-0 mt-2">
                                                 @foreach ($errors as $error)
-                                                    {{ $error }}<br>
+                                                    <li>{{ $error }}</li>
                                                 @endforeach
-                                            </div>
-                                        @endif
-                                        <div class="tab-content">
-                                            <div class="col-lg-6">
-                                                <div class="form-group">
-                                                    <label for="username">Shift <span style="color:red">*</span></label>
-                                                    <input class="form-control" placeholder="Shift Name" type="text"
-                                                           name="shift_name"
-                                                           id="shift_name" value="">
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="form-group">
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <div class="form-group">
-                                                    <label for="username">Monday</label>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="In Time"
-                                                                   type="text" name="monday_in">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="Out Time"
-                                                                   type="text"
-                                                                   name="monday_out">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4">
-
-                                                <div class="form-group">
-                                                    <label for="username">Tuesday </label>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="In Time"
-                                                                   type="text"
-                                                                   name="tuesday_in">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="Out Time"
-                                                                   type="text"
-                                                                   name="tuesday_out">
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4">
-
-                                                <div class="form-group">
-                                                    <label for="username">Wednesday </label>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="In Time"
-                                                                   type="text"
-                                                                   name="wednesday_in">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="Out Time"
-                                                                   name="wednesday_out">
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-                                            <div class="col-lg-4">
-
-                                                <div class="form-group">
-                                                    <label for="username">Thursday</label>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="In Time"
-                                                                   type="text"
-                                                                   name="thursday_in">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="Out Time"
-                                                                   type="text"
-                                                                   name="thursday_out">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <div class="form-group">
-                                                    <label for="username">Friday </label>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="In Time"
-                                                                   type="text" name="friday_in">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="Out Time"
-                                                                   type="text"
-                                                                   name="friday_out">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <div class="form-group">
-                                                    <label for="username">Saturday </label>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="In Time"
-                                                                   type="text"
-                                                                   name="saturday_in">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="Out Time"
-                                                                   type="text" name="saturday_out">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <div class="form-group">
-                                                    <label for="username">Sunday </label>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="In Time"
-                                                                   type="text" name="sunday_in">
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <input class="form-control time" placeholder="Out Time"
-                                                                   type="text" name="sunday_out">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            </ul>
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    @endif
+                                    
+                                    <form method="POST" action="{{ URL::to('timesheet/work_shift/save') }}" accept-charset="UTF-8">
+                                        @csrf
+                                        
+                                        <!-- Shift Information Section -->
+                                        <div class="form-section">
+                                            <h6 class="form-section-title">
+                                                <i class="fas fa-info-circle mr-2"></i>Shift Information
+                                            </h6>
+                                            
                                             <div class="row">
-                                                <div class="col-lg-12">
-                                                    <h3>
-                                                        <button style="margin-left:620px" type="submit"
-                                                                class="btn btn-primary btn-sm">Create
-                                                            Shift
-                                                        </button>
-                                                    </h3>
-                                                    <hr>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label for="shift_name">Shift Name <span class="text-danger">*</span></label>
+                                                        <input class="form-control" placeholder="Enter shift name (e.g., Morning Shift, Night Shift)" 
+                                                               type="text" name="shift_name" id="shift_name" value="{{ old('shift_name') }}" required>
+                                                        <small class="form-text text-muted">Give your shift a descriptive name</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label>Quick Actions</label>
+                                                        <div class="d-flex">
+                                                            <button type="button" class="btn btn-outline-secondary btn-sm mr-2" onclick="setStandardShift('morning')">
+                                                                <i class="fas fa-sun mr-1"></i>Morning
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline-secondary btn-sm mr-2" onclick="setStandardShift('evening')">
+                                                                <i class="fas fa-moon mr-1"></i>Evening
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setStandardShift('night')">
+                                                                <i class="fas fa-star mr-1"></i>Night
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                        
+                                        <!-- Shift Timing Section -->
+                                        <div class="form-section">
+                                            <h6 class="form-section-title">
+                                                <i class="fas fa-clock mr-2"></i>Shift Timings
+                                            </h6>
+                                            
+                                            <div class="row">
+                                                <!-- Monday -->
+                                                <div class="col-lg-4 col-md-6">
+                                                    <div class="day-card">
+                                                        <div class="day-header">
+                                                            <i class="fas fa-calendar-day"></i>Monday
+                                                        </div>
+                                                        <div class="time-input-group">
+                                                            <span class="time-label">In Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-in-alt"></i>
+                                                                <input class="form-control time" placeholder="09:00 AM" 
+                                                                       type="text" name="monday_in" value="{{ old('monday_in') }}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="time-input-group mt-2">
+                                                            <span class="time-label">Out Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-out-alt"></i>
+                                                                <input class="form-control time" placeholder="05:00 PM" 
+                                                                       type="text" name="monday_out" value="{{ old('monday_out') }}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Tuesday -->
+                                                <div class="col-lg-4 col-md-6">
+                                                    <div class="day-card">
+                                                        <div class="day-header">
+                                                            <i class="fas fa-calendar-day"></i>Tuesday
+                                                        </div>
+                                                        <div class="time-input-group">
+                                                            <span class="time-label">In Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-in-alt"></i>
+                                                                <input class="form-control time" placeholder="09:00 AM" 
+                                                                       type="text" name="tuesday_in" value="{{ old('tuesday_in') }}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="time-input-group mt-2">
+                                                            <span class="time-label">Out Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-out-alt"></i>
+                                                                <input class="form-control time" placeholder="05:00 PM" 
+                                                                       type="text" name="tuesday_out" value="{{ old('tuesday_out') }}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Wednesday -->
+                                                <div class="col-lg-4 col-md-6">
+                                                    <div class="day-card">
+                                                        <div class="day-header">
+                                                            <i class="fas fa-calendar-day"></i>Wednesday
+                                                        </div>
+                                                        <div class="time-input-group">
+                                                            <span class="time-label">In Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-in-alt"></i>
+                                                                <input class="form-control time" placeholder="09:00 AM" 
+                                                                       type="text" name="wednesday_in" value="{{ old('wednesday_in') }}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="time-input-group mt-2">
+                                                            <span class="time-label">Out Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-out-alt"></i>
+                                                                <input class="form-control time" placeholder="05:00 PM" 
+                                                                       type="text" name="wednesday_out" value="{{ old('wednesday_out') }}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Thursday -->
+                                                <div class="col-lg-4 col-md-6">
+                                                    <div class="day-card">
+                                                        <div class="day-header">
+                                                            <i class="fas fa-calendar-day"></i>Thursday
+                                                        </div>
+                                                        <div class="time-input-group">
+                                                            <span class="time-label">In Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-in-alt"></i>
+                                                                <input class="form-control time" placeholder="09:00 AM" 
+                                                                       type="text" name="thursday_in" value="{{ old('thursday_in') }}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="time-input-group mt-2">
+                                                            <span class="time-label">Out Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-out-alt"></i>
+                                                                <input class="form-control time" placeholder="05:00 PM" 
+                                                                       type="text" name="thursday_out" value="{{ old('thursday_out') }}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Friday -->
+                                                <div class="col-lg-4 col-md-6">
+                                                    <div class="day-card">
+                                                        <div class="day-header">
+                                                            <i class="fas fa-calendar-day"></i>Friday
+                                                        </div>
+                                                        <div class="time-input-group">
+                                                            <span class="time-label">In Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-in-alt"></i>
+                                                                <input class="form-control time" placeholder="09:00 AM" 
+                                                                       type="text" name="friday_in" value="{{ old('friday_in') }}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="time-input-group mt-2">
+                                                            <span class="time-label">Out Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-out-alt"></i>
+                                                                <input class="form-control time" placeholder="05:00 PM" 
+                                                                       type="text" name="friday_out" value="{{ old('friday_out') }}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Saturday -->
+                                                <div class="col-lg-4 col-md-6">
+                                                    <div class="day-card">
+                                                        <div class="day-header">
+                                                            <i class="fas fa-calendar-day"></i>Saturday
+                                                        </div>
+                                                        <div class="time-input-group">
+                                                            <span class="time-label">In Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-in-alt"></i>
+                                                                <input class="form-control time" placeholder="09:00 AM" 
+                                                                       type="text" name="saturday_in" value="{{ old('saturday_in') }}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="time-input-group mt-2">
+                                                            <span class="time-label">Out Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-out-alt"></i>
+                                                                <input class="form-control time" placeholder="05:00 PM" 
+                                                                       type="text" name="saturday_out" value="{{ old('saturday_out') }}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Sunday -->
+                                                <div class="col-lg-4 col-md-6">
+                                                    <div class="day-card">
+                                                        <div class="day-header">
+                                                            <i class="fas fa-calendar-day"></i>Sunday
+                                                        </div>
+                                                        <div class="time-input-group">
+                                                            <span class="time-label">In Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-in-alt"></i>
+                                                                <input class="form-control time" placeholder="09:00 AM" 
+                                                                       type="text" name="sunday_in" value="{{ old('sunday_in') }}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="time-input-group mt-2">
+                                                            <span class="time-label">Out Time</span>
+                                                            <div class="time-input">
+                                                                <i class="fas fa-sign-out-alt"></i>
+                                                                <input class="form-control time" placeholder="05:00 PM" 
+                                                                       type="text" name="sunday_out" value="{{ old('sunday_out') }}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Form Actions -->
+                                        <div class="form-actions text-right mt-4">
+                                            <a href="{{ URL::previous() }}" class="btn btn-secondary mr-2">
+                                                <i class="fas fa-arrow-left mr-1"></i>Cancel
+                                            </a>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save mr-1"></i>Create Shift
+                                            </button>
                                         </div>
                                     </form>
                                 </div>
@@ -410,104 +392,70 @@ function initials($str, $pfn)
             </div>
         </div>
     </div>
-    <script src="{{asset('media/jquery-1.8.0.min.js')}}"></script>
-    <script src="{{asset('jquery-ui-1.11.4.custom/jquery-ui.js')}}"></script>
-    <script src="{{asset('bt-datetimepicker/moment.min.js')}}"></script>
-    <script src="{{asset('bt-datetimepicker/bootstrap-datetimepicker.min.js')}}"></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#contract').hide();
 
-            $('#newmode').hide();
-            $('#casual').hide();
-            $('#basic_sal').show();
-
-            $("#modep").on("change", function () {
-                if ($(this).val() == 'Others') {
-                    $('#newmode').show();
-                } else {
-                    $('#newmode').hide();
-                    $('#omode').val('');
-                }
-            });
-
-            $("#type_id").on("change", function () {
-                if ($(this).val() == 2) {
-                    $('#contract').show();
-                } else if ($(this).val() == 3) {
-                    $('#casual').show();
-                    $('#basic_sal').hide();
-                } else {
-                    $('#contract').hide();
-                    $('#startdate').val('');
-                    $('#enddate').val('');
-                }
-            });
-
-            $("#uploadFile").on("change", function () {
-                var files = !!this.files ? this.files : [];
-                if (!files.length || !window.FileReader) return; // no file selected, or no FileReader support
-
-                if (/^image/.test(files[0].type)) { // only image file
-                    var reader = new FileReader(); // instance of the FileReader
-                    reader.readAsDataURL(files[0]); // read the local file
-
-                    reader.onloadend = function () { // set image data as background of div
-                        $("#imagePreview").css("background-image", "url(" + this.result + ")");
-                    }
-                }
-            });
-
-            $('#bank_id').change(function () {
-                $.get("{{ url('api/dropdown')}}",
-                    {option: $(this).val()},
-                    function (data) {
-                        $('#bbranch_id').empty();
-                        $('#bbranch_id').append("<option>----------------select Bank Branch--------------------</option>");
-                        $('#bbranch_id').append("<option value='cnew'>Create New</option>");
-                        $.each(data, function (key, element) {
-                            $('#bbranch_id').append("<option value='" + key + "'>" + element + "</option>");
-                        });
-                    });
-            });
-        });
-    </script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $("#signFile").on("change", function () {
-                var files = !!this.files ? this.files : [];
-                if (!files.length || !window.FileReader) return; // no file selected, or no FileReader support
-                if (/^image/.test(files[0].type)) { // only image file
-                    var reader = new FileReader(); // instance of the FileReader
-                    reader.readAsDataURL(files[0]); // read the local file
-                    reader.onloadend = function () { // set image data as background of div
-                        $("#signPreview").css("background-image", "url(" + this.result + ")");
-                    }
-                }
-            });
-        });
-    </script>
+    <!-- JavaScript Libraries -->
+    <script src="{{ asset('media/jquery-1.8.0.min.js') }}"></script>
+    <script src="{{ asset('jquery-ui-1.11.4.custom/jquery-ui.js') }}"></script>
+    <script src="{{ asset('bt-datetimepicker/moment.min.js') }}"></script>
+    <script src="{{ asset('bt-datetimepicker/bootstrap-datetimepicker.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    
     <script type="text/javascript">
         (function ($) {
             "use strict";
+            
+            // Initialize time pickers
             $('.time').datetimepicker({
-                format: 'LT'
+                format: 'LT',
+                icons: {
+                    time: 'fas fa-clock',
+                    date: 'fas fa-calendar',
+                    up: 'fas fa-arrow-up',
+                    down: 'fas fa-arrow-down',
+                    previous: 'fas fa-chevron-left',
+                    next: 'fas fa-chevron-right',
+                    today: 'fas fa-calendar-check',
+                    clear: 'fas fa-trash',
+                    close: 'fas fa-times'
+                }
             });
-
-        })(jQuery)
+            
+            // Set standard shift timings
+            function setStandardShift(type) {
+                let inTime, outTime;
+                
+                switch(type) {
+                    case 'morning':
+                        inTime = '08:00 AM';
+                        outTime = '05:00 PM';
+                        $('#shift_name').val('Morning Shift');
+                        break;
+                    case 'evening':
+                        inTime = '02:00 PM';
+                        outTime = '11:00 PM';
+                        $('#shift_name').val('Evening Shift');
+                        break;
+                    case 'night':
+                        inTime = '10:00 PM';
+                        outTime = '07:00 AM';
+                        $('#shift_name').val('Night Shift');
+                        break;
+                }
+                
+                // Set times for all days
+                $('input[name$="_in"]').val(inTime);
+                $('input[name$="_out"]').val(outTime);
+                
+                toastr.success(`${type.charAt(0).toUpperCase() + type.slice(1)} shift timings applied`);
+            }
+            
+            // Auto-dismiss alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeTo(500, 0).slideUp(500, function(){
+                    $(this).remove(); 
+                });
+            }, 5000);
+            
+        })(jQuery);
     </script>
-    <script>
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            var devices = await navigator.usb;
-            console.log('Found Device', devices)
-            // devices.forEach(device => {
-            //     // Add |device| to the UI.
-            //     console.log('Found Device',device)
-            // });
-        });
-
-
-    </script>
-
 @stop

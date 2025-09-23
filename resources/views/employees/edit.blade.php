@@ -675,31 +675,13 @@
 
                                                         <div class="form-group">
                                                             <label for="username">Job Title</label>
-                                                            <select name="job_title" id="job_title" class="form-control">
-                                                                <option>{{{ $employee->job_title }}}</option>
-                                                                <option value="cnew">Create New</option>
-                                                                @foreach($jobtitles as $jobtitle)
-                                                                    <option
-                                                                        value="{{ $jobtitle->id }}"> {{ $jobtitle->job_title }}</option>
-                                                                @endforeach
-                                                            </select>
+                                                            <input class="form-control" placeholder="" type="text"
+                                                                   name="jtitle" id="jtitle"
+                                                                   value="{{{ $employee->job_title }}}">
                                                         </div>
 
                                                         {{-- TODO: Check proper way of using policies--}}
                                                         @can('manager_payroll')
-                                                            <div class="form-group">
-
-                                                                <label for="username">Basic Salary <span
-                                                                        style="color:red">*</span></label>
-                                                                <div class="input-group">
-                                                            <span
-                                                                class="input-group-addon">{{$currency->shortname}}</span>
-                                                                    <input class="form-control" placeholder="" type="text"
-                                                                           name="pay" id="pay"
-                                                                           @if($employee->basic_pay==='') value="{{$employee->basic_pay}}"
-                                                                           @else value="{{$employee->basic_pay}}" @endif>
-                                                                </div>
-                                                            </div>
                                                         
                                                             @if($employee->job_group_id != 4)
                                                                 <div class="form-group">
@@ -1011,59 +993,6 @@
             modeSelect.addEventListener("change", showHideFields);
             showHideFields(); // run once when the page loads
         });
-        $(function () {
-        // Handle bank selection change
-        $('#bank_id').change(function () {
-            var bankId = $(this).val();
-            
-            if (bankId === "cnew") {
-                // Existing logic: Open dialog to create new bank
-                dialog.dialog("open");
-            } else if (bankId) {
-                // Fetch branches dynamically via API
-                $.ajax({
-                    url: '/api/getBankBranches/' + bankId,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        $('#bbranch_id').empty(); // Clear existing options
-                        $('#bbranch_id').append('<option></option>'); // Blank option
-                        $('#bbranch_id').append('<option value="cnew">Create New</option>'); // Create New option
-                        
-                        // Append fetched branches
-                        $.each(data, function (index, branch) {
-                            $('#bbranch_id').append(
-                                '<option value="' + branch.id + '">' + 
-                                branch.bank_branch_name + ' (' + (branch.branch_code || '') + ')</option>'
-                            );
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error fetching branches:', error);
-                        alert('Failed to load branches. Please try again.');
-                    }
-                });
-            } else {
-                // If no bank selected, reset branches
-                $('#bbranch_id').empty();
-                $('#bbranch_id').append('<option></option><option value="cnew">Create New</option>');
-            }
-    });
-
-    // Your existing branch "Create New" logic (already present, included for context)
-    $('#bbranch_id').change(function () {
-        if ($(this).val() == "cnew") {
-            $("#bid").val($("#bank_id").val());
-            dialog.dialog("open"); // Assuming this is the branch creation dialog
-        }
-    });
-
-    // Optional: Trigger initial load if a bank is pre-selected (useful for edit view)
-    if ($('#bank_id').val()) {
-        $('#bank_id').trigger('change');
-    }
-});
-
     </script>
 
     <script>
@@ -1192,43 +1121,25 @@
             }
             if (id === 5) {
                 console.log(id);
-                var modep = $("#modep").val().trim();
-                var valid = false;
-
-                if (modep === "Bank") {
-                    var bankId = $("#bank_id").val().trim();
-                    var bbranchId = $("#bbranch_id").val().trim();
-                    var bank_account_number = $("#bank_account_number").val().trim();
-                    var bank_eft_code = $("#bank_eft_code").val().trim();
-                    var swift_code = $("#swift_code").val().trim();
-
-                    valid = bankId && bbranchId && bank_account_number && bank_eft_code && swift_code;
-                } 
-                else if (modep === "Mpesa") {
-                    var mpesa_number = $("#mpesa_number").val().trim();
-                    valid = mpesa_number.length !== 0;
-                } 
-                else if (modep === "Cash") {
-                    // Cash might only need the mode selected
-                    valid = true;
-                } 
-                else if (modep === "Cheque") {
-                    // If you add cheque fields, validate them here
-                    valid = true;
-                } 
-                else if (modep === "Others") {
-                    var omode = $("#omode").val().trim();
-                    valid = omode.length !== 0;
-                }
-
-                if (valid) {
+                var modep = $("#modep").val();
+                if (modep.length !== 0) {
                     $("#emptyErr21").fadeOut();
-                    // proceed to page4
+                    document.getElementById("contactBtn").disabled = false;
+                    document.getElementById("hrBtn").disabled = false;
+                    document.getElementById("company").disabled = false;
+                    document.getElementById("contact").disabled = true;
+                    document.getElementById("contact").disabled = true;
+                    document.getElementById("next").disabled = true;
+                    document.getElementById("docs").disabled = true;
                     $("#page4").fadeIn();
-                    $("#page1,#page2,#page3,#page5").hide();
+                    $("#page1").hide();
+                    $("#page2").hide();
+                    $("#page3").hide();
+                    $("#page5").hide();
                     document.getElementById('progressBtn').style.background = "#644ec5";
                     setInterval(Incrementer, 40);
                     var x = 0 + 42;
+
                     function Incrementer() {
                         x = x + 1;
                         if (x <= ((100 / 7) * 4)) {
@@ -1236,11 +1147,15 @@
                             document.getElementById('progressBtn').style.background = "#644ec5";
                         }
                     }
+
+                    //document.getElementById("progressBtn").innerHTML = '<i class="text-white fa fa-check fa-2x"></i>';
                 } else {
                     $("#emptyErr21").fadeIn();
+                    document.getElementById("contactBtn").disabled = false;
+                    document.getElementById("hrBtn").disabled = false;
+                    // document.getElementById("finish").disabled = true;
                 }
             }
-
             if (id === 6) {
                 console.log(id)
                 $("#page3").fadeIn();

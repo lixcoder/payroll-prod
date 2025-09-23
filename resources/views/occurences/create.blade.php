@@ -1,173 +1,158 @@
 @extends('layouts.main')
 @section('xara_cbs')
-    <link href="{{asset('jquery-ui-1.11.4.custom/jquery-ui.css')}}" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <style>
-        label, input {
-            display: block;
-        }
-
-        input.text {
-            margin-bottom: 12px;
-            width: 95%;
-            padding: .4em;
-        }
-
-        fieldset {
-            padding: 0;
-            border: 0;
-            margin-top: 25px;
-        }
-
-        h1 {
-            font-size: 1.2em;
-            margin: .6em 0;
-        }
-
-        div#users-contain {
-            width: 350px;
-            margin: 20px 0;
-        }
-
-        div#users-contain table {
-            margin: 1em 0;
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        div#users-contain table td, div#users-contain table th {
-            border: 1px solid #eee;
-            padding: .6em 10px;
-            text-align: left;
-        }
-
-        .ui-dialog .ui-state-error {
-            padding: .3em;
-        }
-
-        .validateTips {
-            border: 1px solid transparent;
-            padding: 0.3em;
-        }
-
-        /*.ui-dialog {*/
-        /*    position: fixed;*/
-        /*    margin-bottom: 950px;*/
-        /*}*/
-
-
-        .ui-dialog-titlebar-close {
-            background: url("{{ URL::asset('jquery-ui-1.11.4.custom/images/ui-icons_888888_256x240.png'); }}") repeat scroll -93px -128px rgba(0, 0, 0, 0);
-            border: medium none;
-        }
-
-        .ui-dialog-titlebar-close:hover {
-            background: url("{{ URL::asset('jquery-ui-1.11.4.custom/images/ui-icons_222222_256x240.png'); }}") repeat scroll -93px -128px rgba(0, 0, 0, 0);
-        }
-
-    </style>
     <div class="pcoded-inner-content">
         <div class="main-body">
             <div class="page-wrapper">
                 <div class="page-body">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <h3>New Occurrence</h3>
-                            <hr>
-                        </div>
                         <div class="col-sm-12">
                             <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0"><i class="feather icon-alert-triangle mr-2 text-primary"></i>New Occurrence</h5>
+                                            <small class="text-muted">Record employee occurrence or incident</small>
+                                        </div>
+                                        <div class="card-header-right">
+                                            <a href="{{ URL::to('occurences') }}" class="btn btn-secondary btn-sm">
+                                                <i class="feather icon-arrow-left mr-1"></i> Back to Occurrences
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="card-body">
-                                    @if ($errors)
-                                        @foreach ($errors->all() as $error)
-                                            <div class="alert alert-danger">
-                                                {{ $error }}<br>
-                                            </div>
-                                        @endforeach
+                                    @if ($errors->any())
+                                        <div class="alert alert-danger alert-dismissible fade show">
+                                            <button type="button" class="close" data-dismiss="alert">×</button>
+                                            <strong>Please fix the following errors:</strong>
+                                            <ul class="mb-0 mt-1">
+                                                @foreach ($errors->all() as $error)
+                                                    <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
                                     @endif
 
-                                    <div id="dialog-form" title="Create new occurence type">
-                                        <p class="validateTips">Please insert Occurence Type.</p>
-
-                                        <form>
-                                            <fieldset>
-                                                <label for="name">Name <span style="color:red">*</span></label>
-                                                <input type="text" name="name" id="name" value=""
-                                                       class="text ui-widget-content ui-corner-all">
-
-                                                <!-- Allow form submission with keyboard without duplicating the dialog button -->
-                                                <input type="submit" tabindex="-1"
-                                                       style="position:absolute; top:-1000px">
-                                            </fieldset>
-                                        </form>
-                                    </div>
-
-                                    <form method="POST" action="{{{ URL::to('occurences') }}}" accept-charset="UTF-8"
-                                          enctype="multipart/form-data">
-                                        @csrf
-                                        <fieldset>
-                                            <div class="form-group">
-                                                <label for="username">Employee <span style="color:red">*</span></label>
-                                                <select name="employee" class="form-control">
-                                                    <option></option>
-                                                    @foreach($employees as $employee)
-                                                        <option
-                                                            value="{{ $employee->id }}"> {{ $employee->first_name.' '.$employee->middle_name.' '.$employee->last_name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="username">Occurence Brief <span style="color:red">*</span>
-                                                </label>
-                                                <input class="form-control" placeholder="" type="text" name="brief"
-                                                       id="brief"
-                                                       value="{{{ old('brief') }}}">
-                                            </div>
-
-
-                                            <div class="form-group">
-                                                <label for="username">Occurence Type: <span
-                                                        style="color:red">*</span></label>
-                                                <select name="type" id="type" class="form-control">
-                                                    <option></option>
-                                                    <option value="cnew">Create New</option>
-                                                    @foreach($occurences as $occurence)
-                                                        <option
-                                                            value="{{ $occurence->id }}"> {{ $occurence->occurence_type }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="username">Occurence Narrative </label>
-                                                <textarea class="form-control"
-                                                          name="narrative">{{{ old('narrative') }}}</textarea>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="username">Attach Document</label><br>
-                                                <input class="img" placeholder="" type="file" name="path" id="path"
-                                                       value="{{{ old('path') }}}">
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="username">Occurence Date <span
-                                                        style="color:red">*</span></label>
-                                                <div class="right-inner-addon ">
-                                                    <i class="glyphicon glyphicon-calendar"></i>
-                                                    <input class="form-control occdate" readonly="readonly"
-                                                           placeholder="" type="text"
-                                                           name="date" id="date" value="{{{ old('date') }}}">
+                                    <!-- Occurrence Type Creation Modal -->
+                                    <div id="occurrence-modal" class="modal fade" tabindex="-1" role="dialog">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-primary text-white">
+                                                    <h5 class="modal-title"><i class="feather icon-plus mr-2"></i>Create New Occurrence Type</h5>
+                                                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="alert alert-info">
+                                                        <i class="feather icon-info mr-2"></i>Please enter a name for the new occurrence type
+                                                    </div>
+                                                    <form id="occurrence-form">
+                                                        <div class="form-group">
+                                                            <label for="occurrence-name" class="font-weight-bold">Occurrence Type Name <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control" id="occurrence-name" name="name" required placeholder="Enter occurrence type">
+                                                            <div class="invalid-feedback" id="occurrence-name-error"></div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                    <button type="button" class="btn btn-primary" id="create-occurrence-type">
+                                                        <i class="feather icon-check mr-1"></i> Create
+                                                    </button>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
 
-                                            <div class="form-actions form-group">
-
-                                                <button type="submit" class="btn btn-primary btn-sm">Create Occurence
-                                                </button>
+                                    <form method="POST" action="{{ URL::to('occurences') }}" accept-charset="UTF-8" enctype="multipart/form-data" class="modern-form">
+                                        @csrf
+                                        
+                                        <div class="form-section mb-4">
+                                            <h6 class="section-title bg-light p-3 border-bottom">
+                                                <i class="feather icon-user mr-2 text-primary"></i>Employee Information
+                                            </h6>
+                                            <div class="p-3">
+                                                <div class="form-group">
+                                                    <label for="employee" class="font-weight-bold">Employee <span class="text-danger">*</span></label>
+                                                    <select name="employee" id="employee" class="form-control select2" required>
+                                                        <option value="">Select Employee</option>
+                                                        @foreach($employees as $employee)
+                                                            <option value="{{ $employee->id }}" {{ old('employee') == $employee->id ? 'selected' : '' }}>
+                                                                {{ $employee->first_name.' '.$employee->middle_name.' '.$employee->last_name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                             </div>
+                                        </div>
 
-                                        </fieldset>
+                                        <div class="form-section mb-4">
+                                            <h6 class="section-title bg-light p-3 border-bottom">
+                                                <i class="feather icon-file-text mr-2 text-primary"></i>Occurrence Details
+                                            </h6>
+                                            <div class="p-3">
+                                                <div class="form-group">
+                                                    <label for="brief" class="font-weight-bold">Occurrence Brief <span class="text-danger">*</span></label>
+                                                    <input class="form-control" placeholder="Enter occurrence brief" type="text" name="brief" id="brief" value="{{ old('brief') }}" required>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="type" class="font-weight-bold">Occurrence Type <span class="text-danger">*</span></label>
+                                                    <select name="type" id="type" class="form-control select2" required>
+                                                        <option value="">Select Occurrence Type</option>
+                                                        <option value="cnew" {{ old('type') == 'cnew' ? 'selected' : '' }}>
+                                                            <i class="feather icon-plus mr-1"></i> Create New Type
+                                                        </option>
+                                                        @foreach($occurences as $occurence)
+                                                            <option value="{{ $occurence->id }}" {{ old('type') == $occurence->id ? 'selected' : '' }}>
+                                                                {{ $occurence->occurence_type }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="narrative" class="font-weight-bold">Occurrence Narrative</label>
+                                                    <textarea class="form-control" name="narrative" id="narrative" rows="3" placeholder="Describe the occurrence in detail">{{ old('narrative') }}</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-section mb-4">
+                                            <h6 class="section-title bg-light p-3 border-bottom">
+                                                <i class="feather icon-paperclip mr-2 text-primary"></i>Additional Information
+                                            </h6>
+                                            <div class="p-3">
+                                                <div class="form-group">
+                                                    <label for="path" class="font-weight-bold">Attach Document</label>
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" name="path" id="path">
+                                                        <label class="custom-file-label" for="path">Choose file...</label>
+                                                    </div>
+                                                    <small class="form-text text-muted">Upload supporting documents if available</small>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="date" class="font-weight-bold">Occurrence Date <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <input class="form-control datepicker" readonly type="text" name="date" id="date" value="{{ old('date') }}" required>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text"><i class="feather icon-calendar"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-actions text-right p-3 border-top">
+                                            <button type="reset" class="btn btn-outline-secondary mr-2">
+                                                <i class="feather icon-refresh-ccw mr-1"></i> Reset
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="feather icon-save mr-1"></i> Create Occurrence
+                                            </button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -177,141 +162,248 @@
             </div>
         </div>
     </div>
-    <script src="{{asset('media/jquery-1.8.0.min.js')}}"></script>
-    <script src="{{asset('jquery-ui-1.11.4.custom/jquery-ui.js')}}"></script>
-    <script src="{{asset('datepicker/js/bootstrap-datepicker.min.js')}}"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <style>
+        .modern-form {
+            background: #fff;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .form-section {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fff;
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-weight: 600;
+            margin: 0;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .select2-container--default .select2-selection--single {
+            height: 44px;
+            border: 1px solid #dce4ec;
+            border-radius: 6px;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 44px;
+            padding-left: 15px;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 42px;
+        }
+        
+        .form-control {
+            border: 1px solid #dce4ec;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            height: 44px;
+        }
+        
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        textarea.form-control {
+            height: auto;
+            resize: vertical;
+        }
+        
+        .custom-file-input:focus ~ .custom-file-label {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .input-group-text {
+            background: #f8f9fa;
+            border: 1px solid #dce4ec;
+            color: #2c3e50;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .datepicker {
+            z-index: 1000 !important;
+        }
+        
+        @media (max-width: 768px) {
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .card-header-right {
+                margin-top: 1rem;
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
     <script>
-        $(function () {
-            var dialog, form,
-
-                // From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
-                name = $("#name"),
-
-                allFields = $([]).add(name),
-                tips = $(".validateTips");
-
-            function updateTips(t) {
-                tips
-                    .text(t)
-                    .addClass("ui-state-highlight");
-                setTimeout(function () {
-                    tips.removeClass("ui-state-highlight", 1500);
-                }, 500);
-            }
-
-            function checkLength(o) {
-                if (o.val().length == 0) {
-                    o.addClass("ui-state-error");
-                    updateTips("Please insert occurence type!");
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-
-            function checkRegexp(o, regexp, n) {
-                if (!(regexp.test(o.val()))) {
-                    o.addClass("ui-state-error");
-                    updateTips(n);
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-
-            function addUser() {
-                var valid = true;
-                allFields.removeClass("ui-state-error");
-
-                valid = valid && checkLength(name);
-
-                valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for occurence type.");
-
-                if (valid) {
-
-                    /*displaydata();
-                    const reloadData={
-                        "_token": "{{csrf_token()}}"
-                    }
-                    function displaydata() {
-                        $.ajax({
-                            url: "{{URL::to('reloaddata')}}",
-                            type: "POST",
-                            async: false,
-                            data: reloadData,
-                            success: function (s) {
-                                var data = JSON.parse(s)
-                                //alert(data.id);
-                            }
-                        });
-                    }*/
-
-                    const createOccurence = {
-                        "name": document.getElementById('name').value,
-                        "_token": "{{csrf_token()}}"
-                    }
-                    $.ajax({
-                        url: "{{URL::to('createOccurence')}}",
-                        type: "POST",
-                        async: false,
-                        data: createOccurence,
-                        success: function (s) {
-                            $('#type').append($('<option>', {
-                                value: s,
-                                text: name.val(),
-                                selected: true
-                            }));
-                            toastr.success('Occurrence Has Been Created');
-
-                        }
-                    });
-
-                    dialog.dialog("close");
-                }
-                return valid;
-            }
-
-            dialog = $("#dialog-form").dialog({
-                autoOpen: false,
-                height: 250,
-                width: 350,
-                modal: true,
-                buttons: {
-                    "Create": addUser,
-                    Cancel: function () {
-                        dialog.dialog("close");
-                    }
-                },
-                close: function () {
-                    form[0].reset();
-                    allFields.removeClass("ui-state-error");
-                }
+        $(document).ready(function() {
+            // Initialize Select2
+            $('.select2').select2({
+                placeholder: "Select an option",
+                allowClear: true
+                width: '100%'
             });
-
-            form = dialog.find("form").on("submit", function (event) {
-                event.preventDefault();
-                addUser();
-            });
-
-            $('#type').change(function () {
-                if ($(this).val() == "cnew") {
-                    dialog.dialog("open");
-                }
-
-            });
-        });
-    </script>
-    <script type="text/javascript">
-        $(function () {
-
-            $('.occdate').datepicker({
+            
+            // Initialize datepicker
+            $('.datepicker').datepicker({
                 format: 'yyyy-mm-dd',
-                startDate: '-60y',
-                autoclose: true
+                autoclose: true,
+                todayHighlight: true,
+                endDate: new Date()
             });
+            
+            // Handle file input change
+            $('.custom-file-input').on('change', function() {
+                let fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').addClass("selected").html(fileName);
+            });
+            
+            // Handle occurrence type selection
+            $('#type').change(function() {
+                if ($(this).val() === 'cnew') {
+                    $('#occurrence-modal').modal('show');
+                    // Reset the select2 to blank after showing modal
+                    setTimeout(() => {
+                        $(this).val('').trigger('change');
+                    }, 300);
+                }
+            });
+            
+            // Create new occurrence type
+            $('#create-occurrence-type').on('click', function() {
+                const name = $('#occurrence-name').val().trim();
+                const errorDiv = $('#occurrence-name-error');
+                
+                if (!name) {
+                    errorDiv.text('Occurrence type name is required');
+                    $('#occurrence-name').addClass('is-invalid');
+                    return;
+                }
+                
+                $('#occurrence-name').removeClass('is-invalid');
+                
+                // AJAX request to create new occurrence type
+                $.ajax({
+                    url: "{{ URL::to('createOccurence') }}",
+                    type: "POST",
+                    data: {
+                        name: name,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    beforeSend: function() {
+                        $('#create-occurrence-type').prop('disabled', true).html('<i class="feather icon-loader mr-1"></i> Creating...');
+                    },
+                    success: function(response) {
+                        // Add new option to select
+                        const newOption = new Option(name, response, true, true);
+                        $('#type').append(newOption).trigger('change');
+                        
+                        // Close modal and reset form
+                        $('#occurrence-modal').modal('hide');
+                        $('#occurrence-name').val('');
+                        
+                        // Show success message
+                        toastr.success('Occurrence type created successfully!');
+                    },
+                    error: function(xhr) {
+                        errorDiv.text('Error creating occurrence type: ' + (xhr.responseJSON?.message || 'Unknown error'));
+                        $('#occurrence-name').addClass('is-invalid');
+                    },
+                    complete: function() {
+                        $('#create-occurrence-type').prop('disabled', false).html('<i class="feather icon-check mr-1"></i> Create');
+                    }
+                });
+            });
+            
+            // Reset modal when closed
+            $('#occurrence-modal').on('hidden.bs.modal', function() {
+                $('#occurrence-name').val('').removeClass('is-invalid');
+                $('#occurrence-name-error').text('');
+            });
+            
+            // Form validation
+            $('form').on('submit', function(e) {
+                let isValid = true;
+                
+                // Basic validation
+                $('#employee, #brief, #type, #date').each(function() {
+                    if (!$(this).val()) {
+                        $(this).addClass('is-invalid');
+                        isValid = false;
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    // Scroll to first error
+                    $('html, body').animate({
+                        scrollTop: $('.is-invalid').first().offset().top - 100
+                    }, 500);
+                }
+            });
+            
+            // Remove validation classes on input
+            $('input, select, textarea').on('input change', function() {
+                $(this).removeClass('is-invalid');
+            });
+            
+            // Initialize toastr
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                positionClass: "toast-top-right",
+                timeOut: 5000
+            };
         });
-
     </script>
-
 @stop

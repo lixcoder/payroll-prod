@@ -1,227 +1,172 @@
-<?php
-
-function asMoney($value)
-{
-    return number_format($value, 2);
-}
-
-?>
-
 @extends('layouts.main_hr')
-<style>
-    label, input {
-        display: block;
-    }
-
-    input.text {
-        margin-bottom: 12px;
-        width: 95%;
-        padding: .4em;
-    }
-
-    fieldset {
-        padding: 0;
-        border: 0;
-        margin-top: 25px;
-    }
-
-    h1 {
-        font-size: 1.2em;
-        margin: .6em 0;
-    }
-
-    div#users-contain {
-        width: 350px;
-        margin: 20px 0;
-    }
-
-    div#users-contain table {
-        margin: 1em 0;
-        border-collapse: collapse;
-        width: 100%;
-    }
-
-    div#users-contain table td, div#users-contain table th {
-        border: 1px solid #eee;
-        padding: .6em 10px;
-        text-align: left;
-    }
-
-    .ui-dialog .ui-state-error {
-        padding: .3em;
-    }
-
-    .validateTips {
-        border: 1px solid transparent;
-        padding: 0.3em;
-    }
-
-    .ui-dialog {
-        position: fixed;
-        margin-bottom: 950px;
-    }
-
-
-    .ui-dialog-titlebar-close {
-        background: url("{{ URL::asset('jquery-ui-1.11.4.custom/images/ui-icons_888888_256x240.png'); }}") repeat scroll -93px -128px rgba(0, 0, 0, 0);
-        border: medium none;
-    }
-
-    .ui-dialog-titlebar-close:hover {
-        background: url("{{ URL::asset('jquery-ui-1.11.4.custom/images/ui-icons_222222_256x240.png'); }}") repeat scroll -93px -128px rgba(0, 0, 0, 0);
-    }
-
-</style>
-<link rel="stylesheet" href="{{asset('jquery-ui-1.11.4.custom/jquery-ui.css')}}">
 @section('xara_cbs')
     <div class="pcoded-inner-content">
         <div class="main-body">
             <div class="page-wrapper">
                 <div class="page-body">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <h3>Update Employee Allowance</h3>
-                            <hr>
-                        </div>
-                        <div class="col-lg-12">
+                        <div class="col-sm-12">
                             <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0"><i class="feather icon-edit-2 mr-2 text-primary"></i>Update Employee Allowance</h5>
+                                            <small class="text-muted">Modify employee allowance details</small>
+                                        </div>
+                                        <a href="{{ URL::previous() }}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="feather icon-arrow-left"></i> Back
+                                        </a>
+                                    </div>
+                                </div>
                                 <div class="card-body">
                                     @if ($errors)
                                         @foreach ($errors->all() as $error)
-                                            <div class="alert alert-danger">
-                                                {{ $error }}<br>
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                {{ $error }}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
                                             </div>
                                         @endforeach
                                     @endif
-                                    <div id="dialog-form" title="Create new allowance type">
-                                        <p class="validateTips">Please insert Allowance Type.</p>
+                                    
+                                    @if(Session::has('flash_message'))
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            {{ Session::get('flash_message') }}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    @endif
 
+                                    <div id="dialog-form" title="Create new allowance type" style="display: none;">
+                                        <p class="validateTips">Please insert Allowance Type.</p>
                                         <form>
                                             <fieldset>
-                                                <label for="name">Name <span style="color:red">*</span></label>
-                                                <input type="text" name="name" id="name" value=""
-                                                       class="text ui-widget-content ui-corner-all">
-
-                                                <!-- Allow form submission with keyboard without duplicating the dialog button -->
-                                                <input type="submit" tabindex="-1"
-                                                       style="position:absolute; top:-1000px">
+                                                <div class="form-group">
+                                                    <label for="name">Name <span class="text-danger">*</span></label>
+                                                    <input type="text" name="name" id="name" value="" class="form-control" required>
+                                                </div>
+                                                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
                                             </fieldset>
                                         </form>
                                     </div>
 
-                                    <form method="POST"
-                                          action="{{{ URL::to('employee_allowances/update/'.$eallw->id) }}}"
-                                          accept-charset="UTF-8">
+                                    <form method="POST" action="{{{ URL::to('employee_allowances/update/'.$eallw->id) }}}" accept-charset="UTF-8">
                                         @csrf
-                                        <fieldset>
-                                            <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="username">Employee</label>
-                                                    <input class="form-control" placeholder="" type="text" readonly
-                                                           name="employee"
-                                                           id="employee"
-                                                           value="{{ $eallw->employee->first_name.' '.$eallw->employee->last_name }}">
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="form-group">
-                                                <label for="username">Allowance Type <span
-                                                        style="color:red">*</span></label>
-                                                <select name="allowance" id="allowance" class="form-control">
-                                                    <option></option>
-                                                    <option value="cnew">Create New</option>
-                                                    @foreach($allowances as $allowance)
-                                                        <option
-                                                            value="{{$allowance->id }}"<?= ($eallw->allowance_id == $allowance->id) ? 'selected="selected"' : ''; ?>> {{ $allowance->allowance_name }}</option>
-                                                    @endforeach
-
-                                                </select>
-
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="username">Formular <span style="color:red">*</span></label>
-                                                <select name="formular" id="formular" class="form-control forml">
-                                                    <option></option>
-                                                    <option
-                                                        value="One Time"<?= ($eallw->formular == 'One Time') ? 'selected="selected"' : ''; ?>>
-                                                        One Time
-                                                    </option>
-                                                    <option
-                                                        value="Recurring"<?= ($eallw->formular == 'Recurring') ? 'selected="selected"' : ''; ?>>
-                                                        Recurring
-                                                    </option>
-                                                    <option id="instals"
-                                                            value="Instalments"<?= ($eallw->formular == 'Instalments') ? 'selected="selected"' : ''; ?>>
-                                                        Instalments
-                                                    </option>
-                                                </select>
-
-                                            </div>
-
-                                            <div class="form-group" id="insts">
-                                                <label for="username">Instalments </label>
-                                                <input class="form-control" placeholder=""
-                                                       onkeypress="totalB(),getdate()"
-                                                       onkeyup="totalB(),getdate()" type="text" name="instalments"
-                                                       id="instalments"
-                                                       value="{{ $eallw->instalments}}">
-                                            </div>
-
-
-                                            <div class="form-group">
-                                                <label for="username">Amount <span style="color:red">*</span></label>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon">{{$currency->shortname}}</span>
-                                                    <input class="form-control" placeholder="" type="text"
-                                                           onkeypress="totalBalance()"
-                                                           onkeyup="totalBalance()" name="amount" id="amount"
-                                                           value="{{ $eallw->allowance_amount}}">
-                                                </div>
-                                                <script type="text/javascript">
-                                                    $(document).ready(function () {
-                                                        $('#amount').priceFormat();
-                                                    });
-                                                </script>
-                                            </div>
-
-                                            <div class="form-group bal_amt" id="bal">
-                                                <label for="username">Total </label>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon">{{$currency->shortname}}</span>
-                                                    <input class="form-control" placeholder="" readonly="readonly"
-                                                           type="text" name="balance"
-                                                           id="balance"
-                                                           value="{{ asMoney((double)$eallw->allowance_amount * (double)$eallw->instalments)}}">
+                                                    <label for="employee">Employee</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><i class="feather icon-user"></i></span>
+                                                        </div>
+                                                        <input class="form-control" type="text" readonly name="employee" id="employee" value="{{ $eallw->employee->first_name.' '.$eallw->employee->last_name }}">
+                                                    </div>
                                                 </div>
                                             </div>
-
-                                            <?php
-                                            $d = strtotime($eallw->allowance_date);
-
-                                            $d1 = strtotime($eallw->end_date);
-                                            ?>
-
-                                            <div class="form-group">
-                                                <label for="username">Allowance Date <span
-                                                        style="color:red">*</span></label>
-                                                <div class="right-inner-addon ">
-                                                    <i class="glyphicon glyphicon-calendar"></i>
-                                                    <input class="form-control allowancedate" readonly="readonly"
-                                                           placeholder="" type="text"
-                                                           name="adate" id="adate" value="{{ $eallw->allowance_date }}">
+                                            
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="allowance">Allowance Type <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><i class="feather icon-gift"></i></span>
+                                                        </div>
+                                                        <select name="allowance" id="allowance" class="form-control" required>
+                                                            <option value="">Select Allowance Type</option>
+                                                            <option value="cnew">Create New</option>
+                                                            @foreach($allowances as $allowance)
+                                                                <option value="{{$allowance->id }}"<?= ($eallw->allowance_id == $allowance->id) ? 'selected="selected"' : ''; ?>> 
+                                                                    {{ $allowance->allowance_name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
-
-                                            <div class="form-actions form-group">
-
-                                                <button type="submit" class="btn btn-primary btn-sm">Update Employee
-                                                    Allowance
-                                                </button>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="formular">Formular <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><i class="feather icon-cpu"></i></span>
+                                                        </div>
+                                                        <select name="formular" id="formular" class="form-control" required>
+                                                            <option value="">Select Formular</option>
+                                                            <option value="One Time"<?= ($eallw->formular == 'One Time') ? 'selected="selected"' : ''; ?>>One Time</option>
+                                                            <option value="Recurring"<?= ($eallw->formular == 'Recurring') ? 'selected="selected"' : ''; ?>>Recurring</option>
+                                                            <option value="Instalments"<?= ($eallw->formular == 'Instalments') ? 'selected="selected"' : ''; ?>>Instalments</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
                                             </div>
-
-                                        </fieldset>
+                                            
+                                            <div class="col-md-6" id="insts" style="display: none;">
+                                                <div class="form-group">
+                                                    <label for="instalments">Instalments</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><i class="feather icon-hash"></i></span>
+                                                        </div>
+                                                        <input class="form-control" placeholder="Enter number of instalments" type="number" min="1" name="instalments" id="instalments" value="{{ $eallw->instalments}}" onkeyup="totalB()">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="amount">Amount <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text">{{$currency->shortname}}</span>
+                                                        </div>
+                                                        <input class="form-control" placeholder="Enter amount" type="text" name="amount" id="amount" value="{{ $eallw->allowance_amount}}" onkeyup="totalBalance()" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6" id="bal" style="display: none;">
+                                                <div class="form-group">
+                                                    <label for="balance">Total</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text">{{$currency->shortname}}</span>
+                                                        </div>
+                                                        <input class="form-control" readonly type="text" name="balance" id="balance" value="{{ asMoney((double)$eallw->allowance_amount * (double)$eallw->instalments)}}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="adate">Allowance Date <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><i class="feather icon-calendar"></i></span>
+                                                        </div>
+                                                        <input class="form-control allowancedate" readonly placeholder="Select date" type="text" name="adate" id="adate" value="{{ $eallw->allowance_date }}" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-actions form-group">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="feather icon-check-circle mr-1"></i> Update Employee Allowance
+                                            </button>
+                                            <a href="{{ URL::to('employee_allowances') }}" class="btn btn-outline-secondary">
+                                                <i class="feather icon-x-circle mr-1"></i> Cancel
+                                            </a>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -232,9 +177,59 @@ function asMoney($value)
         </div>
     </div>
 
+    <style>
+        .card-header {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-right: none;
+        }
+        
+        .input-group .form-control {
+            border-left: none;
+            padding-left: 0;
+        }
+        
+        .input-group .form-control:focus {
+            border-color: #ced4da;
+            box-shadow: none;
+        }
+        
+        .input-group .form-control:focus + .input-group-append .input-group-text {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .btn {
+            border-radius: 4px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+        }
+        
+        #dialog-form {
+            padding: 20px;
+        }
+        
+        .validateTips {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+
     <script src="{{asset('media/jquery-1.8.0.min.js')}}"></script>
     <script src="{{asset('jquery-ui-1.11.4.custom/jquery-ui.js')}}"></script>
     <script src="{{asset('datepicker/js/bootstrap-datepicker.min.js')}}"></script>
+    
     <script type="text/javascript">
         function totalBalance() {
             var instals = document.getElementById("instalments").value;
@@ -242,7 +237,6 @@ function asMoney($value)
             var total = instals * amt * 10;
             total = total.toLocaleString('en-US', {minimumFractionDigits: 2});
             document.getElementById("balance").value = total;
-
         }
 
         function totalB() {
@@ -251,80 +245,73 @@ function asMoney($value)
             var total = instals * amt;
             total = total.toLocaleString('en-US', {minimumFractionDigits: 2});
             document.getElementById("balance").value = total;
-
         }
 
-    </script>
-    <script>
-        $(function () {
-            var dialog, form,
+        $(document).ready(function () {
+            // Initialize price format
+            $('#amount').priceFormat();
+            
+            // Show/hide instalments field based on formular selection
+            if ($('#formular').val() == "Instalments") {
+                $('#insts').show();
+                $('#bal').show();
+            } else {
+                $('#insts').hide();
+                $('#bal').hide();
+            }
 
-                // From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
-                name = $("#name"),
+            $('#formular').change(function () {
+                if ($(this).val() == "Instalments") {
+                    $('#insts').show();
+                    $('#bal').show();
+                } else {
+                    $('#insts').hide();
+                    $('#bal').hide();
+                }
+            });
 
-                allFields = $([]).add(name),
-                tips = $(".validateTips");
+            // Datepicker initialization
+            $('.allowancedate').datepicker({
+                format: 'yyyy-mm-dd',
+                startDate: '-60y',
+                autoclose: true
+            });
+
+            // Dialog form for creating new allowance
+            var dialog, form, name = $("#name"), allFields = $([]).add(name), tips = $(".validateTips");
 
             function updateTips(t) {
-                tips
-                    .text(t)
-                    .addClass("ui-state-highlight");
-                setTimeout(function () {
-                    tips.removeClass("ui-state-highlight", 1500);
-                }, 500);
+                tips.text(t).addClass("alert alert-info");
+                setTimeout(function() {
+                    tips.removeClass("alert alert-info", 1500);
+                }, 5000);
             }
 
             function checkLength(o) {
                 if (o.val().length == 0) {
-                    o.addClass("ui-state-error");
+                    o.addClass("is-invalid");
                     updateTips("Please insert allowance type!");
                     return false;
                 } else {
-                    return true;
-                }
-            }
-
-            function checkRegexp(o, regexp, n) {
-                if (!(regexp.test(o.val()))) {
-                    o.addClass("ui-state-error");
-                    updateTips(n);
-                    return false;
-                } else {
+                    o.removeClass("is-invalid");
                     return true;
                 }
             }
 
             function addUser() {
                 var valid = true;
-                allFields.removeClass("ui-state-error");
+                allFields.removeClass("is-invalid");
 
                 valid = valid && checkLength(name);
 
-                valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for allowance type.");
-
                 if (valid) {
-
-                    /* displaydata();
-
-                    function displaydata(){
-                     $.ajax({
-                                    url     : "{{URL::to('reloaddata')}}",
-                      type    : "POST",
-                      async   : false,
-                      data    : { },
-                      success : function(s){
-                        var data = JSON.parse(s)
-                        //alert(data.id);
-                      }
-       });
-       }*/
-
                     $.ajax({
                         url: "{{URL::to('createAllowance')}}",
                         type: "POST",
                         async: false,
                         data: {
-                            'name': name.val()
+                            'name': name.val(),
+                            '_token': '{{ csrf_token() }}'
                         },
                         success: function (s) {
                             $('#allowance').append($('<option>', {
@@ -332,6 +319,9 @@ function asMoney($value)
                                 text: name.val(),
                                 selected: true
                             }));
+                        },
+                        error: function() {
+                            updateTips("Error creating allowance. Please try again.");
                         }
                     });
                     dialog.dialog("close");
@@ -342,69 +332,31 @@ function asMoney($value)
             dialog = $("#dialog-form").dialog({
                 autoOpen: false,
                 height: 250,
-                width: 350,
+                width: 400,
                 modal: true,
                 buttons: {
                     "Create": addUser,
-                    Cancel: function () {
+                    "Cancel": function() {
                         dialog.dialog("close");
+                        $('#allowance').val('');
                     }
                 },
-                close: function () {
+                close: function() {
                     form[0].reset();
-                    allFields.removeClass("ui-state-error");
+                    allFields.removeClass("is-invalid");
                 }
             });
 
-            form = dialog.find("form").on("submit", function (event) {
+            form = dialog.find("form").on("submit", function(event) {
                 event.preventDefault();
                 addUser();
             });
 
-            $('#allowance').change(function () {
+            $('#allowance').change(function() {
                 if ($(this).val() == "cnew") {
                     dialog.dialog("open");
                 }
-
             });
         });
-    </script>
-
-    <script type="text/javascript">
-        $(document).ready(function () {
-
-            $('#formular option#instals').each(function () {
-                if (this.selected) {
-                    $('#insts').show();
-                    $('#bal').show();
-                } else {
-                    $('#insts').hide();
-                    $('#bal').hide();
-                }
-            });
-
-            $('#formular').change(function () {
-                if ($(this).val() == "Instalments") {
-                    $('#insts').show();
-                    $('#bal').show();
-                } else {
-                    $('#insts').hide();
-                    $('#bal').hide();
-                }
-
-            });
-
-        });
-    </script>
-    <script type="text/javascript">
-        $(function () {
-
-            $('.allowancedate').datepicker({
-                format: 'yyyy-mm-dd',
-                startDate: '-60y',
-                autoclose: true
-            });
-        });
-
     </script>
 @stop

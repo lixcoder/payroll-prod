@@ -1,69 +1,108 @@
 @extends('layouts.main_hr')
+
 @section('xara_cbs')
     @include('partials.breadcrumbs')
+    
     <div class="pcoded-inner-content">
         <div class="main-body">
             <div class="page-wrapper">
                 <div class="page-body">
                     <div class="row">
                         <div class="col-sm-12">
-                            <h3>Employee Types</h3>
-                            <hr>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="cad">
-                                <div class="card-body">
-                                    <div class="mb-2">
-                                        <a class="btn btn-info btn-sm" href="{{ URL::to('employee_type/create')}}">new
-                                            employee type</a>
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0"><i class="feather icon-users mr-2 text-primary"></i>Employee Types</h5>
+                                            <small class="text-muted">Manage different types of employees in your organization</small>
+                                        </div>
+                                        <div class="card-header-right">
+                                            <a href="{{ URL::to('employee_type/create') }}" class="btn btn-primary btn-sm">
+                                                <i class="feather icon-plus mr-1"></i> New Employee Type
+                                            </a>
+                                        </div>
                                     </div>
-                                    <table id="users"
-                                           class="table table-condensed table-bordered table-hover">
-                                        <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Employee Type Name</th>
-                                            <th>Action</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <?php $i = 1; ?>
-                                        @foreach($etypes as $etype)
-                                            <tr>
-                                                <td> {{ $i }}</td>
-                                                <td>{{ $etype->employee_type_name }}</td>
-                                                <td>
-                                                    <div class="btn-group">
-                                                        <button type="button"
-                                                                class="btn btn-info btn-sm dropdown-toggle"
-                                                                data-toggle="dropdown" aria-expanded="false">
-                                                            Action <span class="caret"></span>
-                                                        </button>
+                                </div>
+                                <div class="card-body">
+                                    @if (Session::has('flash_message'))
+                                        <div class="alert alert-success alert-dismissible fade show">
+                                            <button type="button" class="close" data-dismiss="alert">×</button>
+                                            <i class="feather icon-check-circle mr-2"></i> {{ Session::get('flash_message') }}
+                                        </div>
+                                    @endif
 
-                                                        <ul class="dropdown-menu" role="menu">
-                                                            <li><a href="{{URL::to('employee_type/edit/'.$etype->id)}}">Update</a>
-                                                            </li>
+                                    @if (Session::has('delete_message'))
+                                        <div class="alert alert-danger alert-dismissible fade show">
+                                            <button type="button" class="close" data-dismiss="alert">×</button>
+                                            <i class="feather icon-alert-triangle mr-2"></i> {{ Session::get('delete_message') }}
+                                        </div>
+                                    @endif
 
-                                                            <li>
-                                                                <a href="{{URL::to('employee_type/delete/'.$etype->id)}}">Delete</a>
-                                                            </li>
+                                    <div class="table-responsive">
+                                        <table id="employeeTypesTable" class="table table-hover">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Employee Type Name</th>
+                                                    <th>Status</th>
+                                                    <th class="text-center">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($etypes as $index => $etype)
+                                                    <tr>
+                                                        <td>{{ $index + 1 }}</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="icon-circle bg-info text-white mr-3">
+                                                                    <i class="feather icon-user"></i>
+                                                                </div>
+                                                                <div>
+                                                                    <h6 class="mb-0">{{ $etype->employee_type_name }}</h6>
+                                                                    <small class="text-muted">ID: {{ $etype->id }}</small>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge badge-success">Active</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div class="btn-group" role="group">
+                                                                <a href="{{ URL::to('employee_type/edit/'.$etype->id) }}" 
+                                                                   class="btn btn-outline-primary btn-sm" 
+                                                                   data-toggle="tooltip" 
+                                                                   title="Edit Employee Type">
+                                                                    <i class="feather icon-edit"></i>
+                                                                </a>
+                                                                <a href="{{ URL::to('employee_type/delete/'.$etype->id) }}" 
+                                                                   class="btn btn-outline-danger btn-sm" 
+                                                                   data-toggle="tooltip" 
+                                                                   title="Delete Employee Type"
+                                                                   onclick="return confirm('Are you sure you want to delete this employee type?')">
+                                                                    <i class="feather icon-trash-2"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                                                        </ul>
-                                                    </div>
-
-                                                </td>
-
-
-                                            </tr>
-
-                                            <?php $i++; ?>
-                                        @endforeach
-
-
-                                        </tbody>
-
-
-                                    </table>
+                                    @if($etypes->isEmpty())
+                                        <div class="text-center py-5">
+                                            <div class="empty-state">
+                                                <div class="empty-state-icon">
+                                                    <i class="feather icon-users"></i>
+                                                </div>
+                                                <h4>No Employee Types Found</h4>
+                                                <p class="text-muted">Get started by creating your first employee type.</p>
+                                                <a href="{{ URL::to('employee_type/create') }}" class="btn btn-primary">
+                                                    <i class="feather icon-plus mr-1"></i> Create Employee Type
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -72,4 +111,161 @@
             </div>
         </div>
     </div>
+
+    <style>
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .table td {
+            vertical-align: middle;
+            border-color: #f1f1f1;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(59, 125, 221, 0.05);
+            transform: translateY(-1px);
+            transition: all 0.3s ease;
+        }
+        
+        .icon-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .btn-outline-primary, .btn-outline-danger {
+            border-width: 1px;
+            margin: 0 2px;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 15px;
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .empty-state {
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state h4 {
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .card-header-right {
+                margin-top: 1rem;
+                width: 100%;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn-group .btn {
+                margin: 2px 0;
+            }
+            
+            .table-responsive {
+                border-radius: 8px;
+                border: 1px solid #f1f1f1;
+            }
+        }
+        
+        /* Animation for table rows */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        tbody tr {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+            
+            // Initialize DataTable
+            $('#employeeTypesTable').DataTable({
+                responsive: true,
+                pageLength: 10,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search employee types...",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)"
+                },
+                dom: '<"row"<"col-md-6"l><"col-md-6"f>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
+                columnDefs: [
+                    { orderable: false, targets: [3] }
+                ]
+            });
+            
+            // Fade out alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeTo(500, 0).slideUp(500, function(){
+                    $(this).remove(); 
+                });
+            }, 5000);
+        });
+    </script>
 @endsection

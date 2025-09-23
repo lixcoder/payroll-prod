@@ -1,120 +1,101 @@
-<?php
-
-function asMoney($value)
-{
-    return number_format($value, 2);
-}
-
-?>
-
 @extends('layouts.main_hr')
 @section('xara_cbs')
-    @include('partials.breadcrumbs')
+    <?php
+    function asMoney($value) {
+        return number_format($value, 2);
+    }
+    ?>
+
     <div class="pcoded-inner-content">
         <div class="main-body">
             <div class="page-wrapper">
                 <div class="page-body">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <h3>Employee Deductions</h3>
-
-                            <hr>
-                        </div>
-                        <div class="col-lg-12">
+                        <div class="col-sm-12">
                             <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0"><i class="feather icon-minus-circle mr-2 text-primary"></i>Employee Deductions</h5>
+                                            <small class="text-muted">Manage employee deduction records</small>
+                                        </div>
+                                        <div class="card-header-right">
+                                            <a class="btn btn-primary btn-sm" href="{{ URL::to('employee_deductions/create')}}">
+                                                <i class="feather icon-plus mr-1"></i> New Employee Deduction
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="card-body">
                                     @if (Session::has('flash_message'))
-
-                                        <div class="alert alert-success">
-                                            {{ Session::get('flash_message') }}
+                                        <div class="alert alert-success alert-dismissible fade show">
+                                            <button type="button" class="close" data-dismiss="alert">×</button>
+                                            <i class="feather icon-check-circle mr-2"></i>{{ Session::get('flash_message') }}
                                         </div>
                                     @endif
 
                                     @if (Session::has('delete_message'))
-
-                                        <div class="alert alert-danger">
-                                            {{ Session::get('delete_message') }}
+                                        <div class="alert alert-danger alert-dismissible fade show">
+                                            <button type="button" class="close" data-dismiss="alert">×</button>
+                                            <i class="feather icon-x-circle mr-2"></i>{{ Session::get('delete_message') }}
                                         </div>
                                     @endif
-                                    <div class="mb-2">
-                                        <a class="btn btn-info btn-sm"
-                                           href="{{ URL::to('employee_deductions/create')}}">new employee
-                                            deduction</a>
+
+                                    <div class="table-responsive">
+                                        <table id="employeeDeductionsTable" class="table table-hover table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Employee</th>
+                                                    <th>Deduction Type</th>
+                                                    <th>Amount</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php $i = 1; ?>
+                                                @forelse($deds as $ded)
+                                                    <tr>
+                                                        <td>{{ $i }}</td>
+                                                        @if($ded->middle_name == null || $ded->middle_name == '')
+                                                            <td>{{ $ded->first_name.' '.$ded->last_name }}</td>
+                                                        @else
+                                                            <td>{{ $ded->first_name.' '.$ded->middle_name.' '.$ded->last_name }}</td>
+                                                        @endif
+                                                        <td><span class="badge badge-info">{{ $ded->deduction_name }}</span></td>
+                                                        <td align="right" class="font-weight-bold text-danger">{{ asMoney((double)$ded->deduction_amount) }}</td>
+                                                        <td>
+                                                            <div class="btn-group btn-group-sm" role="group">
+                                                                <a href="{{URL::to('employee_deductions/view/'.$ded->id)}}" class="btn btn-outline-info" data-toggle="tooltip" title="View Details">
+                                                                    <i class="feather icon-eye"></i>
+                                                                </a>
+                                                                <a href="{{URL::to('employee_deductions/edit/'.$ded->id)}}" class="btn btn-outline-primary" data-toggle="tooltip" title="Edit Deduction">
+                                                                    <i class="feather icon-edit"></i>
+                                                                </a>
+                                                                <a href="{{URL::to('employee_deductions/delete/'.$ded->id)}}" class="btn btn-outline-danger" data-toggle="tooltip" title="Delete Deduction" onclick="return confirm('Are you sure you want to delete this employee deduction?')">
+                                                                    <i class="feather icon-trash-2"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <?php $i++; ?>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="5" class="text-center py-5">
+                                                            <div class="empty-state">
+                                                                <i class="feather icon-list empty-state-icon" style="font-size: 48px; color: #dee2e6;"></i>
+                                                                <h4 class="mt-3">No Employee Deductions Found</h4>
+                                                                <p class="text-muted">Get started by adding your first employee deduction.</p>
+                                                                <a href="{{ URL::to('employee_deductions/create')}}" class="btn btn-primary mt-3">
+                                                                    <i class="feather icon-plus mr-1"></i> Add Deduction
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
                                     </div>
-                                    <table id="users" class="table table-condensed table-bordered table-hover">
-                                        <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Employee</th>
-                                            <th>Deduction Type</th>
-                                            <th>Amount</th>
-                                            <th>Action</th>
-                                        </tr>
-                                        </thead>
-
-
-                                        <tbody>
-
-                                        <?php $i = 1; ?>
-                                        @forelse($deds as $ded)
-                                            <tr>
-
-                                                <td> {{ $i }}</td>
-                                                @if($ded->middle_name == null || $ded->middle_name == '')
-                                                    <td>{{ $ded->first_name.' '.$ded->last_name }}</td>
-                                                @else
-                                                    <td>{{ $ded->first_name.' '.$ded->middle_name.' '.$ded->last_name }}</td>
-                                                @endif
-                                                <td>{{ $ded->deduction_name }}</td>
-                                                <td align="right">{{ asMoney((double)$ded->deduction_amount) }}</td>
-                                                <td>
-
-                                                    <div class="btn-group">
-                                                        <button type="button"
-                                                                class="btn btn-info btn-sm dropdown-toggle"
-                                                                data-toggle="dropdown" aria-expanded="false">
-                                                            Action <span class="caret"></span>
-                                                        </button>
-
-                                                        <ul class="dropdown-menu" role="menu">
-                                                            <li>
-                                                                <a href="{{URL::to('employee_deductions/view/'.$ded->id)}}">View</a>
-                                                            </li>
-
-                                                            <li>
-                                                                <a href="{{URL::to('employee_deductions/edit/'.$ded->id)}}">Update</a>
-                                                            </li>
-
-                                                            <li>
-                                                                <a href="{{URL::to('employee_deductions/delete/'.$ded->id)}}"
-                                                                   onclick="return (confirm('Are you sure you want to delete this employee`s deduction?'))">Delete</a>
-                                                            </li>
-
-                                                        </ul>
-                                                    </div>
-
-                                                </td>
-
-
-                                            </tr>
-
-                                            <?php $i++; ?>
-                                            @empty
-                                            <tr>
-                                                <td colspan="5">
-                                                    <center>
-                                                        <h1><i class="fa fa-list fa-5x"></i></h1>
-                                                        <p>Add Deduction</p>
-                                                    </center>
-                                                </td>
-                                            </tr>
-                                        @endforelse
-
-
-                                        </tbody>
-
-
-                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -123,17 +104,55 @@ function asMoney($value)
             </div>
         </div>
     </div>
-    <div class="row">
-    </div>
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                </div>
 
+    <style>
+        .empty-state {
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 0.4em 0.6em;
+        }
+    </style>
 
-            </div>
-
-        </div>
-
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            $('#employeeDeductionsTable').DataTable({
+                responsive: true,
+                pageLength: 10,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search employee deductions...",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    emptyTable: "No employee deductions available",
+                    paginate: {
+                        previous: "<i class='feather icon-chevron-left'></i>",
+                        next: "<i class='feather icon-chevron-right'></i>"
+                    }
+                }
+            });
+            
+            // Initialize tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+            
+            // Auto-dismiss alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeTo(500, 0).slideUp(500, function(){
+                    $(this).remove(); 
+                });
+            }, 5000);
+        });
+    </script>
 @stop

@@ -3,6 +3,77 @@ $notifications = App\Models\Notification::where("user_id", Auth::user()->id)->wh
 $organization = DB::table('x_organizations')
     ->where('id', '=', 1)->first();
 ?>
+
+<style>
+.header-navbar.pcoded-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+.navbar-logo a, .navbar-logo h1 {
+    color: #ffffff !important;
+}
+
+.nav-left a, .mobile-menu, .mobile-options, .dropdown-toggle {
+    color: #ffffff !important;
+}
+
+.dropdown-toggle span {
+    color: #ffffff !important;
+}
+
+.dropdown-toggle i {
+    color: #ffffff !important;
+}
+
+/* Modern Dropdown Styling */
+.dropdown-menu {
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+    padding: 8px 0 !important;
+    margin-top: 8px !important;
+    min-width: 200px !important;
+    overflow: hidden !important;
+}
+
+.dropdown-menu li {
+    margin: 0 !important;
+}
+
+.dropdown-menu a {
+    color: #374151 !important;
+    padding: 12px 20px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    text-decoration: none !important;
+}
+
+.dropdown-menu a:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: #ffffff !important;
+    text-decoration: none !important;
+    transform: translateX(4px);
+}
+
+.dropdown-menu a i {
+    font-size: 16px !important;
+    width: 18px !important;
+    text-align: center !important;
+    transition: all 0.2s ease !important;
+}
+
+.dropdown-menu a:hover i {
+    color: #ffffff !important;
+    transform: scale(1.1);
+}
+</style>
+
 <nav class="navbar header-navbar pcoded-header">
     <div class="navbar-wrapper">
         <div class="navbar-logo">
@@ -18,19 +89,6 @@ $organization = DB::table('x_organizations')
         </div>
         <div class="navbar-container container-fluid">
             <ul class="nav-left">
-                <li class="header-search">
-                    <div class="main-search morphsearch-search">
-                        <div class="input-group">
-                                        <span class="input-group-prepend search-close">
-										<i class="feather icon-x input-group-text"></i>
-									</span>
-                            <input type="text" class="form-control" placeholder="Enter Keyword">
-                            <span class="input-group-append search-btn">
-										<i class="feather icon-search input-group-text"></i>
-									</span>
-                        </div>
-                    </div>
-                </li>
                 <li>
                     <a href="#!" onclick="javascript:toggleFullScreen()" class="waves-effect waves-light">
                         <i class="full-screen feather icon-maximize"></i>
@@ -38,38 +96,10 @@ $organization = DB::table('x_organizations')
                 </li>
             </ul>
             <ul class="nav-right">
-                <li class="header-notification">
-                    <div class="dropdown-primary dropdown">
-                        <div class="dropdown-toggle" data-toggle="dropdown">
-                            <i class="feather icon-bell"></i>
-                            <span class="badge bg-c-red">1</span>
-                        </div>
-                        <ul class="show-notification notification-view dropdown-menu" data-dropdown-in="fadeIn"
-                            data-dropdown-out="fadeOut">
-                            <li>
-                                <h6>Notifications</h6>
-                                <label class="label label-danger">New</label>
-                            </li>
-                            <li>
-                                <div class="media">
-                                    <img class="img-radius" height="40px" src="{{asset('media/logo/logo.png')}}"
-                                         alt="Generic placeholder image">
-                                    <div class="media-body">
-                                        <h5 class="notification-user">John Doe</h5>
-                                        <p class="notification-msg">Lorem ipsum dolor sit amet, consectetuer
-                                            elit.</p>
-                                        <span class="notification-time">30 minutes ago</span>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
                 <li class="user-profile header-notification">
                     <div class="dropdown-primary dropdown">
                         <div class="dropdown-toggle" data-toggle="dropdown">
-                            <img src="{{ asset('assets/assets/images/avatar-4.jpg')}}" class="img-radius"
-                                 alt="User-Profile-Image">
+                            <i class="feather icon-user"></i>
                             <span>{{Auth::user()->name}}</span>
                             <i class="feather icon-chevron-down"></i>
                         </div>
@@ -84,7 +114,6 @@ $organization = DB::table('x_organizations')
                             <li>
                                 <a href="{{url('users/profile',Auth::user()->id)}}">
                                     <i class="feather icon-user"></i> Profile
-
                                 </a>
                             </li>
                             <li class="nav-item dropdown">

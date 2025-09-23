@@ -1,58 +1,112 @@
 @extends('layouts.main_hr')
+
 @section('xara_cbs')
     @include('partials.breadcrumbs')
+    
     <div class="pcoded-inner-content">
         <div class="main-body">
             <div class="page-wrapper">
                 <div class="page-body">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <h3>Job Groups</h3>
-                            <hr>
-                        </div>
-                        <div class="col-lg-12">
+                        <div class="col-sm-12">
                             <div class="card">
-                                <div class="card-body">
-                                    <div class="mb-2">
-                                        <a class="btn btn-info btn-sm" href="{{ URL::to('job_group/create')}}">new
-                                            Job Group</a>
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0"><i class="feather icon-briefcase mr-2 text-primary"></i>Job Groups</h5>
+                                            <small class="text-muted">Manage job classification groups in your organization</small>
+                                        </div>
+                                        <div class="card-header-right">
+                                            <a href="{{ URL::to('job_group/create') }}" class="btn btn-primary btn-sm">
+                                                <i class="feather icon-plus mr-1"></i> New Job Group
+                                            </a>
+                                        </div>
                                     </div>
-                                    <table id="users" class="table table-condensed table-bordered table-hover">
-                                        <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Job Group Name</th>
-                                            <th>Action</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <?php $i = 1; ?>
-                                        @foreach($jgroups as $jgroup)
-                                            <tr>
-                                                <td> {{ $i }}</td>
-                                                <td>{{ $jgroup->job_group_name }}</td>
-                                                <td>
-                                                    <div class="btn-group">
-                                                        <button type="button"
-                                                                class="btn btn-info btn-sm dropdown-toggle"
-                                                                data-toggle="dropdown" aria-expanded="false">
-                                                            Action <span class="caret"></span>
-                                                        </button>
+                                </div>
+                                <div class="card-body">
+                                    @if (Session::has('flash_message'))
+                                        <div class="alert alert-success alert-dismissible fade show">
+                                            <button type="button" class="close" data-dismiss="alert">×</button>
+                                            <i class="feather icon-check-circle mr-2"></i> {{ Session::get('flash_message') }}
+                                        </div>
+                                    @endif
 
-                                                        <ul class="dropdown-menu" role="menu">
-                                                            <form action="{{ URL::to('job_group/' . $jgroup->id) }}" method="POST" style="display:inline;">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="dropdown-item" onclick="return confirm('Are you sure you want to delete this job group?')">Delete</button>
-                                                            </form>
-                                                        </ul>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <?php $i++; ?>
-                                        @endforeach
-                                        </tbody>
-                                    </table>
+                                    @if (Session::has('delete_message'))
+                                        <div class="alert alert-danger alert-dismissible fade show">
+                                            <button type="button" class="close" data-dismiss="alert">×</button>
+                                            <i class="feather icon-alert-triangle mr-2"></i> {{ Session::get('delete_message') }}
+                                        </div>
+                                    @endif
+
+                                    <div class="table-responsive">
+                                        <table id="jobGroupsTable" class="table table-hover">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Job Group Name</th>
+                                                    <th>Status</th>
+                                                    <th class="text-center">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($jgroups as $index => $jgroup)
+                                                    <tr>
+                                                        <td>{{ $index + 1 }}</td>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="icon-circle bg-info text-white mr-3">
+                                                                    <i class="feather icon-briefcase"></i>
+                                                                </div>
+                                                                <div>
+                                                                    <h6 class="mb-0">{{ $jgroup->job_group_name }}</h6>
+                                                                    <small class="text-muted">ID: {{ $jgroup->id }}</small>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge badge-success">Active</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div class="btn-group" role="group">
+                                                                <a href="{{ URL::to('job_group/edit/'.$jgroup->id) }}" 
+                                                                   class="btn btn-outline-primary btn-sm" 
+                                                                   data-toggle="tooltip" 
+                                                                   title="Edit Job Group">
+                                                                    <i class="feather icon-edit"></i>
+                                                                </a>
+                                                                <form action="{{ URL::to('job_group/' . $jgroup->id) }}" method="POST" class="d-inline">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit" 
+                                                                            class="btn btn-outline-danger btn-sm" 
+                                                                            data-toggle="tooltip" 
+                                                                            title="Delete Job Group"
+                                                                            onclick="return confirm('Are you sure you want to delete this job group?')">
+                                                                        <i class="feather icon-trash-2"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    @if($jgroups->isEmpty())
+                                        <div class="text-center py-5">
+                                            <div class="empty-state">
+                                                <div class="empty-state-icon">
+                                                    <i class="feather icon-briefcase"></i>
+                                                </div>
+                                                <h4>No Job Groups Found</h4>
+                                                <p class="text-muted">Get started by creating your first job group.</p>
+                                                <a href="{{ URL::to('job_group/create') }}" class="btn btn-primary">
+                                                    <i class="feather icon-plus mr-1"></i> Create Job Group
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -61,4 +115,165 @@
             </div>
         </div>
     </div>
+
+    <style>
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .table td {
+            vertical-align: middle;
+            border-color: #f1f1f1;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(59, 125, 221, 0.05);
+            transform: translateY(-1px);
+            transition: all 0.3s ease;
+        }
+        
+        .icon-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .btn-outline-primary, .btn-outline-danger {
+            border-width: 1px;
+            margin: 0 2px;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 15px;
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .empty-state {
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state h4 {
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .card-header-right {
+                margin-top: 1rem;
+                width: 100%;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn-group .btn {
+                margin: 2px 0;
+            }
+            
+            .table-responsive {
+                border-radius: 8px;
+                border: 1px solid #f1f1f1;
+            }
+        }
+        
+        /* Animation for table rows */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        tbody tr {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        
+        form.d-inline {
+            display: inline-block;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+            
+            // Initialize DataTable
+            $('#jobGroupsTable').DataTable({
+                responsive: true,
+                pageLength: 10,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search job groups...",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)"
+                },
+                dom: '<"row"<"col-md-6"l><"col-md-6"f>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
+                columnDefs: [
+                    { orderable: false, targets: [3] }
+                ]
+            });
+            
+            // Fade out alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeTo(500, 0).slideUp(500, function(){
+                    $(this).remove(); 
+                });
+            }, 5000);
+        });
+    </script>
 @endsection

@@ -62,10 +62,12 @@ class OfficeShiftController extends BaseController
     public function edit($id)
     {
         $office_shift = OfficeShift::findOrFail($id);
-        //$organization_name
-        $orgs = Organization::select('id','organization')->get();
+        $orgs = Organization::select('id','name')->get();
 
-        return View::make('timesheet.office_shift.edit',compact(''));
+        return view('timesheet.work_shift.edit', [
+            'office_shift' => $office_shift,
+            'orgs' => $orgs,
+        ]);
     }
 
     public function destroy($id){

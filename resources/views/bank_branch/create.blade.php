@@ -1,64 +1,241 @@
 @extends('layouts.main_hr')
 @section('xara_cbs')
-
     <div class="pcoded-inner-content">
         <div class="main-body">
             <div class="page-wrapper">
                 <div class="page-body">
-                    <div class="col-lg-12">
-
-                    </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>New Bank Branch</h3>
-
-                            @if (count($errors) > 0)
-                                <div class="alert alert-danger">
-                                    @foreach ($errors->all() as $error)
-                                        {{ $error }}<br>
-                                    @endforeach
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0"><i class="feather icon-plus-circle mr-2 text-success"></i>New Bank Branch</h5>
+                                            <small class="text-muted">Add a new bank branch for payroll processing</small>
+                                        </div>
+                                        <div class="card-header-right">
+                                            <a href="{{ URL::to('bankbranches') }}" class="btn btn-secondary btn-sm">
+                                                <i class="feather icon-arrow-left mr-1"></i> Back to Branches
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
-                            @endif
-                        </div>
-                        <div class="card-block">
+                                <div class="card-body">
+                                    @if ($errors->any())
+                                        <div class="alert alert-danger alert-dismissible fade show">
+                                            <button type="button" class="close" data-dismiss="alert">×</button>
+                                            <strong><i class="feather icon-alert-triangle mr-2"></i> Please fix the following errors:</strong>
+                                            <ul class="mb-0 mt-2">
+                                                @foreach ($errors->all() as $error)
+                                                    <li>{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif
 
-                            <form method="POST" action="{{{ url('bankbranches') }}}" accept-charset="UTF-8">@csrf
+                                    <form method="POST" action="{{ url('bankbranches') }}" class="modern-form">
+                                        @csrf
+                                        
+                                        <div class="form-section mb-4">
+                                            <h6 class="section-title bg-light p-3 border-bottom">
+                                                <i class="feather icon-info mr-2 text-primary"></i>Branch Details
+                                            </h6>
+                                            <div class="p-3">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="code" class="font-weight-bold">Bank Branch Code <span class="text-danger">*</span></label>
+                                                            <div class="input-group">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text bg-light"><i class="feather icon-hash"></i></span>
+                                                                </div>
+                                                                <input class="form-control" placeholder="e.g., 001, 002" type="text" name="code" id="code" value="{{ old('code') }}" required>
+                                                            </div>
+                                                            <small class="form-text text-muted">Enter the unique branch code</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="name" class="font-weight-bold">Bank Branch Name <span class="text-danger">*</span></label>
+                                                            <div class="input-group">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text bg-light"><i class="feather icon-bookmark"></i></span>
+                                                                </div>
+                                                                <input class="form-control" placeholder="e.g., Main Branch, Westlands Branch" type="text" name="name" id="name" value="{{ old('name') }}" required>
+                                                            </div>
+                                                            <small class="form-text text-muted">Enter the branch name</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                                <fieldset>
-                                    <div class="form-group">
-                                        <label for="username">Bank Branch Code <span style="color:red">*</span> </label>
-                                        <input class="form-control" placeholder="" type="text" name="code" id="code" value="{{{ old('code') }}}">
-                                    </div>
+                                                <div class="form-group mt-4">
+                                                    <label for="bank" class="font-weight-bold">Bank <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text bg-light"><i class="feather icon-credit-card"></i></span>
+                                                        </div>
+                                                        <select name="bank" id="bank" class="form-control" required>
+                                                            <option value="">Select Bank</option>
+                                                            @foreach($banks as $bank)
+                                                                <option value="{{ $bank->id }}" {{ old('bank') == $bank->id ? 'selected' : '' }}>
+                                                                    {{ $bank->bank_name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <small class="form-text text-muted">Select the parent bank</small>
+                                                </div>
 
-                                    <div class="form-group">
-                                        <label for="username">Bank Branch Name <span style="color:red">*</span> </label>
-                                        <input class="form-control" placeholder="" type="text" name="name" id="name" value="{{{ old('name') }}}">
-                                    </div>
+                                                <div class="alert alert-info mt-4">
+                                                    <i class="feather icon-info mr-2"></i>
+                                                    Bank branches are used for employee payroll processing and bank transfers.
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label for="username">Bank <span style="color:red">*</span></label>
-                                        <select name="bank" id="bank" class="form-control">
-                                            <option></option>
-                                            @foreach($banks as $bank)
-                                                <option value="{{ $bank->id }}"> {{ $bank->bank_name }}</option>
-                                            @endforeach
-                                        </select>
-
-                                    </div>
-
-
-                                    <div class="form-actions form-group">
-
-                                        <button type="submit" class="btn btn-primary btn-sm">Create Bank Branch</button>
-                                    </div>
-
-                                </fieldset>
-                            </form>
-
+                                        <div class="form-actions text-right p-3 border-top">
+                                            <button type="reset" class="btn btn-outline-secondary mr-2">
+                                                <i class="feather icon-refresh-ccw mr-1"></i> Reset
+                                            </button>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="feather icon-save mr-1"></i> Create Branch
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <style>
+        .modern-form {
+            background: #fff;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .form-section {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fff;
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-weight: 600;
+            margin: 0;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .form-control {
+            border: 1px solid #dce4ec;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            height: 44px;
+            padding: 10px 15px;
+        }
+        
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .input-group-text {
+            background: #f8f9fa;
+            border: 1px solid #dce4ec;
+            color: #2c3e50;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
+            border: none;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-text {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 768px) {
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .card-header-right {
+                margin-top: 1rem;
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+
+    <script>
+        $(document).ready(function() {
+            // Form validation
+            $('form').on('submit', function(e) {
+                let isValid = true;
+                
+                // Check required fields
+                $('[required]').each(function() {
+                    if (!$(this).val()) {
+                        $(this).addClass('is-invalid');
+                        isValid = false;
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    // Scroll to first error
+                    $('html, body').animate({
+                        scrollTop: $('.is-invalid').first().offset().top - 100
+                    }, 500);
+                }
+            });
+            
+            // Remove validation classes on input
+            $('input, select').on('input change', function() {
+                $(this).removeClass('is-invalid');
+            });
+            
+            // Auto-dismiss alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeTo(500, 0).slideUp(500, function(){
+                    $(this).remove(); 
+                });
+            }, 5000);
+        });
+    </script>
 @stop

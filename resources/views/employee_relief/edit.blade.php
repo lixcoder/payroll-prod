@@ -1,176 +1,113 @@
 @extends('layouts.main_hr')
 @section('xara_cbs')
-    <link rel="stylesheet" href="{{asset('jquery-ui-1.11.4.custom/jquery-ui.css')}}">
-    <style>
-        label, input {
-            display: block;
-        }
-
-        input.text {
-            margin-bottom: 12px;
-            width: 95%;
-            padding: .4em;
-        }
-
-        fieldset {
-            padding: 0;
-            border: 0;
-            margin-top: 25px;
-        }
-
-        h1 {
-            font-size: 1.2em;
-            margin: .6em 0;
-        }
-
-        div#users-contain {
-            width: 350px;
-            margin: 20px 0;
-        }
-
-        div#users-contain table {
-            margin: 1em 0;
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        div#users-contain table td, div#users-contain table th {
-            border: 1px solid #eee;
-            padding: .6em 10px;
-            text-align: left;
-        }
-
-        .ui-dialog .ui-state-error {
-            padding: .3em;
-        }
-
-        .validateTips {
-            border: 1px solid transparent;
-            padding: 0.3em;
-        }
-
-        .ui-dialog {
-            position: fixed;
-            margin-top: 450px;
-        }
-
-
-        .ui-dialog-titlebar-close {
-            background: url("{{ URL::asset('jquery-ui-1.11.4.custom/images/ui-icons_888888_256x240.png'); }}") repeat scroll -93px -128px rgba(0, 0, 0, 0);
-            border: medium none;
-        }
-
-        .ui-dialog-titlebar-close:hover {
-            background: url("{{ URL::asset('jquery-ui-1.11.4.custom/images/ui-icons_222222_256x240.png'); }}") repeat scroll -93px -128px rgba(0, 0, 0, 0);
-        }
-
-    </style>
+    <link href="{{ asset('jquery-ui-1.11.4.custom/jquery-ui.css') }}" rel="stylesheet">
     @include('partials.breadcrumbs')
+    
     <div class="pcoded-inner-content">
         <div class="main-body">
             <div class="page-wrapper">
                 <div class="page-body">
                     <div class="row">
-                        <div class="col-lg-12">
-                            <h3>Update Employee Relief</h3>
-                            <hr>
-                        </div>
-                        <div class="col-lg-12">
+                        <div class="col-sm-12">
                             <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0"><i class="feather icon-edit mr-2 text-primary"></i>Update Employee Relief</h5>
+                                            <small class="text-muted">Modify employee relief details</small>
+                                        </div>
+                                        <div class="card-header-right">
+                                            <a class="btn btn-outline-secondary btn-sm" href="{{ URL::to('employee_relief') }}">
+                                                <i class="feather icon-arrow-left mr-1"></i> Back to List
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="card-body">
                                     @if ($errors)
                                         @foreach ($errors->all() as $error)
-                                            <div class="alert alert-danger">
-                                                {{ $error }}<br>
+                                            <div class="alert alert-danger alert-dismissible fade show">
+                                                <button type="button" class="close" data-dismiss="alert">×</button>
+                                                <i class="feather icon-x-circle mr-2"></i>{{ $error }}
                                             </div>
                                         @endforeach
                                     @endif
-                                    <div id="dialog-form" title="Create new allowance type">
-                                        <p class="validateTips">Please insert Relief Type.</p>
 
+                                    <div id="dialog-form" title="Create new relief type" style="display: none;">
+                                        <p class="validateTips">Please insert Relief Type.</p>
                                         <form>
                                             <fieldset>
-                                                <label for="name">Name <span style="color:red">*</span></label>
-                                                <input type="text" name="name" id="name" value=""
-                                                       class="text ui-widget-content ui-corner-all">
-
-                                                <!-- Allow form submission with keyboard without duplicating the dialog button -->
-                                                <input type="submit" tabindex="-1"
-                                                       style="position:absolute; top:-1000px">
+                                                <div class="form-group">
+                                                    <label for="name">Name <span style="color:red">*</span></label>
+                                                    <input type="text" name="name" id="name" value="" class="form-control">
+                                                </div>
+                                                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
                                             </fieldset>
                                         </form>
                                     </div>
-                                    <form method="POST" action="{{{ URL::to('employee_relief/update/'.$rel->id) }}}"
-                                          accept-charset="UTF-8">
+
+                                    <form method="POST" action="{{ URL::to('employee_relief/update/'.$rel->id) }}" accept-charset="UTF-8">
                                         @csrf
-                                        <fieldset>
-                                            <div class="form-group">
+                                        <div class="form-group">
+                                            <label for="employee">Employee</label>
+                                            <input class="form-control" type="text" readonly name="employee" 
+                                                   id="employee" value="{{ $rel->employee->first_name.' '.$rel->employee->last_name }}">
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="username">Employee</label>
-                                                    <input class="form-control" placeholder="" type="text" readonly
-                                                           name="employee"
-                                                           id="employee"
-                                                           value="{{ $rel->employee->first_name.' '.$rel->employee->last_name }}">
+                                                    <label for="relief">Relief Type <span style="color:red">*</span></label>
+                                                    <select id="relief" name="relief" class="form-control">
+                                                        <option value="">Select Relief Type</option>
+                                                        <option value="cnew">Create New</option>
+                                                        @foreach($reliefs as $relief)
+                                                            <option value="{{ $relief->id }}"<?= ($rel->relief_id == $relief->id) ? 'selected="selected"' : ''; ?>> 
+                                                                {{ $relief->relief_name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
-
                                             </div>
-
-
-                                            <div class="form-group">
-                                                <label for="username">Relief Type <span
-                                                        style="color:red">*</span></label>
-                                                <select id="relief" name="relief" class="form-control">
-                                                    <option></option>
-                                                    <option value="cnew">Create New</option>
-                                                    @foreach($reliefs as $relief)
-                                                        <option
-                                                            value="{{ $relief->id }}"<?= ($rel->relief_id == $relief->id) ? 'selected="selected"' : ''; ?>> {{ $relief->relief_name }}</option>
-                                                    @endforeach
-                                                </select>
-
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="username">Percentage on Premium(%) <span
-                                                        style="color:red">*</span> </label>
-
-                                                <input class="form-control" placeholder="" type="text" name="percentage"
-                                                       onkeypress="totalB()"
-                                                       onkeyup="totalB()" id="percentage" value="{{$rel->percentage}}">
-
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="username">Insurance Premium <span style="color:red">*</span>
-                                                </label>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon">{{$currency->shortname}}</span>
-                                                    <input class="form-control" placeholder=""
-                                                           onkeypress="totalBalance()"
-                                                           onkeyup="totalBalance()" type="text" name="premium"
-                                                           id="premium"
-                                                           value="{{$rel->premium * 100}}">
-                                                </diV>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="username">Amount <span style="color:red">*</span></label>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon">{{$currency->shortname}}</span>
-                                                    <input class="form-control" placeholder="" readonly="" type="text"
-                                                           name="amount" id="amount"
-                                                           value="{{ number_format($rel->relief_amount,2)}}">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="percentage">Percentage on Premium (%) <span style="color:red">*</span></label>
+                                                    <input class="form-control" placeholder="Enter percentage" type="text" 
+                                                           name="percentage" onkeypress="totalB()" onkeyup="totalB()" 
+                                                           id="percentage" value="{{ $rel->percentage }}">
                                                 </div>
-
                                             </div>
+                                        </div>
 
-
-                                            <div class="form-actions form-group">
-
-                                                <button type="submit" class="btn btn-primary btn-sm">Update Employee
-                                                    Relief
-                                                </button>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="premium">Insurance Premium <span style="color:red">*</span></label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">{{ $currency->shortname }}</span>
+                                                        <input class="form-control" placeholder="0.00" onkeypress="totalBalance()"
+                                                               onkeyup="totalBalance()" type="text" name="premium" id="premium"
+                                                               value="{{ $rel->premium * 100 }}">
+                                                    </div>
+                                                </div>
                                             </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="amount">Amount</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon">{{ $currency->shortname }}</span>
+                                                        <input class="form-control" placeholder="" readonly type="text" 
+                                                               name="amount" id="amount" value="{{ number_format($rel->relief_amount, 2) }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                        </fieldset>
+                                        <div class="form-actions form-group">
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="feather icon-check-circle mr-1"></i> Update Employee Relief
+                                            </button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -180,19 +117,56 @@
             </div>
         </div>
     </div>
-    <script src="{{asset('media/jquery-1.12.0.min.js')}}"></script>
-    <script src="{{asset('jquery-ui-1.11.4.custom/jquery-ui.js')}}"></script>
-    <script src="{{asset('datepicker/js/bootstrap-datepicker.min.js')}}"></script>
-    <script type="text/javascript">
-        //document.getElementById("edate").value = '';
 
+    <script src="{{ asset('media/jquery-1.12.0.min.js') }}"></script>
+    <script src="{{ asset('jquery-ui-1.11.4.custom/jquery-ui.js') }}"></script>
+    <script src="{{ asset('datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+
+    <style>
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 4px;
+            padding: 8px 12px;
+            border: 1px solid #dce1e6;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #4361ee;
+            box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .input-group-addon {
+            background-color: #f8f9fa;
+            border: 1px solid #dce1e6;
+            color: #6c757d;
+            padding: 8px 12px;
+        }
+        
+        .btn {
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-weight: 500;
+        }
+        
+        .alert {
+            border-radius: 4px;
+            border: none;
+            padding: 12px 16px;
+        }
+    </style>
+
+    <script type="text/javascript">
         function totalBalance() {
             var percentage = document.getElementById("percentage").value;
             var premium = document.getElementById("premium").value.replace(/,/g, '');
             var total = (percentage * premium * 10) / 100;
             total = total.toLocaleString('en-US', {minimumFractionDigits: 2});
             document.getElementById("amount").value = total;
-
         }
 
         function totalB() {
@@ -201,25 +175,18 @@
             var total = (percentage * premium) / 100;
             total = total.toLocaleString('en-US', {minimumFractionDigits: 2});
             document.getElementById("amount").value = total;
-
         }
-
-
     </script>
+
     <script>
         $(function () {
             var dialog, form,
-
-                // From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
                 name = $("#name"),
-
                 allFields = $([]).add(name),
                 tips = $(".validateTips");
 
             function updateTips(t) {
-                tips
-                    .text(t)
-                    .addClass("ui-state-highlight");
+                tips.text(t).addClass("ui-state-highlight");
                 setTimeout(function () {
                     tips.removeClass("ui-state-highlight", 1500);
                 }, 500);
@@ -250,28 +217,11 @@
                 allFields.removeClass("ui-state-error");
 
                 valid = valid && checkLength(name);
-
                 valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Please insert a valid name for relief type.");
 
                 if (valid) {
-
-                    /* displaydata();
-
-                    function displaydata(){
-                     $.ajax({
-                                    url     : "{{URL::to('reloaddata')}}",
-                      type    : "POST",
-                      async   : false,
-                      data    : { },
-                      success : function(s){
-                        var data = JSON.parse(s)
-                        //alert(data.id);
-                      }
-       });
-       }*/
-
                     $.ajax({
-                        url: "{{URL::to('createRelief')}}",
+                        url: "{{ URL::to('createRelief') }}",
                         type: "POST",
                         async: false,
                         data: {
@@ -317,14 +267,7 @@
                 if ($(this).val() == "cnew") {
                     dialog.dialog("open");
                 }
-
             });
         });
     </script>
-    <script type="text/javascript">
-        // $(document).ready(function () {
-        //     $('#premium').priceFormat();
-        // });
-    </script>
-
 @stop
